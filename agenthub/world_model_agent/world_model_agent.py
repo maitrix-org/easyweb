@@ -370,8 +370,7 @@ If you accidentally enter any of these websites, go back or revisit Google to tr
         focus_prompt = """
 focus(bid: str)
     Examples:
-        focus('b455')
-"""
+        focus('b455')"""
         system_msg = system_msg.replace(focus_prompt, '')
 
         select_option_prompt = """
@@ -379,15 +378,13 @@ select_option(bid: str, options: str | list[str])
     Examples:
         select_option('48', 'blue')
 
-        select_option('48', ['red', 'green', 'blue'])
-"""
+        select_option('48', ['red', 'green', 'blue'])"""
         system_msg = system_msg.replace(select_option_prompt, '')
 
         hover_prompt = """
 hover(bid: str)
     Examples:
-        hover('b8')
-"""
+        hover('b8')"""
         system_msg = system_msg.replace(hover_prompt, '')
         # logger.info(system_msg)
         messages = []

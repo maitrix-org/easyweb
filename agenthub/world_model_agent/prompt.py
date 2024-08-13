@@ -457,6 +457,7 @@ class MyMainPrompt(PromptElement):
 """
 
         prompt += """
+
 # Abstract Example
 
 Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
@@ -474,6 +475,7 @@ Based on the current observation, state, active strategy, and action history, se
 """
 
         prompt += """
+
 # Concrete Example
 
 Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
@@ -504,6 +506,7 @@ fill('32-12', 'example with "quotes"')
 """
 
         prompt += """
+
 # Abstract Example
 
 Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
@@ -522,6 +525,7 @@ Be cautious when assigning the "in-progress" label. If uncertain, choose "not-su
 """
 
         prompt += """
+
 # Concrete Example
 
 Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
@@ -565,6 +569,7 @@ not-sure
 """
 
         prompt += """
+
 # Abstract Example
 
 Here is an abstract version of the answer with description of the content of each tag. Make sure you follow this structure, but replace the content with your answer:
@@ -578,6 +583,7 @@ Given the strategy/action that you just came up with, summarize the strategy/act
 """
 
         prompt += """
+
 # Concrete Example
 
 Here is a concrete example of how to format your answer. Make sure to follow the template by wrapping with proper html starting and closing tags:
