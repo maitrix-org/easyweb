@@ -808,13 +808,24 @@ if __name__ == '__main__':
                 status = gr.Markdown('Agent Status: 🔴 Inactive')
 
             with gr.Column(scale=2):
-                with gr.Group():
+                # with gr.Group():
+                #     start_url = 'about:blank'
+                #     url = gr.Textbox(
+                #         start_url, label='URL', interactive=False, max_lines=1
+                #     )
+                #     blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+                #     screenshot = gr.Image(blank, interactive=False, label='Webpage')
+                #     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
+
+                with gr.Tab('Web Browser') as browser_tab:
                     start_url = 'about:blank'
                     url = gr.Textbox(
                         start_url, label='URL', interactive=False, max_lines=1
                     )
                     blank = Image.new('RGB', (1280, 720), (255, 255, 255))
                     screenshot = gr.Image(blank, interactive=False, label='Webpage')
+
+                with gr.Tab('Planning Process') as planning_tab:
                     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
 
         action_messages = gr.State([])
