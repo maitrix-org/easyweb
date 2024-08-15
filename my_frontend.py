@@ -621,7 +621,7 @@ def get_action_history_markdown(action_history):
     text = ''
     for level, line in action_history:
         text += '  ' * level + '* ' + line + '\n'
-    print(text)
+    # print(text)
     return text
 
 
@@ -635,6 +635,7 @@ def get_messages(
     model_selection,
     api_key,
 ):
+    model_selection = model_display2name[model_selection]
     print('Get Messages', session.agent_state)
     if len(chat_history) > 0:
         if chat_history[-1][1] is None:
@@ -681,10 +682,19 @@ def get_messages(
             session.agent = agent_selection
             # session.model = model_port_config[model_selection]["provider"] + '/' + model_selection
             session.model = model_selection
-            print('API Key:', api_key)
-            session.api_key = (
-                api_key if len(api_key) > 0 else 'token-abc123'
-            )  # token-abc123
+            if model_requires_key[model_selection]:
+                session.api_key = api_key
+            elif model_port_config[model_selection].get('default_key', None):
+                session.api_key = model_port_config[model_selection].get(
+                    'default_key', None
+                )
+            else:
+                session.api_key = ''
+
+            print('API Key:', session.api_key)
+            # session.api_key = (
+            #     api_key if len(api_key) > 0 else 'token-abc123'
+            # )  # token-abc123
             action_messages = []
             browser_history = browser_history[:1]
             for agent_state in session.initialize(as_generator=True):
@@ -770,6 +780,20 @@ def clear_page(browser_history, session):
     )
 
 
+def check_requires_key(model_selection, api_key):
+    model_real_name = model_display2name[model_selection]
+    requires_key = model_requires_key[model_real_name]
+    if requires_key:
+        api_key = gr.Textbox(
+            api_key, label='API Key', placeholder='Your API Key', visible=True
+        )
+    else:
+        api_key = gr.Textbox(
+            api_key, label='API Key', placeholder='Your API Key', visible=False
+        )
+    return api_key
+
+
 def pause_resume_task(is_paused, session, status):
     if not is_paused and session.agent_state == 'running':
         session.pause()
@@ -795,14 +819,28 @@ if __name__ == '__main__':
                 break
     default_agent = 'WorldModelAgent'
 
+    global model_port_config
     model_port_config = {}
     with open('model_port_config.json') as f:
         model_port_config = json.load(f)
-    model_list = list(model_port_config.keys())
+    # model_list = list(model_port_config.keys())
+    # model_list = [cfg.get('display_name', model) for model, cfg in model_port_config.items()]
+    global model_display2name
+    model_display2name = {
+        cfg.get('display_name', model): model
+        for model, cfg in model_port_config.items()
+    }
+    model_list = list(model_display2name.keys())
+    global model_requires_key
+    model_requires_key = {
+        model: cfg.get('requires_key', False)
+        for model, cfg in model_port_config.items()
+    }
+
     default_model = model_list[0]
 
     with gr.Blocks() as demo:
-        title = gr.Markdown('# FastAgent')
+        title = gr.Markdown('# OpenQ')
         with gr.Row(equal_height=True):
             with gr.Column(scale=1):
                 with gr.Group():
@@ -811,16 +849,18 @@ if __name__ == '__main__':
                         value=default_agent,
                         interactive=True,
                         label='Agent',
-                        info='Choose your own adventure partner!',
+                        # info='Choose your own adventure partner!',
                     )
                     model_selection = gr.Dropdown(
                         model_list,
                         value=default_model,
                         interactive=True,
-                        label='Model',
-                        info='Choose the model you would like to use',
+                        label='Backend LLM',
+                        # info='Choose the model you would like to use',
                     )
-                    api_key = gr.Textbox(label='API Key', placeholder='Your API Key')
+                    api_key = gr.Textbox(
+                        label='API Key', placeholder='Your API Key', visible=False
+                    )
                     chatbot = gr.Chatbot()
                 with gr.Group():
                     with gr.Row():
@@ -951,6 +991,10 @@ if __name__ == '__main__':
                 action_history,
             ],
             queue=False,
+        )
+
+        model_selection.select(
+            check_requires_key, [model_selection, api_key], api_key, queue=False
         )
 
     # demo.queue(default_concurrency_limit=5)

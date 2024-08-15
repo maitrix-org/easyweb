@@ -1,26 +1,20 @@
 {
-    "Meta-Llama-3.1-70B-Instruct":
-    {
-        "provider": "openai",
-        "port": 8000
-    },
-    "Meta-Llama-3.1-405B-Instruct-FP8":
-    {
-        "provider": "openai/meta-llama",
-        "base_url": "https://api-inference.huggingface.co/v1/"
-    },
-    "Meta-Llama-3.1-8B-Instruct":
-    {
-        "provider": "openai",
-        "port": 8002
-    },
     "Meta-Llama-3.1-70B-Instruct-Backup":
     {
         "provider": "openai",
-        "port": 8004
+        "port": 8004,
+        "display_name": "Meta-Llama-3.1-70B-Instruct (A100)",
+        "default_key": "token-abc123"
+    },
+    "Meta-Llama-3.1-70B-Instruct":
+    {
+        "provider": "openai",
+        "port": 8000,
+        "display_name": "Meta-Llama-3.1-70B-Instruct (L40)"
     },
     "gpt-4o":
     {
-        "base_url": "https://api.openai.com/v1/"
+        "base_url": "https://api.openai.com/v1/",
+        "requires_key": true
     }
 }
