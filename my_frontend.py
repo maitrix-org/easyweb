@@ -31,7 +31,7 @@ class Node:
         self.reward = reward
         self.Q = 0.0
         self.uct = 0.0
-        self.summary = 'Init'
+        self.summary = 'Start Planning'
 
     def set_summary(self, summary):
         self.summary = summary
@@ -155,6 +155,12 @@ class OpenDevinSession:
         elif 'action' in message:
             if message['action'] != 'browse_interactive':
                 self.action_messages.append(message['message'])
+            else:
+                full_output_dict = json.loads(message['args']['thought'])
+                if full_output_dict['active_strategy'] != self.last_active_strategy:
+                    self.last_active_strategy = full_output_dict['active_strategy']
+                    self.action_history.append((0, self.last_active_strategy))
+                self.action_history.append((1, full_output_dict['summary']))
             # printable = message
             printable = {k: v for k, v in message.items() if k not in 'args'}
         elif 'extras' in message and 'screenshot' in message['extras']:
@@ -192,6 +198,8 @@ class OpenDevinSession:
         self.is_paused = False
         self.raw_messages = []
         self.browser_history = []
+        self.action_history = []
+        self.last_active_strategy = ''
         self.action_messages = []
         self.figure = go.Figure()
 
@@ -609,6 +617,14 @@ def get_status(agent_state):
     return status
 
 
+def get_action_history_markdown(action_history):
+    text = ''
+    for level, line in action_history:
+        text += '  ' * level + '* ' + line + '\n'
+    print(text)
+    return text
+
+
 def get_messages(
     chat_history,
     action_messages,
@@ -644,6 +660,9 @@ def get_messages(
         else:
             figure = go.Figure()
 
+        action_history = get_action_history_markdown(session.action_history)
+        action_history = action_history if action_history else 'No Action Taken Yet'
+
         yield (
             chat_history,
             screenshot,
@@ -654,6 +673,7 @@ def get_messages(
             status,
             clear,
             figure,
+            action_history,
         )
     else:
         clear = gr.Button('Clear', interactive=False)
@@ -676,6 +696,11 @@ def get_messages(
                 else:
                     figure = go.Figure()
 
+                action_history = get_action_history_markdown(session.action_history)
+                action_history = (
+                    action_history if action_history else 'No Action Taken Yet'
+                )
+
                 yield (
                     chat_history,
                     screenshot,
@@ -686,6 +711,7 @@ def get_messages(
                     status,
                     clear,
                     figure,
+                    action_history,
                 )
 
         for message in session.run(user_message):
@@ -706,6 +732,9 @@ def get_messages(
             else:
                 figure = go.Figure()
 
+            action_history = get_action_history_markdown(session.action_history)
+            action_history = action_history if action_history else 'No Action Taken Yet'
+
             yield (
                 chat_history,
                 screenshot,
@@ -716,6 +745,7 @@ def get_messages(
                 status,
                 clear,
                 figure,
+                action_history,
             )
 
 
@@ -736,6 +766,7 @@ def clear_page(browser_history, session):
         session,
         status,
         go.Figure(),
+        'No Action Taken Yet',
     )
 
 
@@ -818,15 +849,19 @@ if __name__ == '__main__':
                 #     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
 
                 with gr.Tab('Web Browser') as browser_tab:
-                    start_url = 'about:blank'
-                    url = gr.Textbox(
-                        start_url, label='URL', interactive=False, max_lines=1
-                    )
-                    blank = Image.new('RGB', (1280, 720), (255, 255, 255))
-                    screenshot = gr.Image(blank, interactive=False, label='Webpage')
+                    with gr.Group():
+                        start_url = 'about:blank'
+                        url = gr.Textbox(
+                            start_url, label='URL', interactive=False, max_lines=1
+                        )
+                        blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+                        screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
                 with gr.Tab('Planning Process') as planning_tab:
                     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
+
+                with gr.Tab('Action History') as history_tab:
+                    action_history = gr.Markdown('No Action Taken Yet')
 
         action_messages = gr.State([])
         browser_history = gr.State([(blank, start_url)])
@@ -862,6 +897,7 @@ if __name__ == '__main__':
                 status,
                 clear,
                 plot,
+                action_history,
             ],
             concurrency_limit=10,
         )
@@ -893,7 +929,9 @@ if __name__ == '__main__':
                     status,
                     clear,
                     plot,
+                    action_history,
                 ],
+                concurrency_limit=10,
             )
         )
         clear.click(
@@ -910,6 +948,7 @@ if __name__ == '__main__':
                 session,
                 status,
                 plot,
+                action_history,
             ],
             queue=False,
         )
