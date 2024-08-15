@@ -303,7 +303,7 @@ Review the current state of the page and all other information to find the best 
 {self.goal}
 
 # Goal Tips
-- Stop and ask the user when their personal information (e.g., name, phone, email, login credentials) is required to proceed. Do not stop if the information is only needed for a search.
+- Stop and ask the user when their personal information (e.g., name, phone, email, login credentials) is required to proceed with tasks like booking, purchase, and reservations.
 - When searching for information online, visit multiple websites for comprehensive information before responding.
 - Avoid messaging the user with information during the exploration. Save your notes internally and provide a comprehensive final answer. Only message the user if you are unable to find specific information, explaining what you have done so far.
 

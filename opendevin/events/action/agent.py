@@ -54,7 +54,8 @@ class AgentFinishAction(Action):
 
     @property
     def message(self) -> str:
-        return "All done! What's next on the agenda?"
+        # return "All done! What's next on the agenda?"
+        return 'Task complete! How can I assist you next?'
 
 
 @dataclass
