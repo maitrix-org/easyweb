@@ -16,6 +16,7 @@ from opendevin.events.action.commands import (
 from opendevin.events.action.empty import NullAction
 from opendevin.events.action.files import FileReadAction, FileWriteAction
 from opendevin.events.action.message import MessageAction
+from opendevin.events.action.planning import FinishPlanningAction, StartPlanningAction
 from opendevin.events.action.tasks import AddTaskAction, ModifyTaskAction
 
 actions = (
@@ -35,6 +36,8 @@ actions = (
     ModifyTaskAction,
     ChangeAgentStateAction,
     MessageAction,
+    StartPlanningAction,
+    FinishPlanningAction,
 )
 
 ACTION_TYPE_TO_CLASS = {action_class.action: action_class for action_class in actions}  # type: ignore[attr-defined]

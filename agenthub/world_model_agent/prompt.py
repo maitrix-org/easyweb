@@ -580,6 +580,10 @@ Given that previous actions have been completed and the environment has transiti
 <summary>
 Given the strategy/action that you just came up with, summarize the strategy/action down to within 5 words in 5 DIFFERENT ways, and choose ONE of them to respond.
 </summary>
+
+<explanation>
+Use first person to describe what you plan to do next. Begin with the phrase "My next step is".
+</explanation>
 """
 
         prompt += """
@@ -594,6 +598,10 @@ Click through the form fields to explore available options and ensure all mandat
 <summary>
 Exploring, ensure mandatory fields completed.
 </summary>
+
+<explanation>
+My next step is to click through the form fields to explore available options and ensure all mandatory fields are completed.
+</explanation>
 """
 
         # prompt = self.add_screenshot(prompt)
@@ -736,7 +744,9 @@ away-from-the-goal
         ans_dict = {}
         ans_dict.update(
             parse_html_tags_raise(
-                text_answer, keys=['strategy', 'summary'], merge_multiple=True
+                text_answer,
+                keys=['strategy', 'summary', 'explanation'],
+                merge_multiple=True,
             )
         )
         return ans_dict

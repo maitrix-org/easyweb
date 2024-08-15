@@ -2,9 +2,6 @@ import ast
 import itertools
 import json
 import math
-
-# import multiprocessing
-# import multiprocess as mp
 import multiprocessing.dummy as mp_dummy
 import os
 import random
@@ -25,7 +22,9 @@ from opendevin.events.action import (
     Action,
     AgentFinishAction,
     BrowseInteractiveAction,
+    FinishPlanningAction,
     MessageAction,
+    StartPlanningAction,
 )
 from opendevin.events.event import EventSource
 from opendevin.events.observation import BrowserOutputObservation
@@ -71,8 +70,8 @@ def sample_action(obs_history, states, strategies, explanations, actions, policy
         explanations=explanations,
         actions=actions,
     )
-    strategy, summary = policy(main_prompt)
-    return strategy, summary
+    strategy, summary, explanation = policy(main_prompt)
+    return strategy, summary, explanation
 
 
 def sample_action_reward(
@@ -190,10 +189,13 @@ class WorldModelAgent(Agent):
         self.states: List[str] = []
         self.evaluations: List[str] = []
         self.strategies: List[Optional[str]] = []
+        self.strategy_explanations: List[Optional[str]] = []
         self.active_strategy: Optional[str] = None
         self.full_output: str = ''
         self.full_output_dict: Dict[str, Any] = {}
         self.active_strategy_turns: int = 0
+        self.is_planning: bool = False
+        self.finished_planning: bool = False
 
     def parse_response(self, response: str, thought: str) -> Action:
         # thought = ''
@@ -443,11 +445,13 @@ hover(bid: str)
         temp = self.temperature
         self.temperature = 1.0
         ans_dict = self.get_llm_output(
-            prompt, main_prompt._parse_policy_answer, ['strategy', 'summary']
+            prompt,
+            main_prompt._parse_policy_answer,
+            ['strategy', 'summary', 'explanation'],
         )
         self.temperature = temp
 
-        return ans_dict['strategy'], ans_dict['summary']
+        return ans_dict['strategy'], ans_dict['summary'], ans_dict['explanation']
 
     def dynamics(self, main_prompt):
         prompt = main_prompt.get_dynamics_prompt()
@@ -504,6 +508,7 @@ hover(bid: str)
         - BrowseInteractiveAction(browsergym_command) - BrowserGym commands to run
         - MessageAction(content) - Message action to run (e.g. ask for clarification)
         - AgentFinishAction() - end the interaction
+        - StartPlanningAction(eta_seconds) - Indicates start of planning
         """
 
         # Set default first action
@@ -517,158 +522,181 @@ hover(bid: str)
         actions = self.actions
         # if DEFAULT_BROWSER is not None:
         #     actions = actions[1:]
+        replan = False
 
-        goal = env_state.get_current_user_intent()
-        if goal is None:
-            goal = env_state.inputs['task']
-        self.goal = goal
+        if not self.is_planning and not self.finished_planning:
+            goal = env_state.get_current_user_intent()
+            if goal is None:
+                goal = env_state.inputs['task']
+            self.goal = goal
 
-        # messages: List[str] = []
-        prev_actions: List[str] = []
-        cur_axtree_txt = ''
-        error_prefix = ''
-        last_obs = None
-        last_action = None
+            # messages: List[str] = []
+            prev_actions: List[str] = []
+            cur_axtree_txt = ''
+            error_prefix = ''
+            last_obs = None
+            last_action = None
 
-        if EVAL_MODE and len(env_state.history) == 1:
-            # for webarena and miniwob++ eval, we need to retrieve the initial observation already in browser env
-            # initialize and retrieve the first observation by issuing an noop OP
-            # For non-benchmark browsing, the browser env starts with a blank page, and the agent is expected to first navigate to desired websites
-            return BrowseInteractiveAction(browser_actions='noop()')
+            if EVAL_MODE and len(env_state.history) == 1:
+                # for webarena and miniwob++ eval, we need to retrieve the initial observation already in browser env
+                # initialize and retrieve the first observation by issuing an noop OP
+                # For non-benchmark browsing, the browser env starts with a blank page, and the agent is expected to first navigate to desired websites
+                return BrowseInteractiveAction(browser_actions='noop()')
 
-        for prev_action, obs in env_state.history:
-            # Go through the history to get the last action
-            if isinstance(prev_action, BrowseInteractiveAction):
-                # Create a list of past actions
-                prev_actions.append(prev_action.browser_actions)
-                last_obs = obs
-                last_action = prev_action
-            elif (
-                isinstance(prev_action, MessageAction)
-                and prev_action.source == EventSource.AGENT
+            for prev_action, obs in env_state.history:
+                # Go through the history to get the last action
+                if isinstance(prev_action, BrowseInteractiveAction):
+                    # Create a list of past actions
+                    prev_actions.append(prev_action.browser_actions)
+                    last_obs = obs
+                    last_action = prev_action
+                elif (
+                    isinstance(prev_action, MessageAction)
+                    and prev_action.source == EventSource.AGENT
+                ):
+                    # agent has responded, task finish.
+                    return AgentFinishAction(outputs={'content': prev_action.content})
+
+            if EVAL_MODE:
+                prev_actions = prev_actions[1:]  # remove the first noop action
+
+            # prev_action_str = '\n'.join(prev_actions)
+            # if the final BrowserInteractiveAction exec BrowserGym's send_msg_to_user,
+            # we should also send a message back to the user in OpenDevin and call it a day
+            if (
+                isinstance(last_action, BrowseInteractiveAction)
+                and last_action.browsergym_send_msg_to_user
             ):
-                # agent has responded, task finish.
-                return AgentFinishAction(outputs={'content': prev_action.content})
+                # Here the browser interaction action from BrowserGym can also include a message to the user
+                # When we see this browsergym action we should use a MessageAction from OpenDevin
+                return MessageAction(last_action.browsergym_send_msg_to_user)
 
-        if EVAL_MODE:
-            prev_actions = prev_actions[1:]  # remove the first noop action
+            if isinstance(last_obs, BrowserOutputObservation):
+                # The browser output observation belongs to OpenDevin
+                if last_obs.error:
+                    # add error recovery prompt prefix
+                    error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'
+                try:
+                    cur_axtree_txt = flatten_axtree_to_str(
+                        last_obs.axtree_object,
+                        extra_properties=last_obs.extra_element_properties,
+                        with_clickable=True,
+                        filter_visible_only=True,
+                    )
+                    # {'scrollTop': 0, 'windowHeight': 720, 'documentHeight': 720, 'remainingPixels': 0}
+                    cur_axtree_txt = (
+                        f"URL {last_obs.url}\n"
+                        f"Scroll Position: {last_obs.scroll_position['scrollTop']}, "
+                        f"Window Height: {last_obs.scroll_position['windowHeight']}, "
+                        f"Webpage Height: {last_obs.scroll_position['documentHeight']}, "
+                        f"Remaining Pixels: {last_obs.scroll_position['remainingPixels']}\n"
+                    ) + cur_axtree_txt
+                    logger.info(last_obs.scroll_position)
+                except Exception as e:
+                    logger.error(
+                        'Error when trying to process the accessibility tree: %s', e
+                    )
+                    return MessageAction('Error encountered when browsing.')
 
-        # prev_action_str = '\n'.join(prev_actions)
-        # if the final BrowserInteractiveAction exec BrowserGym's send_msg_to_user,
-        # we should also send a message back to the user in OpenDevin and call it a day
-        if (
-            isinstance(last_action, BrowseInteractiveAction)
-            and last_action.browsergym_send_msg_to_user
-        ):
-            # Here the browser interaction action from BrowserGym can also include a message to the user
-            # When we see this browsergym action we should use a MessageAction from OpenDevin
-            return MessageAction(last_action.browsergym_send_msg_to_user)
+            if error_prefix:
+                self.error_accumulator += 1
+                if self.error_accumulator > 20:
+                    return MessageAction('Too many errors encountered. Task failed.')
 
-        if isinstance(last_obs, BrowserOutputObservation):
-            # The browser output observation belongs to OpenDevin
-            if last_obs.error:
-                # add error recovery prompt prefix
-                error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'
-            try:
-                cur_axtree_txt = flatten_axtree_to_str(
-                    last_obs.axtree_object,
-                    extra_properties=last_obs.extra_element_properties,
-                    with_clickable=True,
-                    filter_visible_only=True,
-                )
-                # {'scrollTop': 0, 'windowHeight': 720, 'documentHeight': 720, 'remainingPixels': 0}
-                cur_axtree_txt = (
-                    f"URL {last_obs.url}\n"
-                    f"Scroll Position: {last_obs.scroll_position['scrollTop']}, "
-                    f"Window Height: {last_obs.scroll_position['windowHeight']}, "
-                    f"Webpage Height: {last_obs.scroll_position['documentHeight']}, "
-                    f"Remaining Pixels: {last_obs.scroll_position['remainingPixels']}\n"
-                ) + cur_axtree_txt
-                logger.info(last_obs.scroll_position)
-            except Exception as e:
-                logger.error(
-                    'Error when trying to process the accessibility tree: %s', e
-                )
-                return MessageAction('Error encountered when browsing.')
+            ### Above is record keeping by world model
 
-        if error_prefix:
-            self.error_accumulator += 1
-            if self.error_accumulator > 20:
-                return MessageAction('Too many errors encountered. Task failed.')
+            clean_axtree_lines = []
+            num_static_text_lines = 0
+            max_static_text_lines = 10
+            for line in cur_axtree_txt.split('\n'):
+                if line.strip().startswith('StaticText') or line.strip().startswith(
+                    'ListMarker'
+                ):
+                    num_static_text_lines += 1
+                else:
+                    num_static_text_lines = 0
 
-        ### Above is record keeping by world model
+                if num_static_text_lines <= max_static_text_lines:
+                    clean_axtree_lines.append(line)
+            clean_axtree_txt = '\n'.join(clean_axtree_lines)
 
-        clean_axtree_lines = []
-        num_static_text_lines = 0
-        max_static_text_lines = 10
-        for line in cur_axtree_txt.split('\n'):
-            if line.strip().startswith('StaticText') or line.strip().startswith(
-                'ListMarker'
-            ):
-                num_static_text_lines += 1
+            current_obs = {
+                'axtree_txt': clean_axtree_txt,
+                'raw_axtree_txt': cur_axtree_txt,
+                # 'axtree_txt': "AXSTART "+cur_axtree_txt+" AXEND",
+                'last_action_error': error_prefix,
+                'goal': goal,
+            }
+            self.obs_history.append(current_obs)
+            main_prompt = MyMainPrompt(
+                obs_history=self.obs_history,
+                states=self.states,
+                strategies=self.strategies,
+                explanations=self.explanations,
+                actions=self.actions,
+                active_strategy=self.active_strategy,
+            )
+
+            state, status, replan, think = self.encoder(main_prompt)
+            self.state = state
+            self.full_output = ''
+            self.full_output_dict = {}
+
+            logger.info(f'*State*: {state}')
+            logger.info(f'*Replan Reasoning*: {think}')
+            logger.info(f'*Replan Status*: {status}')
+
+            self.full_output_dict['obs'] = current_obs
+            self.full_output_dict['state'] = state
+            self.full_output_dict['replan_reasoning'] = think
+            self.full_output_dict['replan_status'] = status
+
+            self.full_output += f'*State*: {state}\n'
+            self.full_output += f'*Replan Reasoning*: {think}\n'
+            self.full_output += f'*Replan Status*: {status}\n'
+
+            # replan = True
+            if len(actions) > 1 and actions[-1] == actions[-2]:
+                logger.info('*Action Repeat, Force Replan*')
+                replan = True
+            elif self.active_strategy is None or self.active_strategy_turns >= 3:
+                replan = True
+
+        if not self.finished_planning:
+            if replan:
+                self.is_planning = True
+                give_or_take = (random.random() * 4) - 2
+                return StartPlanningAction(30 + give_or_take)
+            elif self.is_planning:
+                strategy, strategy_explanation = self.planning_search(self.state)
+                self.strategies.append(strategy)
+                self.strategy_explanations.append(strategy_explanation)
+                self.active_strategy = strategy
+                self.active_strategy_explanation = strategy_explanation
+                self.active_strategy_turns = 0
+                self.is_planning = False
+                self.finished_planning = True
+                return FinishPlanningAction(strategy_explanation)
             else:
-                num_static_text_lines = 0
+                self.strategies.append(None)
+                self.strategy_explanations.append(None)
+                self.active_strategy_turns += 1
 
-            if num_static_text_lines <= max_static_text_lines:
-                clean_axtree_lines.append(line)
-        clean_axtree_txt = '\n'.join(clean_axtree_lines)
-
-        current_obs = {
-            'axtree_txt': clean_axtree_txt,
-            'raw_axtree_txt': cur_axtree_txt,
-            # 'axtree_txt': "AXSTART "+cur_axtree_txt+" AXEND",
-            'last_action_error': error_prefix,
-            'goal': goal,
-        }
-        self.obs_history.append(current_obs)
-        main_prompt = MyMainPrompt(
-            obs_history=self.obs_history,
-            states=self.states,
-            strategies=self.strategies,
-            explanations=self.explanations,
-            actions=self.actions,
-            active_strategy=self.active_strategy,
-        )
-
-        state, status, replan, think = self.encoder(main_prompt)
-        self.full_output = ''
-        self.full_output_dict = {}
-
-        logger.info(f'*State*: {state}')
-        logger.info(f'*Replan Reasoning*: {think}')
-        logger.info(f'*Replan Status*: {status}')
-
-        self.full_output_dict['obs'] = current_obs
-        self.full_output_dict['state'] = state
-        self.full_output_dict['replan_reasoning'] = think
-        self.full_output_dict['replan_status'] = status
-
-        self.full_output += f'*State*: {state}\n'
-        self.full_output += f'*Replan Reasoning*: {think}\n'
-        self.full_output += f'*Replan Status*: {status}\n'
-
-        # replan = True
-        if len(actions) > 1 and actions[-1] == actions[-2]:
-            logger.info('*Action Repeat, Force Replan*')
-            replan = True
-        elif self.active_strategy is None or self.active_strategy_turns >= 3:
-            replan = True
-
-        if replan:
-            strategy = self.planning_search(state)
-            self.strategies.append(strategy)
-            self.active_strategy = strategy
-            self.active_strategy_turns = 0
-        else:
-            self.strategies.append(None)
-            self.active_strategy_turns += 1
+        self.finished_planning = False
         logger.info(f'*Active Strategy*: {self.active_strategy}')
+        logger.info(
+            f'*Active Strategy Explanation*: {self.active_strategy_explanation}'
+        )
         self.full_output += f'*Active Strategy*: {self.active_strategy}\n'
+        # self.full_output += f'*Active Strategy Explanation*: {self.active_strategy_explanation}'
 
         self.full_output_dict['replan'] = replan
         self.full_output_dict['active_strategy'] = self.active_strategy
+        self.full_output_dict['active_strategy_explanation'] = (
+            self.active_strategy_explanation
+        )
 
-        self.states.append(state)
+        self.states.append(self.state)
         main_prompt = MyMainPrompt(
             obs_history=self.obs_history,
             states=self.states,
@@ -730,6 +758,7 @@ hover(bid: str)
                 state=None,
                 status=None,
                 action=None,
+                action_explanation=None,
                 reward_think=None,
                 reward_answer=None,
                 fast_reward=0,
@@ -739,6 +768,7 @@ hover(bid: str)
                 self.state = state
                 self.status = status
                 self.action = action
+                self.action_explanation = action_explanation
                 self.reward_think = reward_think
                 self.reward_answer = reward_answer
                 self.fast_reward = self.reward = fast_reward
@@ -846,16 +876,21 @@ hover(bid: str)
                     )
 
                 # action_space = {action: (fast_reward, think) for action, (fast_reward, think) in}
-                for (action, summary), (fast_reward, think, response) in zip(
-                    sampled_actions, sampled_action_rewards
-                ):
+                for (action, summary, explanation), (
+                    fast_reward,
+                    think,
+                    response,
+                ) in zip(sampled_actions, sampled_action_rewards):
                     logger.info(f'*Strategy Candidate*: {action}')
                     logger.info(f'*Summary*: {summary}')
+                    logger.info(f'*Explanation*: {explanation}')
+
                     logger.info(f'*Fast Reward Reasoning*: {think}')
                     logger.info(f'*Fast Reward*: {fast_reward}')
 
                     self.full_output += f'*Strategy Candidate*: {action}\n'
                     self.full_output += f'*Summary*: {summary}\n'
+                    # self.full_output += f'*Explanation*: {explanation}\n'
                     self.full_output += f'*Fast Reward Reasoning*: {think}\n'
                     self.full_output += f'*Fast Reward*: {fast_reward}\n'
 
@@ -866,6 +901,7 @@ hover(bid: str)
                         state=None,
                         status=None,
                         action=action,
+                        action_explanation=explanation,
                         reward_think=think,
                         reward_answer=response,
                         fast_reward=fast_reward,
@@ -960,8 +996,11 @@ hover(bid: str)
 
         output_cum_reward, output_iter = _dfs_max_reward([root])
         action = output_iter[1].action
+        action_explanation = output_iter[1].action_explanation
         logger.info(f'*Selected Strategy*: {action}')
+        logger.info(f'*Selected Explanation*: {action_explanation}')
         self.full_output += f'*Selected Strategy*: {action}\n'
+        # self.full_output += f'*Selected Explanation*: {action_explanation}\n'
 
         # def __init__(
         #         self,
@@ -980,6 +1019,7 @@ hover(bid: str)
                 'state': node.state,
                 'status': node.status,
                 'strategy': node.action,
+                'strategy_explanation': node.action_explanation,
                 'critique': node.reward_think,
                 'evaluation': node.reward_answer,
                 'reward': node.reward,
@@ -991,7 +1031,7 @@ hover(bid: str)
 
         # print('Selected Action:', action)
 
-        return action
+        return action, action_explanation
 
     def search_memory(self, query: str) -> list[str]:
         raise NotImplementedError('Implement this abstract method')

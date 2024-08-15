@@ -153,7 +153,8 @@ class OpenDevinSession:
             self.agent_state = message['extras']['agent_state']
             printable = message
         elif 'action' in message:
-            self.action_messages.append(message['message'])
+            if message['action'] != 'browse_interactive':
+                self.action_messages.append(message['message'])
             # printable = message
             printable = {k: v for k, v in message.items() if k not in 'args'}
         elif 'extras' in message and 'screenshot' in message['extras']:
@@ -661,7 +662,9 @@ def get_messages(
             # session.model = model_port_config[model_selection]["provider"] + '/' + model_selection
             session.model = model_selection
             print('API Key:', api_key)
-            session.api_key = api_key if len(api_key) > 0 else 'test'  # token-abc123
+            session.api_key = (
+                api_key if len(api_key) > 0 else 'token-abc123'
+            )  # token-abc123
             action_messages = []
             browser_history = browser_history[:1]
             for agent_state in session.initialize(as_generator=True):

@@ -90,5 +90,11 @@ class ActionTypeSchema(BaseModel):
     SEND_PR: str = Field(default='send_pr')
     """Send a PR to github."""
 
+    START_PLANNING: str = Field(default='start_planning')
+    """Start planning for the next action"""
+
+    FINISH_PLANNING: str = Field(default='finish_planning')
+    """Finish planning for the next action"""
+
 
 ActionType = ActionTypeSchema()
