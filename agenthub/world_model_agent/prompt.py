@@ -465,13 +465,13 @@ Here is an abstract version of the answer with description of the content of eac
 Describe what the action to be taken is trying to do using a single concise sentence. Break down the active strategy into individual, manageable actions. Avoid long, complex search terms. Focus on the single action. Use first-person perspective like "I am doing something." If you encounter trouble using the search button, try hitting enter on the search box instead. If you fail to click on something, try scrolling down by 500 pixels first. If an element is no longer visible, try scrolling up by 500 pixels. Use clear and simple language to describe your action.
 </explanation>
 
+<action>
+Based on the current observation, state, active strategy, and action history, select one single action to be executed. Use only one action at a time. You must not enclose bid inputs in [brackets]. Interact only with elements in the current step observation. Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
+</action>
+
 <summary>
 Based on the explanation, summarize the explanation down to with 5 words.
 </summary>
-
-<action>
-Based on the current observation, state, active strategy, and action history, select one single action to be executed. Use only one action at a time. You must not enclose bid inputs in [brackets]. Interact only with elements in the current observation. Your response will be executed as a Python function call, so ensure it adheres to the format and argument data type specifications defined in the action space.
-</action>
 """
 
         prompt += """
@@ -483,14 +483,13 @@ Here is a concrete example of how to format your answer. Make sure to follow the
 I am filling out the textbox for Date with 'example with "quotes"'
 </explanation>
 
-<summary>
-Filling textbox for date.
-</summary>
-
 <action>
 fill('32-12', 'example with "quotes"')
 </action>
 
+<summary>
+Fill textbox for date.
+</summary>
 """
 
         # prompt = self.add_screenshot(prompt)
@@ -532,7 +531,7 @@ Here is a concrete example of how to format your answer. Make sure to follow the
 <state>
 The previous action resulted in a timeout error, indicating no changes were made to the page. Thus far, I have visited ABC.com and DEF.com, discovering information G and H, respectively. The current page contains a dialog prompting whether to add protection, offering coverage options and the choices "Add Protection" or "No Thanks". A link indicates "1 item in cart", revealing a cellphone in the cart with a subtotal of $345. I searched for a 5-night hotel stay, but results only showed availability for a 6-night stay, suggesting a 5-night stay is unavailable. The page displays:
 - An empty textbox in the middle labeled "Date", indicating it is likely for date input.
-- A button below labeled "Submit" positioned below textbox 123, suggesting it submits the date entered in the textbox.
+- A button below labeled "Submit" positioned below the textbox, suggesting it submits the date entered in the textbox.
 Additionally, there are:
 - A notification below the button displaying "Error: Invalid date format" when attempting to submit the date.
 - A dropdown menu labeled "Room Type" containing options "Single", "Double", and "Suite".
@@ -600,7 +599,7 @@ Exploring, ensure mandatory fields completed.
 </summary>
 
 <explanation>
-My next step is to click through the form fields to explore available options and ensure all mandatory fields are completed.
+I am clicking through the form fields to explore available options and ensure all mandatory fields are completed.
 </explanation>
 """
 

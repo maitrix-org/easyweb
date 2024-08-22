@@ -337,15 +337,11 @@ If you accidentally enter any of these websites, go back or revisit Google to tr
 # Browsing Tips
 - Interact only with elements on the current page starting with bracketed IDs; others are for information or out of view.
 - Scroll up and down if more information is needed.
-- Respond to dialogs immediately to proceed. Accept cookies, select "No Thanks" for insurance offers, and click "Continue" or "Select" button if relevant boxes are filled out.
+- Respond to dialogs immediately to proceed. These typically appear at the end of the page and might not have the label "dialog". Accept cookies, select "No Thanks" for insurance offers, and click "Continue" or "Select" button if relevant boxes are filled out.
 - You can only open one tab at a time. You can only interact with elements starting with bids; the rest are for information only or out of view.
 - If you are blocked by CAPTCHA, consider going back to the previous page or restart your search.
 - If you use go_back() repeatedly but cannot go back to the previous page, consider going to www.google.com to restart your browsing.
 - "Alh6id" and "lst-ib" are not valid element IDs.
-
-# Combobox Tips
-- If a combobox is not clickable, clicking on the section containing it may bring up a dialog with options to select from.
-- If a combobox has autocomplete, filling it with text may bring up a dialog with related options that you can click on to select from.
 """
 
         # - If you enter arithmetic expressions into Google Search, you will see a calculator tool showing the computed result. The term "Alh6id" is not a valid id you can enter.
