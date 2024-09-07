@@ -217,3 +217,11 @@ cache
 # configuration
 config.toml
 config.toml.bak
+
+# stress
+stress.py
+stress.yml
+test.json
+/stress_output
+stat_parse.py
+stat_output.txt

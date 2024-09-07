@@ -8,10 +8,16 @@ import gradio as gr
 import plotly.graph_objects as go
 from PIL import Image, UnidentifiedImageError
 
-from my_frontend import Node, parse_and_visualize, process_string, visualize_tree_plotly
+from my_frontend import (
+    LABEL_LEN,
+    LINE_LEN,
+    Node,
+    parse_and_visualize,
+    process_string,
+    visualize_tree_plotly,
+)
 
 api_key = os.environ.get('OPENAI_API_KEY')
-LINE_LEN = 100
 
 
 def parse_log_onestep(log_file):
@@ -57,6 +63,8 @@ def parse_log_onestep(log_file):
         if line.startswith('*Action*'):
             action_info = process_string(line.split(': ')[1], LINE_LEN)
 
+        if line.startswith('*Summary'):
+            summary = process_string(line.split(': ')[1], LABEL_LEN)
             nodes[count] = Node(
                 count,
                 strat_info + '<br>' + '<b>Grounding</b>: ' + action_info,
@@ -65,6 +73,7 @@ def parse_log_onestep(log_file):
                 0.0,
                 None,
             )
+            nodes[count].set_summary(summary)
             current_node.children.append(nodes[count])
             nodes[count].parent = current_node
             count += 1

@@ -507,32 +507,39 @@ def visualize_tree_plotly(root, nodes):
             hovermode='closest',
             margin=dict(b=20, l=5, r=5, t=40),
             xaxis=dict(
-                showgrid=True,
-                zeroline=True,
-                visible=True,
+                showgrid=False,
+                zeroline=False,
+                visible=False,
                 range=[-10, 80],
-                fixedrange=True,
             ),
             yaxis=dict(
-                showgrid=True,
-                zeroline=True,
-                visible=True,
+                showgrid=False,
+                zeroline=False,
+                visible=False,
                 range=[0, 40],
-                fixedrange=True,
             ),
             width=920,
             height=540,
             shapes=shapes,
             annotations=annotations,
+            dragmode='pan',
         ),
     )
-
+    fig.update_layout(
+        modebar_remove=[
+            'zoom2d',
+            'zoomIn2d',
+            'zoomOut2d',
+            'autoScale2d',
+            'resetScale2d',
+            'lasso2d',
+            'select2d',
+        ]
+    )
     return fig
 
 
-def horizontal_hierarchy_pos(
-    G, root, height=30.0, hor_gap=20.0, hor_loc=0, ycenter=17.5
-):
+def horizontal_hierarchy_pos(G, root, height=110, hor_gap=20.0, hor_loc=0, ycenter=20):
     pos = _horizontal_hierarchy_pos(G, root, height, hor_gap, hor_loc, ycenter)
     return pos
 
@@ -540,10 +547,10 @@ def horizontal_hierarchy_pos(
 def _horizontal_hierarchy_pos(
     G,
     root,
-    height=30.0,
+    height=110,
     hor_gap=20.0,
     hor_loc=0,
-    ycenter=17.5,
+    ycenter=20.0,
     pos=None,
     parent=None,
     parsed=None,
@@ -561,10 +568,8 @@ def _horizontal_hierarchy_pos(
         dy = height / len(children)
         if dy < HEIGHT:
             dy = HEIGHT
-
-        nexty = ycenter - height / 2 - dy / 2
-        if nexty > 40 - HEIGHT * 7 / 2:
-            nexty = 40 - HEIGHT * 7 / 2
+        else:
+            nexty = ycenter - height / 2 - dy / 2
 
         for child in children:
             nexty += dy
