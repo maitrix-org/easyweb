@@ -128,6 +128,8 @@ class OpenDevinSession:
         response = self.ws.recv()
         try:
             message = json.loads(response)
+            message_size = len(str(message))
+            print(f"Received message of size: {message_size}")
         except json.decoder.JSONDecodeError as e:
             print(e)
             print(response)
