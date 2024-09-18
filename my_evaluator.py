@@ -190,6 +190,9 @@ questions = gaia_web_questions
 
 def run_question(args, qs, qid, start_datetime):
     # if qid < 9 or qid > 11:
+    # if qid < 10:
+    #     return
+    # if qid not in [3]:
     #     return
 
     random.seed(qid)
@@ -238,6 +241,7 @@ def main(qs):
     parser.add_argument('--port', type=int, default=5000)
     parser.add_argument('--model', type=str, default='Meta-Llama-3.1-70B-Instruct')
     parser.add_argument('--api_key', type=str, default='token-abc123')
+    parser.add_argument('--n_processes', type=int, default=3)
 
     # Parse the arguments
     args = parser.parse_args()
@@ -247,7 +251,7 @@ def main(qs):
     # args_list = [(args, qid, start_datetime) for qid in range(len(questions)) if qid in [9, 13, 14]]
     args_list = [(args, qs, qid, start_datetime) for qid in range(len(qs))]
     # args_list = [(args, qid, start_datetime) for qid in range(7, len(questions))]
-    with multiprocessing.Pool(processes=3) as pool:
+    with multiprocessing.Pool(processes=args.n_processes) as pool:
         pool.starmap(run_question, args_list)
 
     # run_question(args, 2, start_datetime)

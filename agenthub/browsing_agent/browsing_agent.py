@@ -1,5 +1,7 @@
 import ast
 import os
+import random
+import time
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.utils.obs import flatten_axtree_to_str
@@ -123,6 +125,10 @@ class BrowsingAgent(Agent):
         last_obs = None
         last_action = None
 
+        if len(state.history) == 1:
+            logger.info('Sleeping')
+            time.sleep(10 + 5 * random.random())
+
         if EVAL_MODE and len(state.history) == 1:
             # for webarena and miniwob++ eval, we need to retrieve the initial observation already in browser env
             # initialize and retrieve the first observation by issuing an noop OP
@@ -226,7 +232,9 @@ In order to accomplish my goal I need to send the information asked back to the 
         if not action_resp.endswith('```'):
             action_resp = action_resp + ')```'
 
-        logger.info(prompt)
+        time.sleep(random.random() * 5)
+
+        # logger.info(prompt)
         logger.info(action_resp)
         return self.parse_response(action_resp)
 
