@@ -155,14 +155,18 @@ class OpenDevinSession:
             self.agent_state = message['extras']['agent_state']
             printable = message
         elif 'action' in message:
+            # print(message)
             if message['action'] != 'browse_interactive':
                 self.action_messages.append(message['message'])
-            else:
+            elif self.agent == 'WorldModelAgent':
                 full_output_dict = json.loads(message['args']['thought'])
                 if full_output_dict['active_strategy'] != self.last_active_strategy:
                     self.last_active_strategy = full_output_dict['active_strategy']
                     self.action_history.append((0, self.last_active_strategy))
                 self.action_history.append((1, full_output_dict['summary']))
+            else:
+                self.action_messages.append(message['message'])
+                self.action_history.append((0, message['message']))
             # printable = message
             printable = {k: v for k, v in message.items() if k not in 'args'}
         elif 'extras' in message and 'screenshot' in message['extras']:
@@ -852,8 +856,8 @@ if __name__ == '__main__':
             with gr.Column(scale=1):
                 with gr.Group():
                     agent_selection = gr.Dropdown(
-                        ['DummyWebAgent', 'WorldModelAgent'],
-                        value=default_agent,
+                        ['DummyWebAgent', 'WorldModelAgent', 'NewWorldModelAgent'],
+                        value='NewWorldModelAgent',
                         interactive=True,
                         label='Agent',
                         # info='Choose your own adventure partner!',

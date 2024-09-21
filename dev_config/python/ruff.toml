@@ -1,5 +1,6 @@
 exclude = [
     "agenthub/monologue_agent/regression/",
+    "agenthub/new_world_model_agent",
 ]
 
 [lint]

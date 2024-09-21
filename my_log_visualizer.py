@@ -155,17 +155,21 @@ class TestSession:
             else:
                 log_content = message['args']['thought']
             # self.figure = parse_and_visualize_onestep(message['args']['thought'])
-            self.figure = parse_and_visualize_onestep(log_content)
+            # self.figure = parse_and_visualize_onestep(log_content)
 
     def _load_webpage(self, message):
         webpage = ''
+        print('Start load webpage')
+        print(message)
         if (
             ('args' in message)
             and ('thought' in message['args'])
             and message['args']['thought'].startswith('{')
         ):
+            print('Load webpage')
             planning_record = json.loads(message['args']['thought'])
             if 'obs' in planning_record:
+                print('Planning record')
                 webpage = planning_record['obs']['axtree_txt']
         return webpage
 
@@ -274,12 +278,17 @@ if __name__ == '__main__':
         with gr.Row(equal_height=True):
             with gr.Column(scale=1):
                 with gr.Group():
-                    log_dir_options = ['frontend_logs', 'my_evaluator_logs']
+                    log_dir_options = [
+                        'frontend_logs',
+                        'my_evaluator_logs',
+                        'discussion_logs',
+                    ]
+                    default_logdir = log_dir_options[-1]
                     log_list = list(
-                        reversed(sorted(glob(f'./{log_dir_options[0]}/*.json')))
+                        reversed(sorted(glob(f'./{default_logdir}/*.json')))
                     )
                     log_dir_selection = gr.Dropdown(
-                        log_dir_options, value=log_dir_options[0], label='Log Directory'
+                        log_dir_options, value=default_logdir, label='Log Directory'
                     )
                     log_selection = gr.Dropdown(
                         log_list,
@@ -343,4 +352,4 @@ if __name__ == '__main__':
         refresh.click(refresh_log_selection, log_dir_selection, log_selection)
 
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=True)
