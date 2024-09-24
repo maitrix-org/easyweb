@@ -129,7 +129,7 @@ class OpenDevinSession:
         try:
             message = json.loads(response)
             message_size = len(str(message))
-            print(f"Received message of size: {message_size}")
+            print(f'Received message of size: {message_size}')
         except json.decoder.JSONDecodeError as e:
             print(e)
             print(response)
@@ -848,7 +848,7 @@ if __name__ == '__main__':
         for model, cfg in model_port_config.items()
     }
 
-    default_model = model_list[0]
+    default_model = model_list[1]
 
     with gr.Blocks() as demo:
         title = gr.Markdown('# OpenQ')
@@ -856,8 +856,13 @@ if __name__ == '__main__':
             with gr.Column(scale=1):
                 with gr.Group():
                     agent_selection = gr.Dropdown(
-                        ['DummyWebAgent', 'WorldModelAgent', 'NewWorldModelAgent'],
-                        value='NewWorldModelAgent',
+                        [
+                            'DummyWebAgent',
+                            'WorldModelAgent',
+                            'NewWorldModelAgent',
+                            'FewShotWorldModelAgent',
+                        ],
+                        value='FewShotWorldModelAgent',
                         interactive=True,
                         label='Agent',
                         # info='Choose your own adventure partner!',

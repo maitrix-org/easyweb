@@ -1,5 +1,6 @@
 import atexit
 import base64
+import copy
 import io
 import json
 import multiprocessing
@@ -145,17 +146,17 @@ class BrowserEnv:
                     obs['active_page_index'] = obs['active_page_index'].item()
                     obs['elapsed_time'] = obs['elapsed_time'].item()
                     obs_to_send = copy.copy(obs)
-                    original_size = len(str(obs))
-                    if type(obs) == dict:
-                        for item in obs.keys():
-                            item_size = len(str(obs[item]))
-                        if "dom_object" in obs_to_send.keys():
-                            obs_to_send["dom_object"] = {}
+                    # original_size = len(str(obs))
+                    if isinstance(obs, dict):  # type(obs) == dict:
+                        # for item in obs.keys():
+                        #     item_size = len(str(obs[item]))
+                        if 'dom_object' in obs_to_send.keys():
+                            obs_to_send['dom_object'] = {}
                             # print("\'DOM Object\' removed")
-                        if "text_content" in obs.keys():
-                            obs_to_send["text_content"] = {}
+                        if 'text_content' in obs.keys():
+                            obs_to_send['text_content'] = {}
                             # print("\'Content\' removed")
-                    modified_message_size = len(str(obs_to_send))
+                    # modified_message_size = len(str(obs_to_send))
                     self.browser_side.send((unique_request_id, obs))
             except KeyboardInterrupt:
                 logger.info('Browser env process interrupted by user.')
