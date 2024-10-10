@@ -145,8 +145,14 @@ class BrowserGymSession:
 
         clean_axtree_lines = []
         num_static_text_lines = 0
-        max_static_text_lines = 10
-        for line in cur_axtree_txt.split('\n'):
+        max_static_text_lines = 20
+        last_bracket_line = 0
+        max_after_last_bracket_lines = 10
+        for i, line in enumerate(cur_axtree_txt.split('\n')):
+            if line.strip().startswith('['):
+                last_bracket_line = i
+
+        for i, line in enumerate(cur_axtree_txt.split('\n')):
             if line.strip().startswith('StaticText') or line.strip().startswith(
                 'ListMarker'
             ):
@@ -154,8 +160,11 @@ class BrowserGymSession:
             else:
                 num_static_text_lines = 0
 
-            if num_static_text_lines <= max_static_text_lines:
+            if num_static_text_lines <= max_static_text_lines and i < (
+                last_bracket_line + max_after_last_bracket_lines
+            ):
                 clean_axtree_lines.append(line)
+
         clean_axtree_txt = '\n'.join(clean_axtree_lines)
 
         scroll_progress = (
@@ -178,6 +187,8 @@ class BrowserGymSession:
             'raw_axtree_txt': cur_axtree_txt,
             'clean_axtree_txt': clean_axtree_txt,
             'error_prefix': error_prefix,
+            'axtree_object': self.obs['axtree_object'],
+            'extra_element_properties': self.obs['extra_element_properties'],
             'last_action': self.obs['last_action'],
             'last_action_error': self.obs['last_action_error'],
             'screenshot': screenshot,

@@ -269,7 +269,9 @@ class MCTS(SearchAlgorithm, Generic[State, Action, Example]):
 
     def _dfs_max_reward(self, path: list[MCTSNode]) -> tuple[float, list[MCTSNode]]:
         cur = path[-1]
-        if cur.is_terminal:
+        # _is_terminal_with_depth_limit(self, node: MCTSNode):
+        # if cur.is_terminal:
+        if self._is_terminal_with_depth_limit(cur):
             return self.cum_reward([node.reward for node in path[1:]]), path
         if cur.children is None:
             return -math.inf, path

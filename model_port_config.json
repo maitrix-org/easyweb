@@ -3,14 +3,13 @@
     {
         "provider": "openai",
         "port": 8004,
-        "display_name": "Meta-Llama-3.1-70B-Instruct (A100)",
-        "default_key": "token-abc123"
+        "display_name": "Meta-Llama-3.1-70B-Instruct (Backup)"
     },
     "Meta-Llama-3.1-70B-Instruct":
     {
         "provider": "openai",
         "port": 8000,
-        "display_name": "Meta-Llama-3.1-70B-Instruct (L40)"
+        "display_name": "Meta-Llama-3.1-70B-Instruct (Regular)"
     },
     "gpt-4o":
     {
