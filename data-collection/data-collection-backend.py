@@ -1,9 +1,8 @@
 from datetime import datetime
 
+from data_collection_interface import BrowserGymSession
 from flask import Flask, jsonify, request
 from gevent import monkey
-
-from data_collection_interface import BrowserGymSession
 
 monkey.patch_all()
 

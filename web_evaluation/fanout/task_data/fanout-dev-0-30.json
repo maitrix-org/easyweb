@@ -1,0 +1,3437 @@
+[
+    {
+        "id": "7dcbbbdc7f1120cd",
+        "question": "What is the batting hand of each of the first five picks in the 1998 MLB draft?",
+        "decomposition": [
+            {
+                "id": "bca4ab7d1f4df703",
+                "question": "Who were the first 5 picks in the 1998 MLB Draft?",
+                "decomposition": [],
+                "answer": [
+                    "Pat Burrell",
+                    "Mark Mulder",
+                    "Corey Patterson",
+                    "Jeff Austin",
+                    "JD Drew"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 18468611,
+                    "revid": 1172527864,
+                    "title": "1998 Major League Baseball draft",
+                    "url": "https://en.wikipedia.org/wiki/1998_Major_League_Baseball_draft"
+                }
+            },
+            {
+                "id": "739617a754ded71f",
+                "question": "What is the batting hand of Pat Burrell?",
+                "decomposition": [],
+                "answer": "Right",
+                "depends_on": [
+                    "bca4ab7d1f4df703"
+                ],
+                "evidence": {
+                    "pageid": 428791,
+                    "revid": 1184558033,
+                    "title": "Pat Burrell",
+                    "url": "https://en.wikipedia.org/wiki/Pat_Burrell"
+                }
+            },
+            {
+                "id": "2891593cc0531647",
+                "question": "What is the batting hand of Mark Mulder?",
+                "decomposition": [],
+                "answer": "Left",
+                "depends_on": [
+                    "bca4ab7d1f4df703"
+                ],
+                "evidence": {
+                    "pageid": 1224672,
+                    "revid": 1169013077,
+                    "title": "Mark Mulder",
+                    "url": "https://en.wikipedia.org/wiki/Mark_Mulder"
+                }
+            },
+            {
+                "id": "704cca854386d810",
+                "question": "What is the batting hand of Corey Patterson?",
+                "decomposition": [],
+                "answer": "Left",
+                "depends_on": [
+                    "bca4ab7d1f4df703"
+                ],
+                "evidence": {
+                    "pageid": 966752,
+                    "revid": 1178045549,
+                    "title": "Corey Patterson",
+                    "url": "https://en.wikipedia.org/wiki/Corey_Patterson"
+                }
+            },
+            {
+                "id": "3e4b89409b6fae40",
+                "question": "What is the batting hand of Jeff Austin?",
+                "decomposition": [],
+                "answer": "Right",
+                "depends_on": [
+                    "bca4ab7d1f4df703"
+                ],
+                "evidence": {
+                    "pageid": 21964523,
+                    "revid": 1160882537,
+                    "title": "Jeff Austin (baseball)",
+                    "url": "https://en.wikipedia.org/wiki/Jeff_Austin_(baseball)"
+                }
+            },
+            {
+                "id": "8592de009cf61a86",
+                "question": "What is the batting hand of JD Drew?",
+                "decomposition": [],
+                "answer": "Left",
+                "depends_on": [
+                    "bca4ab7d1f4df703"
+                ],
+                "evidence": {
+                    "pageid": 1084979,
+                    "revid": 1169999583,
+                    "title": "J. D. Drew",
+                    "url": "https://en.wikipedia.org/wiki/J._D._Drew"
+                }
+            }
+        ],
+        "answer": {
+            "Pat Burrell": "Right",
+            "Mark Mulder": "Left",
+            "Corey Patterson": "Left",
+            "Jeff Austin": "Right",
+            "JD Drew": "Left"
+        },
+        "categories": [
+            "Sports",
+            "Statistics"
+        ]
+    },
+    {
+        "id": "2120afba8009bad3",
+        "question": "What were box office values of the Star Wars films in the prequel and sequel trilogies?",
+        "decomposition": [
+            {
+                "id": "0aa4e637db6918ab",
+                "question": "What are the Star Wars films in the prequel and sequel trilogies?",
+                "decomposition": [],
+                "answer": [
+                    "The Phantom Menace",
+                    "Attack of the Clones",
+                    "Revenge of the Sith",
+                    "The Force Awakens",
+                    "The Last Jedi",
+                    "The Rise of Skywalker"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 26678,
+                    "revid": 1185937156,
+                    "title": "Star Wars",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars"
+                }
+            },
+            {
+                "id": "495f497083959290",
+                "question": "What was the box office value of The Phantom Menace?",
+                "decomposition": [],
+                "answer": "$1.027 billion",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 50793,
+                    "revid": 1185883860,
+                    "title": "Star Wars: Episode I \u2013 The Phantom Menace",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_Episode_I_%E2%80%93_The_Phantom_Menace"
+                }
+            },
+            {
+                "id": "26f342a172002bc2",
+                "question": "What was the box office value of The Attack of the Clones?",
+                "decomposition": [],
+                "answer": "$653.8 million",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 50957,
+                    "revid": 1185896387,
+                    "title": "Star Wars: Episode II \u2013 Attack of the Clones",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_Episode_II_%E2%80%93_Attack_of_the_Clones"
+                }
+            },
+            {
+                "id": "00f938b6484f0126",
+                "question": "What was the box office value of The Revenge of the Sith?",
+                "decomposition": [],
+                "answer": "$868.4 million",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 55447,
+                    "revid": 1185897706,
+                    "title": "Star Wars: Episode III \u2013 Revenge of the Sith",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_Episode_III_%E2%80%93_Revenge_of_the_Sith"
+                }
+            },
+            {
+                "id": "f2c713a6d423337d",
+                "question": "What was the box office value of The Force Awakens?",
+                "decomposition": [],
+                "answer": "$2.071 billion",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 14723194,
+                    "revid": 1185889585,
+                    "title": "Star Wars: The Force Awakens",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_The_Force_Awakens"
+                }
+            },
+            {
+                "id": "4237f2229604cf90",
+                "question": "What was the box office value of The Last Jedi?",
+                "decomposition": [],
+                "answer": "$1.334 billion",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 43910621,
+                    "revid": 1185873947,
+                    "title": "Star Wars: The Last Jedi",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_The_Last_Jedi"
+                }
+            },
+            {
+                "id": "9a09d57951b9034a",
+                "question": "What was the box office value of The Rise of Skywalker?",
+                "decomposition": [],
+                "answer": "$1.077 billion",
+                "depends_on": [
+                    "0aa4e637db6918ab"
+                ],
+                "evidence": {
+                    "pageid": 43910733,
+                    "revid": 1185946963,
+                    "title": "Star Wars: The Rise of Skywalker",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_The_Rise_of_Skywalker"
+                }
+            }
+        ],
+        "answer": {
+            "The Phantom Menace": "$1.027 billion",
+            "Attack of the Clones": "$653.8 million",
+            "Revenge of the Sith": "$868.4 million",
+            "The Force Awakens": "$2.071 billion",
+            "The Last Jedi": "$1.334 billion",
+            "The Rise of Skywalker": "$1.077 billion"
+        },
+        "categories": [
+            "Economics",
+            "Film Studies"
+        ]
+    },
+    {
+        "id": "a047ca3f750a134d",
+        "question": "Who won the World Car of the Year Award from 2019 to 2023, and what was the height of each winning car in inches?",
+        "decomposition": [
+            {
+                "id": "f80aa1dcf29dc7cc",
+                "question": "Who won the World Car of the Year Award from 2019-2023?",
+                "decomposition": [],
+                "answer": [
+                    "Jaguar I-Pace",
+                    "Kia Telluride",
+                    "Volkswagen ID.4",
+                    "Hyundai Ioniq 5",
+                    "Hyundai Ioniq 6"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 1462671,
+                    "revid": 1183989397,
+                    "title": "World Car Awards",
+                    "url": "https://en.wikipedia.org/wiki/World_Car_Awards"
+                }
+            },
+            {
+                "id": "dd7b8780971e896f",
+                "question": "What is the height of the Jaguar I-Pace in inches?",
+                "decomposition": [],
+                "answer": 61.6,
+                "depends_on": [
+                    "f80aa1dcf29dc7cc"
+                ],
+                "evidence": {
+                    "pageid": 52331455,
+                    "revid": 1185467557,
+                    "title": "Jaguar I-Pace",
+                    "url": "https://en.wikipedia.org/wiki/Jaguar_I-Pace"
+                }
+            },
+            {
+                "id": "f60a75173c104ca1",
+                "question": "What is the height of the Kia Telluride in inches?",
+                "decomposition": [],
+                "answer": 68.9,
+                "depends_on": [
+                    "f80aa1dcf29dc7cc"
+                ],
+                "evidence": {
+                    "pageid": 49416953,
+                    "revid": 1182552469,
+                    "title": "Kia Telluride",
+                    "url": "https://en.wikipedia.org/wiki/Kia_Telluride"
+                }
+            },
+            {
+                "id": "2be44a26f462f8e3",
+                "question": "What is the height of the Volkswagen ID.4 in inches?",
+                "decomposition": [],
+                "answer": 64.4,
+                "depends_on": [
+                    "f80aa1dcf29dc7cc"
+                ],
+                "evidence": {
+                    "pageid": 63265580,
+                    "revid": 1180728563,
+                    "title": "Volkswagen ID.4",
+                    "url": "https://en.wikipedia.org/wiki/Volkswagen_ID.4"
+                }
+            },
+            {
+                "id": "8f56eecc43a2bdc5",
+                "question": "What is the height of the Hyundai Ioniq 5 in inches?",
+                "decomposition": [],
+                "answer": 63.2,
+                "depends_on": [
+                    "f80aa1dcf29dc7cc"
+                ],
+                "evidence": {
+                    "pageid": 65319960,
+                    "revid": 1181510929,
+                    "title": "Hyundai Ioniq 5",
+                    "url": "https://en.wikipedia.org/wiki/Hyundai_Ioniq_5"
+                }
+            },
+            {
+                "id": "8c045810b3c91a3b",
+                "question": "What is the height of the Hyundai Ioniq 6 in inches?",
+                "decomposition": [],
+                "answer": 58.9,
+                "depends_on": [
+                    "f80aa1dcf29dc7cc"
+                ],
+                "evidence": {
+                    "pageid": 65440428,
+                    "revid": 1184425441,
+                    "title": "Hyundai Ioniq 6",
+                    "url": "https://en.wikipedia.org/wiki/Hyundai_Ioniq_6"
+                }
+            }
+        ],
+        "answer": {
+            "Jaguar I-Pace": 61.6,
+            "Kia Telluride": 68.9,
+            "Volkswagen ID.4": 64.4,
+            "Hyundai Ioniq 5": 63.2,
+            "Hyundai Ioniq 6": 58.9
+        },
+        "categories": [
+            "Automobiles",
+            "Awards",
+            "Measurement"
+        ]
+    },
+    {
+        "id": "563b95ed6141123c",
+        "question": "What is the population of the five smallest countries, by area, located in the largest continent?",
+        "decomposition": [
+            {
+                "id": "5452b8a8f7c7d609",
+                "question": "Find the largest continent",
+                "decomposition": [],
+                "answer": "Asia",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 19630739,
+                    "revid": 1185821688,
+                    "title": "Continent",
+                    "url": "https://en.wikipedia.org/wiki/Continent"
+                }
+            },
+            {
+                "id": "09da94dbd375f894",
+                "question": "What is the population of the 5 smallest (by area) countries in it?",
+                "decomposition": [
+                    {
+                        "id": "ad6fb04f3cb620ef",
+                        "question": "What are the 5 smallest (by area) countries in it?",
+                        "decomposition": [],
+                        "answer": [
+                            "Macau",
+                            "Maldives",
+                            "Singapore",
+                            "Bahrain",
+                            "Hong Kong"
+                        ],
+                        "depends_on": [],
+                        "evidence": {
+                            "pageid": 47659173,
+                            "revid": 1183148166,
+                            "title": "List of Asian countries by area",
+                            "url": "https://en.wikipedia.org/wiki/List_of_Asian_countries_by_area"
+                        }
+                    },
+                    {
+                        "id": "8f328da12f4c2b17",
+                        "question": "What is the population of Macau?",
+                        "decomposition": [],
+                        "answer": 680000,
+                        "depends_on": [
+                            "ad6fb04f3cb620ef"
+                        ],
+                        "evidence": {
+                            "pageid": 19068,
+                            "revid": 1185350217,
+                            "title": "Macau",
+                            "url": "https://en.wikipedia.org/wiki/Macau"
+                        }
+                    },
+                    {
+                        "id": "3abcbad7082b0929",
+                        "question": "What is the population of Maldives?",
+                        "decomposition": [],
+                        "answer": 521000,
+                        "depends_on": [
+                            "ad6fb04f3cb620ef"
+                        ],
+                        "evidence": {
+                            "pageid": 19117,
+                            "revid": 1185750716,
+                            "title": "Maldives",
+                            "url": "https://en.wikipedia.org/wiki/Maldives"
+                        }
+                    },
+                    {
+                        "id": "0c01398f995f8732",
+                        "question": "What is the population of Singapore?",
+                        "decomposition": [],
+                        "answer": 5917000,
+                        "depends_on": [
+                            "ad6fb04f3cb620ef"
+                        ],
+                        "evidence": {
+                            "pageid": 27318,
+                            "revid": 1185356760,
+                            "title": "Singapore",
+                            "url": "https://en.wikipedia.org/wiki/Singapore"
+                        }
+                    },
+                    {
+                        "id": "6a2c982c9a83eecb",
+                        "question": "What is the population of Bahrain?",
+                        "decomposition": [],
+                        "answer": 1463000,
+                        "depends_on": [
+                            "ad6fb04f3cb620ef"
+                        ],
+                        "evidence": {
+                            "pageid": 18933277,
+                            "revid": 1185880801,
+                            "title": "Bahrain",
+                            "url": "https://en.wikipedia.org/wiki/Bahrain"
+                        }
+                    },
+                    {
+                        "id": "2b34ad3f3019c22c",
+                        "question": "What is the population of Hong Kong?",
+                        "decomposition": [],
+                        "answer": 7498000,
+                        "depends_on": [
+                            "ad6fb04f3cb620ef"
+                        ],
+                        "evidence": {
+                            "pageid": 13404,
+                            "revid": 1185841020,
+                            "title": "Hong Kong",
+                            "url": "https://en.wikipedia.org/wiki/Hong_Kong"
+                        }
+                    }
+                ],
+                "answer": {
+                    "Macau": 680000,
+                    "Maldives": 521000,
+                    "Singapore": 5917000,
+                    "Bahrain": 1463000,
+                    "Hong Kong": 7498000
+                },
+                "depends_on": [
+                    "5452b8a8f7c7d609"
+                ],
+                "evidence": null
+            }
+        ],
+        "answer": {
+            "Macau": 680000,
+            "Maldives": 521000,
+            "Singapore": 5917000,
+            "Bahrain": 1463000,
+            "Hong Kong": 7498000
+        },
+        "categories": [
+            "Demographics",
+            "Geography"
+        ]
+    },
+    {
+        "id": "8c82924e2ce017a9",
+        "question": "Who are the directors of the top 5 highest-grossing films?",
+        "decomposition": [
+            {
+                "id": "4359cb60388ba650",
+                "question": "What are the top 5 highest-grossing films?",
+                "decomposition": [],
+                "answer": [
+                    "Avatar",
+                    "Avengers: Endgame",
+                    "Avatar: The Way of Water",
+                    "Titanic",
+                    "Star Wars: The Force Awakens"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 59892,
+                    "revid": 1185890055,
+                    "title": "List of highest-grossing films",
+                    "url": "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
+                }
+            },
+            {
+                "id": "a161acd81975b8e7",
+                "question": "Who is the director of Avatar?",
+                "decomposition": [],
+                "answer": "James Cameron",
+                "depends_on": [
+                    "4359cb60388ba650"
+                ],
+                "evidence": {
+                    "pageid": 4273140,
+                    "revid": 1185356274,
+                    "title": "Avatar (2009 film)",
+                    "url": "https://en.wikipedia.org/wiki/Avatar_(2009_film)"
+                }
+            },
+            {
+                "id": "4f5a9ba1952d90e8",
+                "question": "Who is the director of Avengers: Endgame?",
+                "decomposition": [],
+                "answer": "Anthony Russo and Joe Russo",
+                "depends_on": [
+                    "4359cb60388ba650"
+                ],
+                "evidence": {
+                    "pageid": 44254295,
+                    "revid": 1185724642,
+                    "title": "Avengers: Endgame",
+                    "url": "https://en.wikipedia.org/wiki/Avengers:_Endgame"
+                }
+            },
+            {
+                "id": "a9d0e999efd3da47",
+                "question": "Who is the director of Avatar: The Way of Water?",
+                "decomposition": [],
+                "answer": "James Cameron",
+                "depends_on": [
+                    "4359cb60388ba650"
+                ],
+                "evidence": {
+                    "pageid": 25813358,
+                    "revid": 1185376874,
+                    "title": "Avatar: The Way of Water",
+                    "url": "https://en.wikipedia.org/wiki/Avatar:_The_Way_of_Water"
+                }
+            },
+            {
+                "id": "8407e998c35f6da7",
+                "question": "Who is the director of Titanic?",
+                "decomposition": [],
+                "answer": "James Cameron",
+                "depends_on": [
+                    "4359cb60388ba650"
+                ],
+                "evidence": {
+                    "pageid": 52371,
+                    "revid": 1185400166,
+                    "title": "Titanic (1997 film)",
+                    "url": "https://en.wikipedia.org/wiki/Titanic_(1997_film)"
+                }
+            },
+            {
+                "id": "90d5c8d707ea63e2",
+                "question": "Who is the director of Star Wars: The Force Awakens?",
+                "decomposition": [],
+                "answer": "J. J. Abrams",
+                "depends_on": [
+                    "4359cb60388ba650"
+                ],
+                "evidence": {
+                    "pageid": 14723194,
+                    "revid": 1185889585,
+                    "title": "Star Wars: The Force Awakens",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_The_Force_Awakens"
+                }
+            }
+        ],
+        "answer": {
+            "Avatar": "James Cameron",
+            "Avengers: Endgame": "Anthony Russo and Joe Russo",
+            "Avatar: The Way of Water": "James Cameron",
+            "Titanic": "James Cameron",
+            "Star Wars: The Force Awakens": "J. J. Abrams"
+        },
+        "categories": [
+            "Film Studies"
+        ]
+    },
+    {
+        "id": "a8144c2b180759f1",
+        "question": "Who are the nominees of the 2024 Taiwanese presidential election and what are their birth dates?",
+        "decomposition": [
+            {
+                "id": "671fb9a9b6b200b3",
+                "question": "Who are the nominees of the 2024 Taiwanese presidential election?",
+                "decomposition": [],
+                "answer": [
+                    "Lai Ching-te",
+                    "Hou Yu-ih",
+                    "Ko Wen-je",
+                    "Terry Gou"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 66879039,
+                    "revid": 1185861671,
+                    "title": "2024 Taiwanese presidential election",
+                    "url": "https://en.wikipedia.org/wiki/2024_Taiwanese_presidential_election"
+                }
+            },
+            {
+                "id": "54f0b035fd01c307",
+                "question": "What is Lai Ching-te's birth date?",
+                "decomposition": [],
+                "answer": "6 October 1959",
+                "depends_on": [
+                    "671fb9a9b6b200b3"
+                ],
+                "evidence": {
+                    "pageid": 22609914,
+                    "revid": 1184783506,
+                    "title": "Lai Ching-te",
+                    "url": "https://en.wikipedia.org/wiki/Lai_Ching-te"
+                }
+            },
+            {
+                "id": "dd29086cd004518b",
+                "question": "What is Hou Yu-ih's birth date?",
+                "decomposition": [],
+                "answer": "7 June 1957",
+                "depends_on": [
+                    "671fb9a9b6b200b3"
+                ],
+                "evidence": {
+                    "pageid": 48287259,
+                    "revid": 1185875261,
+                    "title": "Hou Yu-ih",
+                    "url": "https://en.wikipedia.org/wiki/Hou_Yu-ih"
+                }
+            },
+            {
+                "id": "7ca8481fefa5e63d",
+                "question": "What is Ko Wen-je's birth date?",
+                "decomposition": [],
+                "answer": "6 August 1959",
+                "depends_on": [
+                    "671fb9a9b6b200b3"
+                ],
+                "evidence": {
+                    "pageid": 43919669,
+                    "revid": 1185874908,
+                    "title": "Ko Wen-je",
+                    "url": "https://en.wikipedia.org/wiki/Ko_Wen-je"
+                }
+            },
+            {
+                "id": "a2096fe39dacacee",
+                "question": "What is Terry Gou's birth date?",
+                "decomposition": [],
+                "answer": "18 October 1950",
+                "depends_on": [
+                    "671fb9a9b6b200b3"
+                ],
+                "evidence": {
+                    "pageid": 933792,
+                    "revid": 1185394450,
+                    "title": "Terry Gou",
+                    "url": "https://en.wikipedia.org/wiki/Terry_Gou"
+                }
+            }
+        ],
+        "answer": {
+            "Lai Ching-te": "6 October 1959",
+            "Hou Yu-ih": "7 June 1957",
+            "Ko Wen-je": "6 August 1959",
+            "Terry Gou": "18 October 1950"
+        },
+        "categories": [
+            "History",
+            "Politics"
+        ]
+    },
+    {
+        "id": "2c472f015b5e38fd",
+        "question": "What are the names of 6 Metropolitan cities in Korea and their respective symbol flowers?",
+        "decomposition": [
+            {
+                "id": "551eb5a1ab3cf3da",
+                "question": "What are 6 Metropolitan cities of Korea?",
+                "decomposition": [],
+                "answer": [
+                    "Busan",
+                    "Daegu",
+                    "Incheon",
+                    "Gwang-ju",
+                    "Daejeon",
+                    "Ulsan"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 27019,
+                    "revid": 1185407120,
+                    "title": "South Korea",
+                    "url": "https://en.wikipedia.org/wiki/South_Korea"
+                }
+            },
+            {
+                "id": "2ed3775e02abd3b5",
+                "question": "What is symbol flower of Busan?",
+                "decomposition": [],
+                "answer": "Camellia",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 68115,
+                    "revid": 1182540450,
+                    "title": "Busan",
+                    "url": "https://en.wikipedia.org/wiki/Busan"
+                }
+            },
+            {
+                "id": "321954b5911f2644",
+                "question": "What is symbol flower of Daegu?",
+                "decomposition": [],
+                "answer": "Magnolia",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 323135,
+                    "revid": 1184363042,
+                    "title": "Daegu",
+                    "url": "https://en.wikipedia.org/wiki/Daegu"
+                }
+            },
+            {
+                "id": "10e610789fb636e8",
+                "question": "What is symbol flower of Incheon?",
+                "decomposition": [],
+                "answer": "Rose",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 68074,
+                    "revid": 1185284469,
+                    "title": "Incheon",
+                    "url": "https://en.wikipedia.org/wiki/Incheon"
+                }
+            },
+            {
+                "id": "f7e77555d8b10499",
+                "question": "What is symbol flower of Gwang-ju?",
+                "decomposition": [],
+                "answer": "Royal Azalea",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 323128,
+                    "revid": 1179792599,
+                    "title": "Gwangju",
+                    "url": "https://en.wikipedia.org/wiki/Gwangju"
+                }
+            },
+            {
+                "id": "b7546d50cf190b15",
+                "question": "What is symbol flower of Daejeon?",
+                "decomposition": [],
+                "answer": "White Magnolia",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 284812,
+                    "revid": 1185355560,
+                    "title": "Daejeon",
+                    "url": "https://en.wikipedia.org/wiki/Daejeon"
+                }
+            },
+            {
+                "id": "9a81044854287220",
+                "question": "What is symbol flower of Ulsan?",
+                "decomposition": [],
+                "answer": "Pear flower",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 323111,
+                    "revid": 1183489092,
+                    "title": "Ulsan",
+                    "url": "https://en.wikipedia.org/wiki/Ulsan"
+                }
+            }
+        ],
+        "answer": {
+            "Busan": "Camellia",
+            "Daegu": "Magnolia",
+            "Incheon": "Rose",
+            "Gwang-ju": "Royal Azalea",
+            "Daejeon": "White Magnolia",
+            "Ulsan": "Pear flower"
+        },
+        "categories": [
+            "Botany",
+            "Geography"
+        ]
+    },
+    {
+        "id": "3bd8400a1174f1a0",
+        "question": "What law schools did the most recent four Supreme Court justices attend?",
+        "decomposition": [
+            {
+                "id": "efa1252c1d774faa",
+                "question": "Who are the last four justices appointed to the Supreme Court?",
+                "decomposition": [],
+                "answer": [
+                    "Ketanji Brown Jackson",
+                    "Amy Coney Barrett",
+                    "Brett Kavanaugh",
+                    "Neil Gorsuch"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 216429,
+                    "revid": 1180184921,
+                    "title": "List of justices of the Supreme Court of the United States",
+                    "url": "https://en.wikipedia.org/wiki/List_of_justices_of_the_Supreme_Court_of_the_United_States"
+                }
+            },
+            {
+                "id": "4659f48987c2f0e9",
+                "question": "What law school did Ketanji Brown Jackson attend?",
+                "decomposition": [
+                    {
+                        "id": "96d752f86dbc05e7",
+                        "question": "Where did Ketanji Brown Jackson study law?",
+                        "decomposition": [],
+                        "answer": "Harvard Law School",
+                        "depends_on": [],
+                        "evidence": {
+                            "pageid": 23741955,
+                            "revid": 1185494927,
+                            "title": "Ketanji Brown Jackson",
+                            "url": "https://en.wikipedia.org/wiki/Ketanji_Brown_Jackson"
+                        }
+                    }
+                ],
+                "answer": "Harvard Law School",
+                "depends_on": [
+                    "efa1252c1d774faa"
+                ],
+                "evidence": null
+            },
+            {
+                "id": "cc7b573461114c5d",
+                "question": "What law school did Amy Coney Barrett attend?",
+                "decomposition": [
+                    {
+                        "id": "38da9033f0ecefeb",
+                        "question": "Where did Amy Coney Barrett study law?",
+                        "decomposition": [],
+                        "answer": "Notre Dame Law School",
+                        "depends_on": [],
+                        "evidence": {
+                            "pageid": 53992581,
+                            "revid": 1184345665,
+                            "title": "Amy Coney Barrett",
+                            "url": "https://en.wikipedia.org/wiki/Amy_Coney_Barrett"
+                        }
+                    }
+                ],
+                "answer": "Notre Dame Law School",
+                "depends_on": [
+                    "efa1252c1d774faa"
+                ],
+                "evidence": null
+            },
+            {
+                "id": "53fc567b53548dbd",
+                "question": "What law school did Brett Kavanaugh attend?",
+                "decomposition": [
+                    {
+                        "id": "3038a62fc130552a",
+                        "question": "Where did Brett Kavanaugh study law?",
+                        "decomposition": [],
+                        "answer": "Yale Law School",
+                        "depends_on": [],
+                        "evidence": {
+                            "pageid": 21816987,
+                            "revid": 1183477870,
+                            "title": "Brett Kavanaugh",
+                            "url": "https://en.wikipedia.org/wiki/Brett_Kavanaugh"
+                        }
+                    }
+                ],
+                "answer": "Yale Law School",
+                "depends_on": [
+                    "efa1252c1d774faa"
+                ],
+                "evidence": null
+            },
+            {
+                "id": "8e3838e9858207b0",
+                "question": "What law school did Neil Gorsuch attend?",
+                "decomposition": [
+                    {
+                        "id": "3b9da1f58b764217",
+                        "question": "Where did Neil Gorsuch study law?",
+                        "decomposition": [],
+                        "answer": "Harvard Law School",
+                        "depends_on": [],
+                        "evidence": {
+                            "pageid": 6049434,
+                            "revid": 1185809196,
+                            "title": "Neil Gorsuch",
+                            "url": "https://en.wikipedia.org/wiki/Neil_Gorsuch"
+                        }
+                    }
+                ],
+                "answer": "Harvard Law School",
+                "depends_on": [
+                    "efa1252c1d774faa"
+                ],
+                "evidence": null
+            }
+        ],
+        "answer": {
+            "Ketanji Brown Jackson": "Harvard Law School",
+            "Amy Coney Barrett": "Notre Dame Law School",
+            "Brett Kavanaugh": "Yale Law School",
+            "Neil Gorsuch": "Harvard Law School"
+        },
+        "categories": [
+            "History",
+            "Law"
+        ]
+    },
+    {
+        "id": "33b87d71522e6ea7",
+        "question": "Name the U.S. Senators who represent the states in the Pacific region, as defined by the U.S. Census Bureau.",
+        "decomposition": [
+            {
+                "id": "b7e71e2669792419",
+                "question": "According to the U.S. Census Bureau, which states make up the Pacific region?",
+                "decomposition": [],
+                "answer": [
+                    "Washington",
+                    "Oregon",
+                    "California",
+                    "Alaska",
+                    "Hawaii"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 179578,
+                    "revid": 1182462822,
+                    "title": "Western United States",
+                    "url": "https://en.wikipedia.org/wiki/Western_United_States"
+                }
+            },
+            {
+                "id": "75deb54d35bdcad1",
+                "question": "Who are the U.S. Senators who represent Washington?",
+                "decomposition": [],
+                "answer": [
+                    "Patty Murray",
+                    "Maria Cantwell"
+                ],
+                "depends_on": [
+                    "b7e71e2669792419"
+                ],
+                "evidence": {
+                    "pageid": 13015878,
+                    "revid": 1185500647,
+                    "title": "Washington (state)",
+                    "url": "https://en.wikipedia.org/wiki/Washington_(state)"
+                }
+            },
+            {
+                "id": "90f158ff4729cf52",
+                "question": "Who are the U.S. Senators who represent Oregon?",
+                "decomposition": [],
+                "answer": [
+                    "Ron Wyden",
+                    "Jeff Merkley"
+                ],
+                "depends_on": [
+                    "b7e71e2669792419"
+                ],
+                "evidence": {
+                    "pageid": 26811621,
+                    "revid": 1185886227,
+                    "title": "Oregon",
+                    "url": "https://en.wikipedia.org/wiki/Oregon"
+                }
+            },
+            {
+                "id": "dce7154db52f4d02",
+                "question": "Who are the U.S. Senators who represent California?",
+                "decomposition": [],
+                "answer": [
+                    "Alex Padilla",
+                    "Laphonza Butler"
+                ],
+                "depends_on": [
+                    "b7e71e2669792419"
+                ],
+                "evidence": {
+                    "pageid": 5407,
+                    "revid": 1185824790,
+                    "title": "California",
+                    "url": "https://en.wikipedia.org/wiki/California"
+                }
+            },
+            {
+                "id": "c3ba84e739a713da",
+                "question": "Who are the U.S. Senators who represent Alaska?",
+                "decomposition": [],
+                "answer": [
+                    "Lisa Murkowski",
+                    "Dan Sullivan"
+                ],
+                "depends_on": [
+                    "b7e71e2669792419"
+                ],
+                "evidence": {
+                    "pageid": 624,
+                    "revid": 1185663816,
+                    "title": "Alaska",
+                    "url": "https://en.wikipedia.org/wiki/Alaska"
+                }
+            },
+            {
+                "id": "ed4269fd855258f2",
+                "question": "Who are the U.S. Senators who represent Hawaii?",
+                "decomposition": [],
+                "answer": [
+                    "Brian Schatz",
+                    "Mazie Hirono"
+                ],
+                "depends_on": [
+                    "b7e71e2669792419"
+                ],
+                "evidence": {
+                    "pageid": 13270,
+                    "revid": 1185456145,
+                    "title": "Hawaii",
+                    "url": "https://en.wikipedia.org/wiki/Hawaii"
+                }
+            }
+        ],
+        "answer": [
+            "Patty Murray",
+            "Maria Cantwell",
+            "Ron Wyden",
+            "Jeff Merkley",
+            "Alex Padilla",
+            "Laphonza Butler",
+            "Lisa Murkowski",
+            "Dan Sullivan",
+            "Brian Schatz",
+            "Mazie Hirono"
+        ],
+        "categories": [
+            "Politics",
+            "Geography"
+        ]
+    },
+    {
+        "id": "66d9d79aea844c0d",
+        "question": "What is the highest elevation (in feet) of the 5 largest states (by land mass) in the U.S.?",
+        "decomposition": [
+            {
+                "id": "b057ce0e67ca5bd6",
+                "question": "What are the 5 largest states by land mass in the U.S.?",
+                "decomposition": [],
+                "answer": [
+                    "Alaska",
+                    "Texas",
+                    "California",
+                    "Montana",
+                    "New Mexico"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 87513,
+                    "revid": 1173100807,
+                    "title": "List of U.S. states and territories by area",
+                    "url": "https://en.wikipedia.org/wiki/List_of_U.S._states_and_territories_by_area"
+                }
+            },
+            {
+                "id": "2293b48c75f14958",
+                "question": "What is the highest elevation (in feet) of Alaska?",
+                "decomposition": [],
+                "answer": 20310,
+                "depends_on": [
+                    "b057ce0e67ca5bd6"
+                ],
+                "evidence": {
+                    "pageid": 624,
+                    "revid": 1185663816,
+                    "title": "Alaska",
+                    "url": "https://en.wikipedia.org/wiki/Alaska"
+                }
+            },
+            {
+                "id": "5c2ac42dcbb3cad2",
+                "question": "What is the highest elevation (in feet) of Texas?",
+                "decomposition": [],
+                "answer": 8751,
+                "depends_on": [
+                    "b057ce0e67ca5bd6"
+                ],
+                "evidence": {
+                    "pageid": 29810,
+                    "revid": 1184801241,
+                    "title": "Texas",
+                    "url": "https://en.wikipedia.org/wiki/Texas"
+                }
+            },
+            {
+                "id": "eb2afe0bc3635297",
+                "question": "What is the highest elevation (in feet) of California?",
+                "decomposition": [],
+                "answer": 14505,
+                "depends_on": [
+                    "b057ce0e67ca5bd6"
+                ],
+                "evidence": {
+                    "pageid": 5407,
+                    "revid": 1185824790,
+                    "title": "California",
+                    "url": "https://en.wikipedia.org/wiki/California"
+                }
+            },
+            {
+                "id": "cc3f1d78598b0b37",
+                "question": "What is the highest elevation (in feet) of Montana?",
+                "decomposition": [],
+                "answer": 12807,
+                "depends_on": [
+                    "b057ce0e67ca5bd6"
+                ],
+                "evidence": {
+                    "pageid": 19978,
+                    "revid": 1180753026,
+                    "title": "Montana",
+                    "url": "https://en.wikipedia.org/wiki/Montana"
+                }
+            },
+            {
+                "id": "254dfe978909b491",
+                "question": "What is the highest elevation (in feet) of New Mexico?",
+                "decomposition": [],
+                "answer": 13161,
+                "depends_on": [
+                    "b057ce0e67ca5bd6"
+                ],
+                "evidence": {
+                    "pageid": 21649,
+                    "revid": 1185671361,
+                    "title": "New Mexico",
+                    "url": "https://en.wikipedia.org/wiki/New_Mexico"
+                }
+            }
+        ],
+        "answer": {
+            "Alaska": 20310,
+            "Texas": 8751,
+            "California": 14505,
+            "Montana": 12807,
+            "New Mexico": 13161
+        },
+        "categories": [
+            "History",
+            "Geography"
+        ]
+    },
+    {
+        "id": "d65057f597c21114",
+        "question": "What is the signed form of each of the top 5 languages spoken in the world by number of native speakers?",
+        "decomposition": [
+            {
+                "id": "45068fac92b6467a",
+                "question": "What are the top 5 languages spoken in the world by dialect?",
+                "decomposition": [],
+                "answer": [
+                    "Mandarin Chinese",
+                    "Spanish",
+                    "English",
+                    "Hindi",
+                    "Portuguese"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 405385,
+                    "revid": 1184830752,
+                    "title": "List of languages by number of native speakers",
+                    "url": "https://en.wikipedia.org/wiki/List_of_languages_by_number_of_native_speakers"
+                }
+            },
+            {
+                "id": "a49c19adf3359a6b",
+                "question": "What is the signed form of Mandarin Chinese called?",
+                "decomposition": [],
+                "answer": "Wenfa Shouyu",
+                "depends_on": [
+                    "45068fac92b6467a"
+                ],
+                "evidence": {
+                    "pageid": 19359,
+                    "revid": 1185741123,
+                    "title": "Mandarin Chinese",
+                    "url": "https://en.wikipedia.org/wiki/Mandarin_Chinese"
+                }
+            },
+            {
+                "id": "77b03f8e3a5facef",
+                "question": "What is the signed form of Spanish called?",
+                "decomposition": [],
+                "answer": "Signed Spanish",
+                "depends_on": [
+                    "45068fac92b6467a"
+                ],
+                "evidence": {
+                    "pageid": 26825,
+                    "revid": 1185541806,
+                    "title": "Spanish language",
+                    "url": "https://en.wikipedia.org/wiki/Spanish_language"
+                }
+            },
+            {
+                "id": "8b88fd17b136cd38",
+                "question": "What is the signed form of English called?",
+                "decomposition": [],
+                "answer": "Manually coded English",
+                "depends_on": [
+                    "45068fac92b6467a"
+                ],
+                "evidence": {
+                    "pageid": 8569916,
+                    "revid": 1185405094,
+                    "title": "English language",
+                    "url": "https://en.wikipedia.org/wiki/English_language"
+                }
+            },
+            {
+                "id": "be71146a7ef85084",
+                "question": "What is the signed form of Hindi called?",
+                "decomposition": [],
+                "answer": "Signed Hindi",
+                "depends_on": [
+                    "45068fac92b6467a"
+                ],
+                "evidence": {
+                    "pageid": 13652,
+                    "revid": 1185803484,
+                    "title": "Hindi",
+                    "url": "https://en.wikipedia.org/wiki/Hindi"
+                }
+            },
+            {
+                "id": "92ec245ac3c4fe3e",
+                "question": "What is the signed form of Portuguese called?",
+                "decomposition": [],
+                "answer": "Manually coded Portuguese",
+                "depends_on": [
+                    "45068fac92b6467a"
+                ],
+                "evidence": {
+                    "pageid": 23915,
+                    "revid": 1185886886,
+                    "title": "Portuguese language",
+                    "url": "https://en.wikipedia.org/wiki/Portuguese_language"
+                }
+            }
+        ],
+        "answer": {
+            "Mandarin Chinese": "Wenfa Shouyu",
+            "Spanish": "Signed Spanish",
+            "English": "Manually coded English",
+            "Hindi": "Signed Hindi",
+            "Portuguese": "Manually coded Portuguese"
+        },
+        "categories": [
+            "Culture",
+            "Linguistics"
+        ]
+    },
+    {
+        "id": "44e89b3eac9c16fc",
+        "question": "What are the mythical Pokemon introduced between generations 1 and 3, and what is their typing?",
+        "decomposition": [
+            {
+                "id": "b7bea4f2a958cf52",
+                "question": "What are the mythical Pokemon introduced between generations 1 and 4?",
+                "decomposition": [],
+                "answer": [
+                    "Mew",
+                    "Celebi",
+                    "Jirachi",
+                    "Deoxys"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 23840,
+                    "revid": 1185245170,
+                    "title": "List of Pok\u00e9mon",
+                    "url": "https://en.wikipedia.org/wiki/List_of_Pok%C3%A9mon"
+                }
+            },
+            {
+                "id": "b794e88c6a7af6d8",
+                "question": "What typing is Mew?",
+                "decomposition": [],
+                "answer": "Psychic",
+                "depends_on": [
+                    "b7bea4f2a958cf52"
+                ],
+                "evidence": {
+                    "pageid": 428082,
+                    "revid": 1173471883,
+                    "title": "Mew (Pok\u00e9mon)",
+                    "url": "https://en.wikipedia.org/wiki/Mew_(Pok%C3%A9mon)"
+                }
+            },
+            {
+                "id": "e52334b61ea98efd",
+                "question": "What typing is Celebi?",
+                "decomposition": [],
+                "answer": "Psychic Grass",
+                "depends_on": [
+                    "b7bea4f2a958cf52"
+                ],
+                "evidence": {
+                    "pageid": 49391776,
+                    "revid": 1185560297,
+                    "title": "List of generation II Pok\u00e9mon",
+                    "url": "https://en.wikipedia.org/wiki/List_of_generation_II_Pok%C3%A9mon#Celebi"
+                }
+            },
+            {
+                "id": "2dea946bb7496831",
+                "question": "What typing is Jirachi?",
+                "decomposition": [],
+                "answer": "Steel Psychic",
+                "depends_on": [
+                    "b7bea4f2a958cf52"
+                ],
+                "evidence": {
+                    "pageid": 49392702,
+                    "revid": 1185464080,
+                    "title": "List of generation III Pok\u00e9mon",
+                    "url": "https://en.wikipedia.org/wiki/List_of_generation_III_Pok%C3%A9mon#Jirachi"
+                }
+            },
+            {
+                "id": "69ad23f08c9d0137",
+                "question": "What typing is Deoxys?",
+                "decomposition": [],
+                "answer": "Psychic",
+                "depends_on": [
+                    "b7bea4f2a958cf52"
+                ],
+                "evidence": {
+                    "pageid": 49392702,
+                    "revid": 1185464080,
+                    "title": "List of generation III Pok\u00e9mon",
+                    "url": "https://en.wikipedia.org/wiki/List_of_generation_III_Pok%C3%A9mon#Deoxys"
+                }
+            }
+        ],
+        "answer": {
+            "Mew": "Psychic",
+            "Celebi": "Psychic Grass",
+            "Jirachi": "Steel Psychic",
+            "Deoxys": "Psychic"
+        },
+        "categories": [
+            "Video Games",
+            "Mythology"
+        ]
+    },
+    {
+        "id": "2b19d0853e149804",
+        "question": "What are the symptoms of the top 5 mortality cancers in the world amongst females?",
+        "decomposition": [
+            {
+                "id": "d22f945690374041",
+                "question": "What are the top 5 mortality cancers in the world amongst females?",
+                "decomposition": [],
+                "answer": [
+                    "Lung",
+                    "Breast",
+                    "Colorectal",
+                    "Pancreatic",
+                    "Ovarian"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 21499583,
+                    "revid": 1175444387,
+                    "title": "Epidemiology of cancer",
+                    "url": "https://en.wikipedia.org/wiki/Epidemiology_of_cancer"
+                }
+            },
+            {
+                "id": "10d3f602cca66ae6",
+                "question": "What are the symptoms of Lung Cancer?",
+                "decomposition": [],
+                "answer": "Coughing (including coughing up blood), shortness of breath, chest pain",
+                "depends_on": [
+                    "d22f945690374041"
+                ],
+                "evidence": {
+                    "pageid": 18450,
+                    "revid": 1182616742,
+                    "title": "Lung cancer",
+                    "url": "https://en.wikipedia.org/wiki/Lung_cancer"
+                }
+            },
+            {
+                "id": "e59d9fef12da5c75",
+                "question": "What are the symptoms of Breast Cancer?",
+                "decomposition": [],
+                "answer": "A lump in a breast, a change in breast shape, dimpling of the skin, fluid from the nipple, a newly inverted nipple, a red scaly patch of skin on the breast",
+                "depends_on": [
+                    "d22f945690374041"
+                ],
+                "evidence": {
+                    "pageid": 70547,
+                    "revid": 1185527758,
+                    "title": "Breast cancer",
+                    "url": "https://en.wikipedia.org/wiki/Breast_cancer"
+                }
+            },
+            {
+                "id": "3efe2f93aa207b4b",
+                "question": "What are the symptoms of Colorectal Cancer?",
+                "decomposition": [],
+                "answer": "Blood in stool, change in bowel movements, unintentional weight loss, vomiting, fatigue",
+                "depends_on": [
+                    "d22f945690374041"
+                ],
+                "evidence": {
+                    "pageid": 206979,
+                    "revid": 1185068172,
+                    "title": "Colorectal cancer",
+                    "url": "https://en.wikipedia.org/wiki/Colorectal_cancer"
+                }
+            },
+            {
+                "id": "57eaa6861a966d14",
+                "question": "What are the symptoms of Pancreatic Cancer?",
+                "decomposition": [],
+                "answer": "Yellow skin, abdominal or back pain, unexplained weight loss, light-colored stools, dark urine, loss of appetite",
+                "depends_on": [
+                    "d22f945690374041"
+                ],
+                "evidence": {
+                    "pageid": 363559,
+                    "revid": 1185354102,
+                    "title": "Pancreatic cancer",
+                    "url": "https://en.wikipedia.org/wiki/Pancreatic_cancer"
+                }
+            },
+            {
+                "id": "e2a41c40d5474efc",
+                "question": "What are the symptoms of Ovarian Cancer?",
+                "decomposition": [],
+                "answer": "Bloating, pelvic pain, constipation, abdominal swelling, loss of appetite",
+                "depends_on": [
+                    "d22f945690374041"
+                ],
+                "evidence": {
+                    "pageid": 414192,
+                    "revid": 1185929045,
+                    "title": "Ovarian cancer",
+                    "url": "https://en.wikipedia.org/wiki/Ovarian_cancer"
+                }
+            }
+        ],
+        "answer": {
+            "Lung": "Coughing (including coughing up blood), shortness of breath, chest pain",
+            "Breast": "A lump in a breast, a change in breast shape, dimpling of the skin, fluid from the nipple, a newly inverted nipple, a red scaly patch of skin on the breast",
+            "Colorectal": "Blood in stool, change in bowel movements, unintentional weight loss, vomiting, fatigue",
+            "Pancreatic": "Yellow skin, abdominal or back pain, unexplained weight loss, light-colored stools, dark urine, loss of appetite",
+            "Ovarian": "Bloating, pelvic pain, constipation, abdominal swelling, loss of appetite"
+        },
+        "categories": [
+            "Women's Health",
+            "Oncology"
+        ]
+    },
+    {
+        "id": "9eb4feb88c3f980b",
+        "question": "What were the release dates of the studio albums released by the band Destiny's Child?",
+        "decomposition": [
+            {
+                "id": "c1c05151c5a498ec",
+                "question": "What are the studio albums released by Destiny's Child?",
+                "decomposition": [],
+                "answer": [
+                    "Destiny's Child",
+                    "The Writing's on the Wall",
+                    "Survivor",
+                    "8 Days of Christmas",
+                    "Destiny Fulfilled"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 2652289,
+                    "revid": 1182206124,
+                    "title": "Destiny's Child discography",
+                    "url": "https://en.wikipedia.org/wiki/Destiny%27s_Child_discography"
+                }
+            },
+            {
+                "id": "2578b779da292859",
+                "question": "What was the release date of Destiny's Child?",
+                "decomposition": [],
+                "answer": "February 17, 1998",
+                "depends_on": [
+                    "c1c05151c5a498ec"
+                ],
+                "evidence": {
+                    "pageid": 3310186,
+                    "revid": 1182557118,
+                    "title": "Destiny's Child (album)",
+                    "url": "https://en.wikipedia.org/wiki/Destiny%27s_Child_(album)"
+                }
+            },
+            {
+                "id": "e06cbafa71f04891",
+                "question": "What was the release date of The Writing's on the Wall?",
+                "decomposition": [],
+                "answer": "July 14, 1999",
+                "depends_on": [
+                    "c1c05151c5a498ec"
+                ],
+                "evidence": {
+                    "pageid": 2113034,
+                    "revid": 1185884998,
+                    "title": "The Writing's on the Wall",
+                    "url": "https://en.wikipedia.org/wiki/The_Writing%27s_on_the_Wall"
+                }
+            },
+            {
+                "id": "d778fa6562812eb8",
+                "question": "What was the release date of Survivor?",
+                "decomposition": [],
+                "answer": "April 25, 2001",
+                "depends_on": [
+                    "c1c05151c5a498ec"
+                ],
+                "evidence": {
+                    "pageid": 1272199,
+                    "revid": 1182609538,
+                    "title": "Survivor (Destiny's Child album)",
+                    "url": "https://en.wikipedia.org/wiki/Survivor_(Destiny%27s_Child_album)"
+                }
+            },
+            {
+                "id": "3bdc080a425d211e",
+                "question": "What was the release date of 8 Days of Christmas?",
+                "decomposition": [],
+                "answer": "October 30, 2001",
+                "depends_on": [
+                    "c1c05151c5a498ec"
+                ],
+                "evidence": {
+                    "pageid": 6540549,
+                    "revid": 1170243271,
+                    "title": "8 Days of Christmas",
+                    "url": "https://en.wikipedia.org/wiki/8_Days_of_Christmas"
+                }
+            },
+            {
+                "id": "6c52f3180ec9a017",
+                "question": "What was the release date of Destiny Fulfilled?",
+                "decomposition": [],
+                "answer": "November 16, 2004",
+                "depends_on": [
+                    "c1c05151c5a498ec"
+                ],
+                "evidence": {
+                    "pageid": 972631,
+                    "revid": 1185391470,
+                    "title": "Destiny Fulfilled",
+                    "url": "https://en.wikipedia.org/wiki/Destiny_Fulfilled"
+                }
+            }
+        ],
+        "answer": {
+            "Destiny's Child": "February 17, 1998",
+            "The Writing's on the Wall": "July 14, 1999",
+            "Survivor": "April 25, 2001",
+            "8 Days of Christmas": "October 30, 2001",
+            "Destiny Fulfilled": "November 16, 2004"
+        },
+        "categories": [
+            "Music"
+        ]
+    },
+    {
+        "id": "9bf015e9abca6d73",
+        "question": "What is the projected GDP in US dollars of the top 5 countries or territories with the highest GDP per capita, including non-IMF members, for the year 2023?",
+        "decomposition": [
+            {
+                "id": "9dfd13096058a406",
+                "question": "What are the 5 highest GDP per capita country or territory or non IMF members in 2023?",
+                "decomposition": [],
+                "answer": [
+                    "Luxembourg",
+                    "Ireland",
+                    "Singapore",
+                    "Qatar",
+                    "Macau"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 695403,
+                    "revid": 1184371248,
+                    "title": "List of countries by GDP (PPP) per capita",
+                    "url": "https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(PPP)_per_capita"
+                }
+            },
+            {
+                "id": "f72fee295890c29e",
+                "question": "What is the GDP of Luxembourg in 2023?",
+                "decomposition": [],
+                "answer": "$87 billion",
+                "depends_on": [
+                    "9dfd13096058a406"
+                ],
+                "evidence": {
+                    "pageid": 17834,
+                    "revid": 1185796524,
+                    "title": "Economy of Luxembourg",
+                    "url": "https://en.wikipedia.org/wiki/Economy_of_Luxembourg"
+                }
+            },
+            {
+                "id": "25db25feb5af33a0",
+                "question": "What is the GDP of Ireland in 2023?",
+                "decomposition": [],
+                "answer": "$516 billion",
+                "depends_on": [
+                    "9dfd13096058a406"
+                ],
+                "evidence": {
+                    "pageid": 18933019,
+                    "revid": 1185002235,
+                    "title": "Economy of the Republic of Ireland",
+                    "url": "https://en.wikipedia.org/wiki/Economy_of_the_Republic_of_Ireland"
+                }
+            },
+            {
+                "id": "b11037f63408693d",
+                "question": "What is the GDP of Singapore in 2023?",
+                "decomposition": [],
+                "answer": "$515 billion",
+                "depends_on": [
+                    "9dfd13096058a406"
+                ],
+                "evidence": {
+                    "pageid": 57011,
+                    "revid": 1185760381,
+                    "title": "Economy of Singapore",
+                    "url": "https://en.wikipedia.org/wiki/Economy_of_Singapore"
+                }
+            },
+            {
+                "id": "1c4447875f55bcc0",
+                "question": "What is the GDP of Qatar in 2023?",
+                "decomposition": [],
+                "answer": "$219.576 billion",
+                "depends_on": [
+                    "9dfd13096058a406"
+                ],
+                "evidence": {
+                    "pageid": 25191,
+                    "revid": 1181711237,
+                    "title": "Economy of Qatar",
+                    "url": "https://en.wikipedia.org/wiki/Economy_of_Qatar"
+                }
+            },
+            {
+                "id": "9ada78a3177ebc15",
+                "question": "What is the GDP of Macau in 2023?",
+                "decomposition": [],
+                "answer": "$38.480 billion",
+                "depends_on": [
+                    "9dfd13096058a406"
+                ],
+                "evidence": {
+                    "pageid": 19073,
+                    "revid": 1185381140,
+                    "title": "Economy of Macau",
+                    "url": "https://en.wikipedia.org/wiki/Economy_of_Macau"
+                }
+            }
+        ],
+        "answer": {
+            "Luxembourg": "$87 billion",
+            "Ireland": "$516 billion",
+            "Singapore": "$515 billion",
+            "Qatar": "$219.576 billion",
+            "Macau": "$38.480 billion"
+        },
+        "categories": [
+            "Economics"
+        ]
+    },
+    {
+        "id": "daaf58facccf012d",
+        "question": "In what years did the top four most subscribed YouTube channels start?",
+        "decomposition": [
+            {
+                "id": "44a7d34763a6109b",
+                "question": "What are the top four most subscribed YouTube channels?",
+                "decomposition": [],
+                "answer": [
+                    "T-Series",
+                    "MrBeast",
+                    "Cocomelon",
+                    "Sony Entertainment Television India"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 40199886,
+                    "revid": 1185924728,
+                    "title": "List of most-subscribed YouTube channels",
+                    "url": "https://en.wikipedia.org/wiki/List_of_most-subscribed_YouTube_channels"
+                }
+            },
+            {
+                "id": "46270350fbf5da64",
+                "question": "When did the channel of T-Series start?",
+                "decomposition": [],
+                "answer": 2006,
+                "depends_on": [
+                    "44a7d34763a6109b"
+                ],
+                "evidence": {
+                    "pageid": 21844874,
+                    "revid": 1185743653,
+                    "title": "T-Series (company)",
+                    "url": "https://en.wikipedia.org/wiki/T-Series_(company)"
+                }
+            },
+            {
+                "id": "65898eadae9bc4a4",
+                "question": "When did the channel of MrBeast start?",
+                "decomposition": [],
+                "answer": 2012,
+                "depends_on": [
+                    "44a7d34763a6109b"
+                ],
+                "evidence": {
+                    "pageid": 58920328,
+                    "revid": 1185656775,
+                    "title": "MrBeast",
+                    "url": "https://en.wikipedia.org/wiki/MrBeast"
+                }
+            },
+            {
+                "id": "84327de6c1035bf5",
+                "question": "When did the channel of Cocomelon start?",
+                "decomposition": [],
+                "answer": 2006,
+                "depends_on": [
+                    "44a7d34763a6109b"
+                ],
+                "evidence": {
+                    "pageid": 58728524,
+                    "revid": 1185359161,
+                    "title": "Cocomelon",
+                    "url": "https://en.wikipedia.org/wiki/Cocomelon"
+                }
+            },
+            {
+                "id": "509f92bec7caf60d",
+                "question": "When did the channel of Sony Entertainment Television India start?",
+                "decomposition": [],
+                "answer": 1995,
+                "depends_on": [
+                    "44a7d34763a6109b"
+                ],
+                "evidence": {
+                    "pageid": 1429265,
+                    "revid": 1182843124,
+                    "title": "Sony Entertainment Television",
+                    "url": "https://en.wikipedia.org/wiki/Sony_Entertainment_Television"
+                }
+            }
+        ],
+        "answer": [
+            2006,
+            2012,
+            2006,
+            1995
+        ],
+        "categories": [
+            "Film Studies",
+            "Internet"
+        ]
+    },
+    {
+        "id": "626c8dd35bd2f3e2",
+        "question": "In what months were the 5 highest-scoring small forwards in NBA history born?",
+        "decomposition": [
+            {
+                "id": "a40d41a7e53cb075",
+                "question": "Who are the 5 highest-scoring small forwards in NBA history?",
+                "decomposition": [],
+                "answer": [
+                    "Lebron James",
+                    "Carmelo Anthony",
+                    "Kevin Durant",
+                    "Dominique Wilkins",
+                    "Paul Pierce"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 8588996,
+                    "revid": 1185862434,
+                    "title": "List of National Basketball Association career scoring leaders",
+                    "url": "https://en.wikipedia.org/wiki/List_of_National_Basketball_Association_career_scoring_leaders"
+                }
+            },
+            {
+                "id": "fe640839f292d47e",
+                "question": "In what month was Lebron James born?",
+                "decomposition": [],
+                "answer": "December",
+                "depends_on": [
+                    "a40d41a7e53cb075"
+                ],
+                "evidence": {
+                    "pageid": 240940,
+                    "revid": 1185865019,
+                    "title": "LeBron James",
+                    "url": "https://en.wikipedia.org/wiki/LeBron_James"
+                }
+            },
+            {
+                "id": "93eb65f25b2f607e",
+                "question": "In what month was Carmelo Anthony born?",
+                "decomposition": [],
+                "answer": "May",
+                "depends_on": [
+                    "a40d41a7e53cb075"
+                ],
+                "evidence": {
+                    "pageid": 878643,
+                    "revid": 1185454964,
+                    "title": "Carmelo Anthony",
+                    "url": "https://en.wikipedia.org/wiki/Carmelo_Anthony"
+                }
+            },
+            {
+                "id": "e8ba23b7c2da52c4",
+                "question": "In what month was Kevin Durant born?",
+                "decomposition": [],
+                "answer": "September",
+                "depends_on": [
+                    "a40d41a7e53cb075"
+                ],
+                "evidence": {
+                    "pageid": 6933101,
+                    "revid": 1185725438,
+                    "title": "Kevin Durant",
+                    "url": "https://en.wikipedia.org/wiki/Kevin_Durant"
+                }
+            },
+            {
+                "id": "0a41a91e04c74d71",
+                "question": "In what month was Dominique Wilkins born?",
+                "decomposition": [],
+                "answer": "January",
+                "depends_on": [
+                    "a40d41a7e53cb075"
+                ],
+                "evidence": {
+                    "pageid": 613063,
+                    "revid": 1185787017,
+                    "title": "Dominique Wilkins",
+                    "url": "https://en.wikipedia.org/wiki/Dominique_Wilkins"
+                }
+            },
+            {
+                "id": "53dc9d31263f2a18",
+                "question": "In what month was Paul Pierce born?",
+                "decomposition": [],
+                "answer": "October",
+                "depends_on": [
+                    "a40d41a7e53cb075"
+                ],
+                "evidence": {
+                    "pageid": 956947,
+                    "revid": 1185783356,
+                    "title": "Paul Pierce",
+                    "url": "https://en.wikipedia.org/wiki/Paul_Pierce"
+                }
+            }
+        ],
+        "answer": {
+            "Lebron James": "December",
+            "Carmelo Anthony": "May",
+            "Kevin Durant": "September",
+            "Dominique Wilkins": "January",
+            "Paul Pierce": "October"
+        },
+        "categories": [
+            "Sports",
+            "Statistics"
+        ]
+    },
+    {
+        "id": "a19574bcd377eda6",
+        "question": "Who are the members of the current British Royal Family and who are their respective fathers?",
+        "decomposition": [
+            {
+                "id": "257314fb5d04d075",
+                "question": "Find the members of the current British Royal Family.",
+                "decomposition": [],
+                "answer": [
+                    "King Charles III",
+                    "Queen Camilla",
+                    "William, Prince of Wales",
+                    "Catherine, Princess of Wales",
+                    "Anne, Princess Royal",
+                    "Prince Edward, Duke of Edinburgh",
+                    "Sophie, Duchess of Edinburgh"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 46542,
+                    "revid": 1185805524,
+                    "title": "British royal family",
+                    "url": "https://en.wikipedia.org/wiki/British_royal_family"
+                }
+            },
+            {
+                "id": "585d206f3454f25a",
+                "question": "Who are the parents of King Charles III?",
+                "decomposition": [],
+                "answer": "Prince Philip, Duke of Edinburgh",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 125248,
+                    "revid": 1184891229,
+                    "title": "Charles III",
+                    "url": "https://en.wikipedia.org/wiki/Charles_III"
+                }
+            },
+            {
+                "id": "46bde360b16f674f",
+                "question": "Who are the parents of Queen Camilla?",
+                "decomposition": [],
+                "answer": "Bruce Shand",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 160811,
+                    "revid": 1185555146,
+                    "title": "Queen Camilla",
+                    "url": "https://en.wikipedia.org/wiki/Queen_Camilla"
+                }
+            },
+            {
+                "id": "83c58057afbf0185",
+                "question": "Who are the parents of William, Prince of Wales?",
+                "decomposition": [],
+                "answer": "Charles III",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 72201,
+                    "revid": 1185102897,
+                    "title": "William, Prince of Wales",
+                    "url": "https://en.wikipedia.org/wiki/William,_Prince_of_Wales"
+                }
+            },
+            {
+                "id": "90f768a9214a7e25",
+                "question": "Who are the parents of Catherine, Princess of Wales?",
+                "decomposition": [],
+                "answer": "Michael Middleton",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 1677192,
+                    "revid": 1185420721,
+                    "title": "Catherine, Princess of Wales",
+                    "url": "https://en.wikipedia.org/wiki/Catherine,_Princess_of_Wales"
+                }
+            },
+            {
+                "id": "ced13268b54b050d",
+                "question": "Who are the parents of Anne, Princess Royal?",
+                "decomposition": [],
+                "answer": "Prince Philip, Duke of Edinburgh",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 125231,
+                    "revid": 1184962270,
+                    "title": "Anne, Princess Royal",
+                    "url": "https://en.wikipedia.org/wiki/Anne,_Princess_Royal"
+                }
+            },
+            {
+                "id": "25dd7e13dc058b63",
+                "question": "Who are the parents of Prince Edward, Duke of Edinburgh?",
+                "decomposition": [],
+                "answer": "Prince Philip, Duke of Edinburgh",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 125209,
+                    "revid": 1185301566,
+                    "title": "Prince Edward, Duke of Edinburgh",
+                    "url": "https://en.wikipedia.org/wiki/Prince_Edward,_Duke_of_Edinburgh"
+                }
+            },
+            {
+                "id": "127746860be2999f",
+                "question": "Who are the parents of Sophie, Duchess of Edinburgh?",
+                "decomposition": [],
+                "answer": "Christopher Rhys-Jones",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 125195,
+                    "revid": 1183702809,
+                    "title": "Sophie, Duchess of Edinburgh",
+                    "url": "https://en.wikipedia.org/wiki/Sophie,_Duchess_of_Edinburgh"
+                }
+            }
+        ],
+        "answer": {
+            "King Charles III": "Prince Philip, Duke of Edinburgh",
+            "Queen Camilla": "Bruce Shand",
+            "William, Prince of Wales": "Charles III",
+            "Catherine, Princess of Wales": "Michael Middleton",
+            "Anne, Princess Royal": "Prince Philip, Duke of Edinburgh",
+            "Prince Edward, Duke of Edinburgh": "Prince Philip, Duke of Edinburgh",
+            "Sophie, Duchess of Edinburgh": "Christopher Rhys-Jones"
+        },
+        "categories": [
+            "History",
+            "Genealogy"
+        ]
+    },
+    {
+        "id": "1686afcc411d5bd7",
+        "question": "Where are the headquarters of the Big Five companies in the technology industry located?",
+        "decomposition": [
+            {
+                "id": "10e463e71a7401db",
+                "question": "What are the Big Five companies in the technology industry?",
+                "decomposition": [],
+                "answer": [
+                    "Microsoft",
+                    "Meta",
+                    "Amazon",
+                    "Apple",
+                    "Alphabet"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 57174306,
+                    "revid": 1185943779,
+                    "title": "Big Tech",
+                    "url": "https://en.wikipedia.org/wiki/Big_Tech"
+                }
+            },
+            {
+                "id": "3f4c33ef73f89225",
+                "question": "What is the headquarter of Alphabet?",
+                "decomposition": [],
+                "answer": "Mountain View, California",
+                "depends_on": [
+                    "10e463e71a7401db"
+                ],
+                "evidence": {
+                    "pageid": 47489893,
+                    "revid": 1184949012,
+                    "title": "Alphabet Inc.",
+                    "url": "https://en.wikipedia.org/wiki/Alphabet_Inc."
+                }
+            },
+            {
+                "id": "e3a58076f01f3d62",
+                "question": "What is the headquarter of Amazon?",
+                "decomposition": [],
+                "answer": "Seattle, Washington and Arlington County, Virginia",
+                "depends_on": [
+                    "10e463e71a7401db"
+                ],
+                "evidence": {
+                    "pageid": 90451,
+                    "revid": 1185345455,
+                    "title": "Amazon (company)",
+                    "url": "https://en.wikipedia.org/wiki/Amazon_(company)"
+                }
+            },
+            {
+                "id": "5eee56847234e006",
+                "question": "What is the headquarter of Meta?",
+                "decomposition": [],
+                "answer": "Menlo Park, California",
+                "depends_on": [
+                    "10e463e71a7401db"
+                ],
+                "evidence": {
+                    "pageid": 62420226,
+                    "revid": 1185758146,
+                    "title": "Meta Platforms",
+                    "url": "https://en.wikipedia.org/wiki/Meta_Platforms"
+                }
+            },
+            {
+                "id": "da93cfc7a2652169",
+                "question": "What is the headquarter of Apple?",
+                "decomposition": [],
+                "answer": "Cupertino, California",
+                "depends_on": [
+                    "10e463e71a7401db"
+                ],
+                "evidence": {
+                    "pageid": 856,
+                    "revid": 1185504212,
+                    "title": "Apple Inc.",
+                    "url": "https://en.wikipedia.org/wiki/Apple_Inc."
+                }
+            },
+            {
+                "id": "10b924df13208d5a",
+                "question": "What is the headquarter of Microsoft?",
+                "decomposition": [],
+                "answer": "Redmond, Washington",
+                "depends_on": [
+                    "10e463e71a7401db"
+                ],
+                "evidence": {
+                    "pageid": 19001,
+                    "revid": 1185824087,
+                    "title": "Microsoft",
+                    "url": "https://en.wikipedia.org/wiki/Microsoft"
+                }
+            }
+        ],
+        "answer": {
+            "Alphabet": "Mountain View, California",
+            "Amazon": "Seattle, Washington and Arlington County, Virginia",
+            "Meta": "Menlo Park, California",
+            "Apple": "Cupertino, California",
+            "Microsoft": "Redmond, Washington"
+        },
+        "categories": [
+            "Business",
+            "Technology"
+        ]
+    },
+    {
+        "id": "95de313fdfef9d01",
+        "question": "What were the ages of the five most recent presidents of the United States?",
+        "decomposition": [
+            {
+                "id": "f3d4f7ce561a6963",
+                "question": "What are the 5 most recent presidents of the United States?",
+                "decomposition": [],
+                "answer": [
+                    "Joe Biden",
+                    "Donald Trump",
+                    "Barack Obama",
+                    "George W. Bush",
+                    "Bill Clinton"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 39707994,
+                    "revid": 1183557170,
+                    "title": "List of countries by population (United Nations)",
+                    "url": "https://en.wikipedia.org/wiki/List_of_countries_by_population_(United_Nations)"
+                }
+            },
+            {
+                "id": "f88ed94d47aff8d3",
+                "question": "What is the age of Joe Biden?",
+                "decomposition": [],
+                "answer": 80,
+                "depends_on": [
+                    "f3d4f7ce561a6963"
+                ],
+                "evidence": {
+                    "pageid": 145422,
+                    "revid": 1185946453,
+                    "title": "Joe Biden",
+                    "url": "https://en.wikipedia.org/wiki/Joe_Biden"
+                }
+            },
+            {
+                "id": "0a46dd907318ebc8",
+                "question": "What is the age of Donald Trump?",
+                "decomposition": [],
+                "answer": 77,
+                "depends_on": [
+                    "f3d4f7ce561a6963"
+                ],
+                "evidence": {
+                    "pageid": 4848272,
+                    "revid": 1185888837,
+                    "title": "Donald Trump",
+                    "url": "https://en.wikipedia.org/wiki/Donald_Trump"
+                }
+            },
+            {
+                "id": "7901291571ee3e86",
+                "question": "What is the age of Barack Obama?",
+                "decomposition": [],
+                "answer": 62,
+                "depends_on": [
+                    "f3d4f7ce561a6963"
+                ],
+                "evidence": {
+                    "pageid": 534366,
+                    "revid": 1185877587,
+                    "title": "Barack Obama",
+                    "url": "https://en.wikipedia.org/wiki/Barack_Obama"
+                }
+            },
+            {
+                "id": "ce4f98194a95d0b6",
+                "question": "What is the age of George W. Bush?",
+                "decomposition": [],
+                "answer": 77,
+                "depends_on": [
+                    "f3d4f7ce561a6963"
+                ],
+                "evidence": {
+                    "pageid": 3414021,
+                    "revid": 1185789468,
+                    "title": "George W. Bush",
+                    "url": "https://en.wikipedia.org/wiki/George_W._Bush"
+                }
+            },
+            {
+                "id": "b9c3b9631ae519bb",
+                "question": "What is the age of Bill Clinton?",
+                "decomposition": [],
+                "answer": 77,
+                "depends_on": [
+                    "f3d4f7ce561a6963"
+                ],
+                "evidence": {
+                    "pageid": 3356,
+                    "revid": 1185156347,
+                    "title": "Bill Clinton",
+                    "url": "https://en.wikipedia.org/wiki/Bill_Clinton"
+                }
+            }
+        ],
+        "answer": {
+            "Joe Biden": 80,
+            "Donald Trump": 77,
+            "Barack Obama": 62,
+            "George W. Bush": 77,
+            "Bill Clinton": 77
+        },
+        "categories": [
+            "History",
+            "Politics"
+        ]
+    },
+    {
+        "id": "dfc2faff26b2f26c",
+        "question": "What are the top 5 most widely spoken languages?",
+        "decomposition": [
+            {
+                "id": "d984c27366802cd8",
+                "question": "What are the top 5 most widely spoken languages?",
+                "decomposition": [],
+                "answer": [
+                    "Mandarin Chinese",
+                    "Spanish",
+                    "English",
+                    "Hindi",
+                    "Portuguese"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 405385,
+                    "revid": 1184830752,
+                    "title": "List of languages by number of native speakers",
+                    "url": "https://en.wikipedia.org/wiki/List_of_languages_by_number_of_native_speakers"
+                }
+            },
+            {
+                "id": "dff0e9a009ca92b5",
+                "question": "How many Mandarin Chinese speakers are there?",
+                "decomposition": [],
+                "answer": "920,000,000",
+                "depends_on": [
+                    "d984c27366802cd8"
+                ],
+                "evidence": {
+                    "pageid": 19359,
+                    "revid": 1185741123,
+                    "title": "Mandarin Chinese",
+                    "url": "https://en.wikipedia.org/wiki/Mandarin_Chinese"
+                }
+            },
+            {
+                "id": "b5e7d5015b4e4754",
+                "question": "How many Spanish speakers are there?",
+                "decomposition": [],
+                "answer": "600,000,000",
+                "depends_on": [
+                    "d984c27366802cd8"
+                ],
+                "evidence": {
+                    "pageid": 26825,
+                    "revid": 1185541806,
+                    "title": "Spanish language",
+                    "url": "https://en.wikipedia.org/wiki/Spanish_language"
+                }
+            },
+            {
+                "id": "59c969fef872ecd1",
+                "question": "How many English speakers are there?",
+                "decomposition": [],
+                "answer": "380,000,000",
+                "depends_on": [
+                    "d984c27366802cd8"
+                ],
+                "evidence": {
+                    "pageid": 8569916,
+                    "revid": 1185405094,
+                    "title": "English language",
+                    "url": "https://en.wikipedia.org/wiki/English_language"
+                }
+            },
+            {
+                "id": "a18e0d23fec7d790",
+                "question": "How many Hindi speakers are there?",
+                "decomposition": [],
+                "answer": "322,000,000",
+                "depends_on": [
+                    "d984c27366802cd8"
+                ],
+                "evidence": {
+                    "pageid": 13652,
+                    "revid": 1185803484,
+                    "title": "Hindi",
+                    "url": "https://en.wikipedia.org/wiki/Hindi"
+                }
+            },
+            {
+                "id": "9a0f985fdaf6f6f6",
+                "question": "How many Portuguese speakers are there?",
+                "decomposition": [],
+                "answer": "230,000,000",
+                "depends_on": [
+                    "d984c27366802cd8"
+                ],
+                "evidence": {
+                    "pageid": 23915,
+                    "revid": 1185886886,
+                    "title": "Portuguese language",
+                    "url": "https://en.wikipedia.org/wiki/Portuguese_language"
+                }
+            }
+        ],
+        "answer": {
+            "Mandarin Chinese": "920,000,000",
+            "Hindi": "322,000,000",
+            "English": "380,000,000",
+            "Spanish": "600,000,000",
+            "Portuguese": "230,000,000"
+        },
+        "categories": [
+            "Linguistics"
+        ]
+    },
+    {
+        "id": "6ffa8a28719b1246",
+        "question": "Who are the five most recent mayors of Philadelphia and what are their hometowns?",
+        "decomposition": [
+            {
+                "id": "c43a2df2e437396c",
+                "question": "Who are the five most recent mayors of Philadelphia?",
+                "decomposition": [],
+                "answer": [
+                    "Jim Kenney",
+                    "Michael Nutter",
+                    "John F. Street",
+                    "Ed Rendell",
+                    "Wilson Goode"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 538842,
+                    "revid": 1184198832,
+                    "title": "Mayor of Philadelphia",
+                    "url": "https://en.wikipedia.org/wiki/Mayor_of_Philadelphia"
+                }
+            },
+            {
+                "id": "b62d32e012d3c6b5",
+                "question": "Which town/city is Jim Kenney from?",
+                "decomposition": [],
+                "answer": "Philadelphia, PA",
+                "depends_on": [
+                    "c43a2df2e437396c"
+                ],
+                "evidence": {
+                    "pageid": 26211264,
+                    "revid": 1184303710,
+                    "title": "Jim Kenney",
+                    "url": "https://en.wikipedia.org/wiki/Jim_Kenney"
+                }
+            },
+            {
+                "id": "a88c8af3c12138c9",
+                "question": "Which town/city is Michael Nutter from?",
+                "decomposition": [],
+                "answer": "Philadelphia, PA",
+                "depends_on": [
+                    "c43a2df2e437396c"
+                ],
+                "evidence": {
+                    "pageid": 2151817,
+                    "revid": 1179132314,
+                    "title": "Michael Nutter",
+                    "url": "https://en.wikipedia.org/wiki/Michael_Nutter"
+                }
+            },
+            {
+                "id": "1b24589f15c5eb38",
+                "question": "Which town/city is John F. Street from?",
+                "decomposition": [],
+                "answer": "Norristown, PA",
+                "depends_on": [
+                    "c43a2df2e437396c"
+                ],
+                "evidence": {
+                    "pageid": 451278,
+                    "revid": 1178150503,
+                    "title": "John F. Street",
+                    "url": "https://en.wikipedia.org/wiki/John_F._Street"
+                }
+            },
+            {
+                "id": "64a5d79315ddcc3a",
+                "question": "Which town/city is Ed Rendell from?",
+                "decomposition": [],
+                "answer": "New York City, NY",
+                "depends_on": [
+                    "c43a2df2e437396c"
+                ],
+                "evidence": {
+                    "pageid": 195061,
+                    "revid": 1172756628,
+                    "title": "Ed Rendell",
+                    "url": "https://en.wikipedia.org/wiki/Ed_Rendell"
+                }
+            },
+            {
+                "id": "25d80b67c1a3135c",
+                "question": "Which town/city is Wilson Goode from?",
+                "decomposition": [],
+                "answer": "Seaboard, NC",
+                "depends_on": [
+                    "c43a2df2e437396c"
+                ],
+                "evidence": {
+                    "pageid": 25125043,
+                    "revid": 1165327726,
+                    "title": "Wilson Goode",
+                    "url": "https://en.wikipedia.org/wiki/Wilson_Goode"
+                }
+            }
+        ],
+        "answer": {
+            "Jim Kenney": "Philadelphia, PA",
+            "Michael Nutter": "Philadelphia, PA",
+            "John F. Street": "Norristown, PA",
+            "Ed Rendell": "New York City, NY",
+            "Wilson Goode": "Seaboard, NC"
+        },
+        "categories": [
+            "Politics",
+            "Geography"
+        ]
+    },
+    {
+        "id": "31ec74ff936a0f36",
+        "question": "What were the budgets (in USD millions) of the top 5 grossing films of all time",
+        "decomposition": [
+            {
+                "id": "9e52607ede224a42",
+                "question": "What were the top 5 grossing films of all time?",
+                "decomposition": [],
+                "answer": [
+                    "Avatar",
+                    "Avengers: Endgame",
+                    "Avatar: The Way of Water",
+                    "Titanic",
+                    "Star Wars: The Force Awakens"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 59892,
+                    "revid": 1185890055,
+                    "title": "List of highest-grossing films",
+                    "url": "https://en.wikipedia.org/wiki/List_of_highest-grossing_films"
+                }
+            },
+            {
+                "id": "f07f1204bf42434c",
+                "question": "What was the budget (in USD Millions) of Avatar?",
+                "decomposition": [],
+                "answer": 237,
+                "depends_on": [
+                    "9e52607ede224a42"
+                ],
+                "evidence": {
+                    "pageid": 4273140,
+                    "revid": 1185356274,
+                    "title": "Avatar (2009 film)",
+                    "url": "https://en.wikipedia.org/wiki/Avatar_(2009_film)"
+                }
+            },
+            {
+                "id": "d64cb1f507a9c8bb",
+                "question": "What was the budget (in USD Millions) of Avengers: Endgame?",
+                "decomposition": [],
+                "answer": 400,
+                "depends_on": [
+                    "9e52607ede224a42"
+                ],
+                "evidence": {
+                    "pageid": 44254295,
+                    "revid": 1185724642,
+                    "title": "Avengers: Endgame",
+                    "url": "https://en.wikipedia.org/wiki/Avengers:_Endgame"
+                }
+            },
+            {
+                "id": "a533d28efe2ff285",
+                "question": "What was the budget (in USD Millions) of Avatar: The Way of Water?",
+                "decomposition": [],
+                "answer": 460,
+                "depends_on": [
+                    "9e52607ede224a42"
+                ],
+                "evidence": {
+                    "pageid": 25813358,
+                    "revid": 1185376874,
+                    "title": "Avatar: The Way of Water",
+                    "url": "https://en.wikipedia.org/wiki/Avatar:_The_Way_of_Water"
+                }
+            },
+            {
+                "id": "046d5126ac67c2b8",
+                "question": "What was the budget (in USD Millions) of Titanic?",
+                "decomposition": [],
+                "answer": 200,
+                "depends_on": [
+                    "9e52607ede224a42"
+                ],
+                "evidence": {
+                    "pageid": 52371,
+                    "revid": 1185400166,
+                    "title": "Titanic (1997 film)",
+                    "url": "https://en.wikipedia.org/wiki/Titanic_(1997_film)"
+                }
+            },
+            {
+                "id": "32190a37d3b73591",
+                "question": "What was the budget (in USD Millions) of Star Wars: The Force Awakens?",
+                "decomposition": [],
+                "answer": 447,
+                "depends_on": [
+                    "9e52607ede224a42"
+                ],
+                "evidence": {
+                    "pageid": 14723194,
+                    "revid": 1185889585,
+                    "title": "Star Wars: The Force Awakens",
+                    "url": "https://en.wikipedia.org/wiki/Star_Wars:_The_Force_Awakens"
+                }
+            }
+        ],
+        "answer": {
+            "Avatar": 237,
+            "Avengers: Endgame": 400,
+            "Avatar: The Way of Water": 460,
+            "Titanic": 200,
+            "Star Wars: The Force Awakens": 447
+        },
+        "categories": [
+            "Finance",
+            "Film Studies"
+        ]
+    },
+    {
+        "id": "114fef46b46c49e6",
+        "question": "Who were the heads of state of the belligerents in the War of the Third Coalition and when did they die?",
+        "decomposition": [
+            {
+                "id": "15c664b3d2e4b210",
+                "question": "Who were the heads of state of the belligerents in the War of the Third Coalition ?",
+                "decomposition": [],
+                "answer": [
+                    "Francis I",
+                    "William Grenville",
+                    "Alexander I",
+                    "Ferdinand IV",
+                    "Gustav IV Adolf",
+                    "Napoleon I",
+                    "Maximilian I",
+                    "Charles IV"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 178661,
+                    "revid": 1177593069,
+                    "title": "War of the Third Coalition",
+                    "url": "https://en.wikipedia.org/wiki/War_of_the_Third_Coalition"
+                }
+            },
+            {
+                "id": "b2a2da23538b9ceb",
+                "question": "When did Francis I die?",
+                "decomposition": [],
+                "answer": "2 March 1835",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 11551,
+                    "revid": 1183832254,
+                    "title": "Francis II, Holy Roman Emperor",
+                    "url": "https://en.wikipedia.org/wiki/Francis_II,_Holy_Roman_Emperor"
+                }
+            },
+            {
+                "id": "8bdcf109ef645c07",
+                "question": "When did William Grenville die?",
+                "decomposition": [],
+                "answer": "12 January 1834",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 232769,
+                    "revid": 1185631324,
+                    "title": "William Grenville, 1st Baron Grenville",
+                    "url": "https://en.wikipedia.org/wiki/William_Grenville,_1st_Baron_Grenville"
+                }
+            },
+            {
+                "id": "af551c395e154521",
+                "question": "When did Alexander I die?",
+                "decomposition": [],
+                "answer": "1 December 1825",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 27126603,
+                    "revid": 1184929703,
+                    "title": "Alexander I of Russia",
+                    "url": "https://en.wikipedia.org/wiki/Alexander_I_of_Russia"
+                }
+            },
+            {
+                "id": "6474597cb6c326f3",
+                "question": "When did Ferdinand IV die?",
+                "decomposition": [],
+                "answer": "4 January 1825",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 173245,
+                    "revid": 1181828586,
+                    "title": "Ferdinand I of the Two Sicilies",
+                    "url": "https://en.wikipedia.org/wiki/Ferdinand_I_of_the_Two_Sicilies"
+                }
+            },
+            {
+                "id": "1527e94ec31ffbd5",
+                "question": "When did Gustav IV Adolf die?",
+                "decomposition": [],
+                "answer": "7 February 1837",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 104462,
+                    "revid": 1184810297,
+                    "title": "Gustav IV Adolf",
+                    "url": "https://en.wikipedia.org/wiki/Gustav_IV_Adolf"
+                }
+            },
+            {
+                "id": "864b68aabcc827cc",
+                "question": "When did Napoleon I die?",
+                "decomposition": [],
+                "answer": "5 May 1821",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 69880,
+                    "revid": 1185946354,
+                    "title": "Napoleon",
+                    "url": "https://en.wikipedia.org/wiki/Napoleon"
+                }
+            },
+            {
+                "id": "39066002efce73fa",
+                "question": "When did Maximilian I die?",
+                "decomposition": [],
+                "answer": "13 October 1825",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 295384,
+                    "revid": 1184711085,
+                    "title": "Maximilian I Joseph of Bavaria",
+                    "url": "https://en.wikipedia.org/wiki/Maximilian_I_Joseph_of_Bavaria"
+                }
+            },
+            {
+                "id": "18a4e09bd9c6113f",
+                "question": "When did Charles IV die?",
+                "decomposition": [],
+                "answer": "20 January 1819",
+                "depends_on": [
+                    "15c664b3d2e4b210"
+                ],
+                "evidence": {
+                    "pageid": 149439,
+                    "revid": 1185535857,
+                    "title": "Charles IV of Spain",
+                    "url": "https://en.wikipedia.org/wiki/Charles_IV_of_Spain"
+                }
+            }
+        ],
+        "answer": {
+            "Francis I": "2 March 1835",
+            "William Grenville": "12 January 1834",
+            "Alexander I": "1 December 1825",
+            "Ferdinand IV": "4 January 1825",
+            "Gustav IV Adolf": "7 February 1837",
+            "Napoleon I": "5 May 1821",
+            "Maximilian I": "13 October 1825",
+            "Charles IV": "20 January 1819"
+        },
+        "categories": [
+            "History",
+            "Political Science"
+        ]
+    },
+    {
+        "id": "220852c6d47dfd38",
+        "question": "What are the heights in meters of Mount Everest, K2, Kangchenjunga, Lhotse, and Makalu?",
+        "decomposition": [
+            {
+                "id": "7e61ad90cab0ffab",
+                "question": "What is the height of Mount Everest?",
+                "decomposition": [],
+                "answer": "8,848.86 m",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 42179,
+                    "revid": 1184999603,
+                    "title": "Mount Everest",
+                    "url": "https://en.wikipedia.org/wiki/Mount_Everest"
+                }
+            },
+            {
+                "id": "292325f4e20631ef",
+                "question": "What is the height of K2?",
+                "decomposition": [],
+                "answer": "8,611 m",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 17359,
+                    "revid": 1178193327,
+                    "title": "K2",
+                    "url": "https://en.wikipedia.org/wiki/K2"
+                }
+            },
+            {
+                "id": "c604c27a634fc812",
+                "question": "What is the height of Kangchenjunga?",
+                "decomposition": [],
+                "answer": "8,586 m",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 17073,
+                    "revid": 1184860365,
+                    "title": "Kangchenjunga",
+                    "url": "https://en.wikipedia.org/wiki/Kangchenjunga"
+                }
+            },
+            {
+                "id": "c688664adebe90a5",
+                "question": "What is the height of Lhotse?",
+                "decomposition": [],
+                "answer": "8,516 m",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 234548,
+                    "revid": 1185539994,
+                    "title": "Lhotse",
+                    "url": "https://en.wikipedia.org/wiki/Lhotse"
+                }
+            },
+            {
+                "id": "3501e2046cf60d24",
+                "question": "What is the height of Makalu?",
+                "decomposition": [],
+                "answer": "8,485 m",
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 295084,
+                    "revid": 1174766353,
+                    "title": "Makalu",
+                    "url": "https://en.wikipedia.org/wiki/Makalu"
+                }
+            }
+        ],
+        "answer": {
+            "Mount Everest": "8,848.86 m",
+            "K2": "8,611 m",
+            "Kangchenjunga": "8,586 m",
+            "Lhotse": "8,516 m",
+            "Makalu": "8,485 m"
+        },
+        "categories": [
+            "Geography"
+        ]
+    },
+    {
+        "id": "6533545d9f5eb7b6",
+        "question": "What was the population in 2020 of the 5 most populous cities in the United States?",
+        "decomposition": [
+            {
+                "id": "1a51a91178d6b7c6",
+                "question": "What are the 5 most populous cities in the United States?",
+                "decomposition": [],
+                "answer": [
+                    "New York",
+                    "Los Angeles",
+                    "Chicago",
+                    "Houston",
+                    "Phoenix"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 1649321,
+                    "revid": 1185657569,
+                    "title": "List of United States cities by population",
+                    "url": "https://en.wikipedia.org/wiki/List_of_United_States_cities_by_population"
+                }
+            },
+            {
+                "id": "7aa39d69344fd5db",
+                "question": "What was the population of New York in 2020?",
+                "decomposition": [],
+                "answer": 8804190,
+                "depends_on": [
+                    "1a51a91178d6b7c6"
+                ],
+                "evidence": {
+                    "pageid": 33281496,
+                    "revid": 1185637666,
+                    "title": "Demographic history of New York City",
+                    "url": "https://en.wikipedia.org/wiki/Demographic_history_of_New_York_City"
+                }
+            },
+            {
+                "id": "df657e5cdac8b7bd",
+                "question": "What was the population of Los Angeles in 2020?",
+                "decomposition": [],
+                "answer": 3898747,
+                "depends_on": [
+                    "1a51a91178d6b7c6"
+                ],
+                "evidence": {
+                    "pageid": 18110,
+                    "revid": 1185453578,
+                    "title": "Los Angeles",
+                    "url": "https://en.wikipedia.org/wiki/Los_Angeles"
+                }
+            },
+            {
+                "id": "db7f503f19b626b8",
+                "question": "What was the population of Chicago in 2020?",
+                "decomposition": [],
+                "answer": 2746388,
+                "depends_on": [
+                    "1a51a91178d6b7c6"
+                ],
+                "evidence": {
+                    "pageid": 6886,
+                    "revid": 1185815115,
+                    "title": "Chicago",
+                    "url": "https://en.wikipedia.org/wiki/Chicago"
+                }
+            },
+            {
+                "id": "b4b7cdae7357f9b9",
+                "question": "What was the population of Houston in 2020?",
+                "decomposition": [],
+                "answer": 2301572,
+                "depends_on": [
+                    "1a51a91178d6b7c6"
+                ],
+                "evidence": {
+                    "pageid": 13774,
+                    "revid": 1185605911,
+                    "title": "Houston",
+                    "url": "https://en.wikipedia.org/wiki/Houston"
+                }
+            },
+            {
+                "id": "1129af322bb16850",
+                "question": "What was the population of Phoenix in 2020?",
+                "decomposition": [],
+                "answer": 1608139,
+                "depends_on": [
+                    "1a51a91178d6b7c6"
+                ],
+                "evidence": {
+                    "pageid": 49121,
+                    "revid": 1185099906,
+                    "title": "Phoenix, Arizona",
+                    "url": "https://en.wikipedia.org/wiki/Phoenix,_Arizona"
+                }
+            }
+        ],
+        "answer": {
+            "New York": 8804190,
+            "Los Angeles": 3898747,
+            "Chicago": 2746388,
+            "Houston": 2301572,
+            "Phoenix": 1608139
+        },
+        "categories": [
+            "Demographics",
+            "Geography"
+        ]
+    },
+    {
+        "id": "c5a093133acd74a9",
+        "question": "What are the life expectancies at birth in years for the top five countries with the largest land area?",
+        "decomposition": [
+            {
+                "id": "bc611acfd40c174c",
+                "question": "What are the top five countries with the largest land area?",
+                "decomposition": [],
+                "answer": [
+                    "Russia",
+                    "Canada",
+                    "China",
+                    "United States",
+                    "Brazil"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 3989609,
+                    "revid": 1185612973,
+                    "title": "List of countries and dependencies by area",
+                    "url": "https://en.wikipedia.org/wiki/List_of_countries_and_dependencies_by_area"
+                }
+            },
+            {
+                "id": "93d19dd3742cde23",
+                "question": "What is the life expectancy at birth in Russia?",
+                "decomposition": [],
+                "answer": 72.76,
+                "depends_on": [
+                    "bc611acfd40c174c"
+                ],
+                "evidence": {
+                    "pageid": 25703,
+                    "revid": 1184467382,
+                    "title": "Demographics of Russia",
+                    "url": "https://en.wikipedia.org/wiki/Demographics_of_Russia"
+                }
+            },
+            {
+                "id": "a12126d0efe14acb",
+                "question": "What is the life expectancy at birth in Canada?",
+                "decomposition": [],
+                "answer": 83.8,
+                "depends_on": [
+                    "bc611acfd40c174c"
+                ],
+                "evidence": {
+                    "pageid": 5193,
+                    "revid": 1185242107,
+                    "title": "Demographics of Canada",
+                    "url": "https://en.wikipedia.org/wiki/Demographics_of_Canada"
+                }
+            },
+            {
+                "id": "c8ebd78d2989e12f",
+                "question": "What is the life expectancy at birth in China?",
+                "decomposition": [],
+                "answer": 78.6,
+                "depends_on": [
+                    "bc611acfd40c174c"
+                ],
+                "evidence": {
+                    "pageid": 23238,
+                    "revid": 1185025967,
+                    "title": "Demographics of China",
+                    "url": "https://en.wikipedia.org/wiki/Demographics_of_China"
+                }
+            },
+            {
+                "id": "c29f804b8fd45f34",
+                "question": "What is the life expectancy at birth in the United States?",
+                "decomposition": [],
+                "answer": 76.1,
+                "depends_on": [
+                    "bc611acfd40c174c"
+                ],
+                "evidence": {
+                    "pageid": 70197,
+                    "revid": 1184146182,
+                    "title": "Demographics of the United States",
+                    "url": "https://en.wikipedia.org/wiki/Demographics_of_the_United_States"
+                }
+            },
+            {
+                "id": "990ae87dbad54886",
+                "question": "What is the life expectancy at birth in Brazil?",
+                "decomposition": [],
+                "answer": 77.76,
+                "depends_on": [
+                    "bc611acfd40c174c"
+                ],
+                "evidence": {
+                    "pageid": 18950570,
+                    "revid": 1185882417,
+                    "title": "Demographics of Brazil",
+                    "url": "https://en.wikipedia.org/wiki/Demographics_of_Brazil"
+                }
+            }
+        ],
+        "answer": {
+            "Russia": 72.76,
+            "Canada": 83.8,
+            "China": 78.6,
+            "United States": 76.1,
+            "Brazil": 77.76
+        },
+        "categories": [
+            "Demographics",
+            "Geography"
+        ]
+    },
+    {
+        "id": "5865c4b3f5b1456b",
+        "question": "Of both current and former members of South Korean boy band Astro, how many members were born in March?",
+        "decomposition": [
+            {
+                "id": "550dfed65d91c9a7",
+                "question": "Who are the current and former members of South Korean boy band Astro?",
+                "decomposition": [],
+                "answer": [
+                    "MJ",
+                    "Jinjin",
+                    "Cha Eun-woo",
+                    "Yoon San-ha",
+                    "Moonbin",
+                    "Rocky"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 49596116,
+                    "revid": 1185049502,
+                    "title": "Astro (South Korean band)",
+                    "url": "https://en.wikipedia.org/wiki/Astro_(South_Korean_band)"
+                }
+            },
+            {
+                "id": "c1e87402804cb94e",
+                "question": "What month was MJ born?",
+                "decomposition": [],
+                "answer": "March",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 65054639,
+                    "revid": 1184096761,
+                    "title": "MJ (South Korean singer)",
+                    "url": "https://en.wikipedia.org/wiki/MJ_(South_Korean_singer)"
+                }
+            },
+            {
+                "id": "e47a8fedb7549873",
+                "question": "What month was Jinjin born?",
+                "decomposition": [],
+                "answer": "March",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 66122854,
+                    "revid": 1181988306,
+                    "title": "Jinjin",
+                    "url": "https://en.wikipedia.org/wiki/Jinjin"
+                }
+            },
+            {
+                "id": "679dc08f1ef2d4bf",
+                "question": "What month was Cha Eun-woo born?",
+                "decomposition": [],
+                "answer": "March",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 57551413,
+                    "revid": 1185877315,
+                    "title": "Cha Eun-woo",
+                    "url": "https://en.wikipedia.org/wiki/Cha_Eun-woo"
+                }
+            },
+            {
+                "id": "c4e35988f0142991",
+                "question": "What month was Yoon San-ha born?",
+                "decomposition": [],
+                "answer": "March",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 65392724,
+                    "revid": 1184451773,
+                    "title": "Yoon San-ha",
+                    "url": "https://en.wikipedia.org/wiki/Yoon_San-ha"
+                }
+            },
+            {
+                "id": "8dc177e51077ab18",
+                "question": "What month was Moonbin born?",
+                "decomposition": [],
+                "answer": "January",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 65207637,
+                    "revid": 1185091154,
+                    "title": "Moonbin",
+                    "url": "https://en.wikipedia.org/wiki/Moonbin"
+                }
+            },
+            {
+                "id": "e2aede124bc71d13",
+                "question": "What month was Rocky born?",
+                "decomposition": [],
+                "answer": "February",
+                "depends_on": [
+                    "550dfed65d91c9a7"
+                ],
+                "evidence": {
+                    "pageid": 66055305,
+                    "revid": 1184751449,
+                    "title": "Rocky (singer)",
+                    "url": "https://en.wikipedia.org/wiki/Rocky_(singer)"
+                }
+            }
+        ],
+        "answer": 4,
+        "categories": [
+            "Music",
+            "Culture"
+        ]
+    },
+    {
+        "id": "4c82c308093e7dfd",
+        "question": "At which university did the last five presidents at the University of Pennsylvania complete their undergraduate degree (not including interim presidents)?",
+        "decomposition": [
+            {
+                "id": "1dca59474bd63852",
+                "question": "Who are the last five presidents at the University of Pennsylvania?",
+                "decomposition": [],
+                "answer": [
+                    "M. Elizabeth Magill",
+                    "Amy Gutmann",
+                    "Judith Rodin",
+                    "Sheldon Hackney",
+                    "Martin Meyerson"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 35033632,
+                    "revid": 1148715543,
+                    "title": "List of presidents of the University of Pennsylvania",
+                    "url": "https://en.wikipedia.org/wiki/List_of_presidents_of_the_University_of_Pennsylvania"
+                }
+            },
+            {
+                "id": "b157a6cbbf4e2541",
+                "question": "At which universities did M. Elizabeth Magill study?",
+                "decomposition": [],
+                "answer": "Yale University",
+                "depends_on": [
+                    "1dca59474bd63852"
+                ],
+                "evidence": {
+                    "pageid": 21921167,
+                    "revid": 1183397162,
+                    "title": "Liz Magill",
+                    "url": "https://en.wikipedia.org/wiki/M._Elizabeth_Magill"
+                }
+            },
+            {
+                "id": "14b4a23a2c7862e4",
+                "question": "At which universities did Amy Gutmann study?",
+                "decomposition": [],
+                "answer": "Harvard University",
+                "depends_on": [
+                    "1dca59474bd63852"
+                ],
+                "evidence": {
+                    "pageid": 1910482,
+                    "revid": 1184711240,
+                    "title": "Amy Gutmann",
+                    "url": "https://en.wikipedia.org/wiki/Amy_Gutmann"
+                }
+            },
+            {
+                "id": "fc4d168d791ef55e",
+                "question": "At which universities did Judith Rodin study?",
+                "decomposition": [],
+                "answer": "University of Pennsylvania",
+                "depends_on": [
+                    "1dca59474bd63852"
+                ],
+                "evidence": {
+                    "pageid": 3225568,
+                    "revid": 1163174472,
+                    "title": "Judith Rodin",
+                    "url": "https://en.wikipedia.org/wiki/Judith_Rodin"
+                }
+            },
+            {
+                "id": "8b1d9cc17950755e",
+                "question": "At which universities did Sheldon Hackney study?",
+                "decomposition": [],
+                "answer": "Vanderbilt University",
+                "depends_on": [
+                    "1dca59474bd63852"
+                ],
+                "evidence": {
+                    "pageid": 2297624,
+                    "revid": 1182188200,
+                    "title": "Sheldon Hackney",
+                    "url": "https://en.wikipedia.org/wiki/Sheldon_Hackney"
+                }
+            },
+            {
+                "id": "e61f03b10bc8a889",
+                "question": "At which universities did Martin Meyerson study?",
+                "decomposition": [],
+                "answer": "Columbia University",
+                "depends_on": [
+                    "1dca59474bd63852"
+                ],
+                "evidence": {
+                    "pageid": 11637028,
+                    "revid": 1180600467,
+                    "title": "Martin Meyerson",
+                    "url": "https://en.wikipedia.org/wiki/Martin_Meyerson"
+                }
+            }
+        ],
+        "answer": {
+            "M. Elizabeth Magill": "Yale University",
+            "Amy Gutmann": "Harvard University",
+            "Judith Rodin": "University of Pennsylvania",
+            "Sheldon Hackney": "Vanderbilt University",
+            "Martin Meyerson": "Columbia University"
+        },
+        "categories": [
+            "Education",
+            "History"
+        ]
+    },
+    {
+        "id": "ca2bf128869985f6",
+        "question": "Where are the six marathon races in the world marathon majors hosted, and when was each first held?",
+        "decomposition": [
+            {
+                "id": "57d480006631a098",
+                "question": "Where are the six marathon races in the world marathon majors hosted??",
+                "decomposition": [],
+                "answer": [
+                    "Tokyo",
+                    "Boston",
+                    "London",
+                    "Berlin",
+                    "Chicago",
+                    "New York"
+                ],
+                "depends_on": [],
+                "evidence": {
+                    "pageid": 3836257,
+                    "revid": 1183929702,
+                    "title": "World Marathon Majors",
+                    "url": "https://en.wikipedia.org/wiki/World_Marathon_Majors"
+                }
+            },
+            {
+                "id": "cddb2e30938b4ad3",
+                "question": "When was the Tokyo Marathon first held?",
+                "decomposition": [],
+                "answer": "2007",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 8086554,
+                    "revid": 1168808498,
+                    "title": "Tokyo Marathon",
+                    "url": "https://en.wikipedia.org/wiki/Tokyo_Marathon"
+                }
+            },
+            {
+                "id": "5e4a99e0a98e0435",
+                "question": "When was the Boston Marathon first held?",
+                "decomposition": [],
+                "answer": "1897",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 182265,
+                    "revid": 1185914342,
+                    "title": "Boston Marathon",
+                    "url": "https://en.wikipedia.org/wiki/Boston_Marathon"
+                }
+            },
+            {
+                "id": "450e2e180327b37a",
+                "question": "When was the London Marathon first held?",
+                "decomposition": [],
+                "answer": "1909",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 48804,
+                    "revid": 1183471126,
+                    "title": "London Marathon",
+                    "url": "https://en.wikipedia.org/wiki/London_Marathon"
+                }
+            },
+            {
+                "id": "393bf43236c4c45f",
+                "question": "When was the Berlin Marathon first held?",
+                "decomposition": [],
+                "answer": "1974",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 1663911,
+                    "revid": 1185234311,
+                    "title": "Berlin Marathon",
+                    "url": "https://en.wikipedia.org/wiki/Berlin_Marathon"
+                }
+            },
+            {
+                "id": "5d25a15359814952",
+                "question": "When was the Chicago Marathon first held?",
+                "decomposition": [],
+                "answer": "1905",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 762701,
+                    "revid": 1180934497,
+                    "title": "Chicago Marathon",
+                    "url": "https://en.wikipedia.org/wiki/Chicago_Marathon"
+                }
+            },
+            {
+                "id": "780dff2427412c5c",
+                "question": "When was the New York Marathon first held?",
+                "decomposition": [],
+                "answer": "1970",
+                "depends_on": [
+                    "57d480006631a098"
+                ],
+                "evidence": {
+                    "pageid": 429897,
+                    "revid": 1185685127,
+                    "title": "New York City Marathon",
+                    "url": "https://en.wikipedia.org/wiki/New_York_City_Marathon"
+                }
+            }
+        ],
+        "answer": {
+            "Tokyo": "2007",
+            "Boston": "1897",
+            "London": "1909",
+            "Berlin": "1974",
+            "Chicago": "1905",
+            "New York": "1970"
+        },
+        "categories": [
+            "Sports",
+            "Geography"
+        ]
+    }
+]

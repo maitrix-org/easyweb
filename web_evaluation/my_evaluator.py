@@ -3,9 +3,11 @@ import json
 import multiprocessing
 import os
 import random
+import sys
 import time
 from datetime import datetime
 
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from my_frontend import OpenDevinSession
 
 # questions as of 7/15
