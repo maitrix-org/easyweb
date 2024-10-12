@@ -15,5 +15,12 @@
     {
         "base_url": "https://api.openai.com/v1/",
         "requires_key": true
+    },
+    "llama-3.1-405b-instruct:free":
+    {
+        "provider": "openai",
+        "base_url": "https://openrouter.ai/api/v1",
+        "requires_key": true,
+        "display_name": "Meta-Llama-3.1-405B-Instruct (Free)"
     }
 }

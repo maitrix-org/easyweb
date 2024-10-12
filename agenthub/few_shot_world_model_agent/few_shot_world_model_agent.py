@@ -215,7 +215,7 @@ class FewShotWorldModelAgent(Agent):
         self,
         messages,
         parser,
-        n_retry=4,
+        n_retry=16,
         log=True,
         min_retry_wait_time=60,
         rate_limit_max_wait_time=60 * 30,
@@ -223,20 +223,10 @@ class FewShotWorldModelAgent(Agent):
         use_completions_api=False,
         **kwargs,
     ):
+        n_retries = 0
         tries = 0
         rate_limit_total_delay = 0
         while tries < n_retry and rate_limit_total_delay < rate_limit_max_wait_time:
-            if not override_llm:
-                # truncated_messages = self.truncate_messages(
-                #     messages, MAX_TOKENS - OUTPUT_BUFFER
-                # )  # added
-                response = self.llm.completion(
-                    messages=messages,
-                    # messages=truncated_messages,  # added
-                    temperature=self.temperature,
-                    stop=None,
-                )
-                answer = response['choices'][0]['message']['content'].strip()
             if override_llm:
                 tmp_llm = 'gpt-4o'
                 logger.info('Overriding LLM with ' + tmp_llm)
@@ -246,7 +236,6 @@ class FewShotWorldModelAgent(Agent):
                     temperature=self.temperature,
                     stop=None,
                 )
-
                 answer = response.choices[0].message.content.strip()
             elif use_completions_api:
                 logger.info('Using completions API')
@@ -263,10 +252,51 @@ class FewShotWorldModelAgent(Agent):
                 )
                 answer = response.choices[0].text.strip()
                 logger.info(answer)
+            elif self.llm.base_url == 'https://openrouter.ai/api/v1':
+                logger.info('Using OpenRouter API with model ' + self.llm.model_name)
+                client_openrouter = OpenAI(
+                    base_url=self.llm.base_url,
+                    api_key=self.llm.api_key,
+                )
+                response = client_openrouter.chat.completions.create(
+                    model=self.llm.model_name.replace('openai/', 'meta-llama/'),
+                    messages=messages,
+                    temperature=self.temperature,
+                    stop=None,
+                )
+                if response.choices is None and 'rate_limit_exceeded' in str(
+                    response.error
+                ):
+                    wait_time = min(5 * (2**n_retries) + random.random() * 3, 30)
+                    n_retries += 1
+                    logger.warning(
+                        f'RateLimitError, waiting {wait_time}s before retrying.'
+                    )
+                    time.sleep(wait_time)
+                    rate_limit_total_delay += wait_time
+                    if rate_limit_total_delay >= rate_limit_max_wait_time:
+                        logger.warning(
+                            f'Total wait time for rate limit exceeded. Waited {rate_limit_total_delay}s > {rate_limit_max_wait_time}s.'
+                        )
+                        raise
+                    continue
+                answer = response.choices[0].message.content.strip()
+            else:
+                # truncated_messages = self.truncate_messages(
+                #     messages, MAX_TOKENS - OUTPUT_BUFFER
+                # )  # added
+                response = self.llm.completion(
+                    messages=messages,
+                    # messages=truncated_messages,  # added
+                    temperature=self.temperature,
+                    stop=None,
+                )
+                answer = response['choices'][0]['message']['content'].strip()
 
             # with open("/home/demo/jinyu/prompts/last_answer.txt", "w") as f:
             #     f.write(answer)
 
+            # if tries < 1:
             messages.append({'role': 'assistant', 'content': answer})
 
             value, valid, retry_message = parser(answer)

@@ -10,8 +10,8 @@ few_shot_example_paths = [
     # 'agenthub/few_shot_world_model_agent/few_shot_examples/search-example-1-with-action-space-final-state-next-state.json'
     # 'agenthub/few_shot_world_model_agent/few_shot_examples/flight-example-1.json'
     # 'agenthub/few_shot_world_model_agent/few_shot_examples/flight-example-2.json'
-    # 'agenthub/few_shot_world_model_agent/few_shot_examples/search-example-1-datetime.json'
-    'agenthub/few_shot_world_model_agent/few_shot_examples/flight-example-2-datetime.json'
+    'agenthub/few_shot_world_model_agent/few_shot_examples/search-example-1-datetime.json'
+    # 'agenthub/few_shot_world_model_agent/few_shot_examples/flight-example-2-datetime.json'
 ]
 few_shot_example_data = [json.load(open(path)) for path in few_shot_example_paths]
 
@@ -130,7 +130,7 @@ def get_full_prompt(current_obs, history, goal):
 {few_shot_example_prompt}
 
 {current_example_prompt}
-    """
+"""
     return few_shot_prompt
 
 
