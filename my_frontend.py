@@ -118,7 +118,7 @@ class OpenDevinSession:
             message = self._get_message()
             self._read_message(message)
 
-            self._update_figure(message)
+            # self._update_figure(message)
 
             print(self.agent_state)
             yield message

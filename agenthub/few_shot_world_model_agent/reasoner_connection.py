@@ -1,7 +1,19 @@
 import multiprocessing.dummy as mp_dummy
+import warnings
+from collections import defaultdict
+
+import numpy as np
+from nltk.translate.bleu_score import sentence_bleu
+
+# For deduping purpose
+from openai import OpenAI
 
 from . import prompt_factory
 from .reasoners import SearchConfig, WorldModel
+
+client_llama = OpenAI(
+    base_url='http://localhost:8000/v1',
+)
 
 
 def apply_function(function, args, kwargs):
@@ -15,53 +27,117 @@ class WebWorldModel(WorldModel):
         self.add_to_log_fn = add_to_log_fn
 
     def init_state(self):
-        return {'partial_plan': [(None, self.current_state_dict)]}
+        return {
+            'history': self.history,
+            'action_history': [],
+            'current_state': self.current_state,
+            'goal': self.goal,
+        }
 
     def step(self, state, action):
         """World Model"""
-        next_state_prompt_answer_key_dict = prompt_factory.get_next_state_prompt(
-            action['strategy'], state['partial_plan'], self.state_history
+        action, freq = action
+        world_model_prompt = prompt_factory.get_world_model_prompt(
+            state['current_state'], action, state['history'], state['goal']
         )
+        answer_keys = ['next_state', 'reward', 'termination']
+        answer_dict = self.get_llm_output_fn(world_model_prompt, answer_keys)
 
-        with mp_dummy.Pool(processes=len(next_state_prompt_answer_key_dict)) as pool:
-            arguments = [
-                (prompt, keys)
-                for prompt, keys in next_state_prompt_answer_key_dict.items()
-            ]
-            answer_dicts = pool.starmap(
-                apply_function, [(self.get_llm_output_fn, arg, {}) for arg in arguments]
-            )
+        for key in answer_keys:
+            self.add_to_log_fn(key, answer_dict[key])
 
-        next_state_dict = {}
-        for ans_dict in answer_dicts:
-            next_state_dict.update(ans_dict)
+        next_state = {
+            'history': state['history']
+            + [(None, state['current_state'], action, None)],
+            'action_history': state['action_history'] + [action],
+            'current_state': answer_dict['next_state'],
+            'reward': answer_dict['reward'],
+            'termination': answer_dict['termination'],
+            'goal': state['goal'],
+        }
 
-        if self.add_to_log_fn is not None:
-            for key in [
-                'summary',
-                'content',
-                'progress',
-                'reflection',
-                'think',
-                'completion',
-            ]:
-                value = next_state_dict.get(key, 'None')
-                if value != 'None':
-                    self.add_to_log_fn(key, value)
+        status = {
+            'reward': answer_dict['reward'],
+            'termination': answer_dict['termination'],
+        }
 
-        next_state = dict(state)
-        next_state['partial_plan'].append((action['strategy'], next_state_dict))
-
-        return next_state, {'completion': next_state_dict['completion']}
+        return next_state, status
 
     def is_terminal(self, state):
-        last_state = state['partial_plan'][-1][1]
-        return last_state['completion'].strip('"') == 'finished'
+        return state['termination'] == 'yes'
 
     def update_example(self, example, **kwargs):
         super().update_example(example, **kwargs)
-        self.current_state_dict = example['current_state_dict']
-        self.state_history = example['state_history']
+        self.history = example['history']
+        self.current_state = example['current_state']
+        self.goal = example['goal']
+
+
+def dedup_and_match_actions(action_count_dict):
+    action_list = list(action_count_dict.keys())
+    for _ in range(5):
+        try:
+            prompt = f"""\
+Example 1:
+
+Here is a list of actions:
+
+['Fill the search box with the query "Josh Hamilton batting hand"', 'Click into the ESPN result for the 1998 MLB draft', 'Fill the search box with query "Josh Hamilton batting hand"']
+
+Here are the semantically unique actions from the list above:
+
+['Fill the search box with the query "Josh Hamilton batting hand"', 'Click into the ESPN result for the 1998 MLB draft']
+
+Example 2:
+
+Here is a list of actions:
+
+{action_list}
+
+Here are the semantically unique actions from the list above:
+"""
+
+            completion = client_llama.chat.completions.create(
+                model='Meta-Llama-3.1-70B-Instruct',
+                messages=[
+                    {'role': 'system', 'content': 'You are a helpful assistant.'},
+                    {'role': 'user', 'content': prompt},
+                ],
+                stop='\n',
+            )
+            response = completion.choices[0].message.content
+            deduped_action_list = eval(response)
+
+            # Find a mapping between each deduped action to the original actions
+            similarities = []
+            for deduped_action in deduped_action_list:
+                new_to_old_sims = []
+                for original_action in action_list:
+                    sim = 0
+                    with warnings.catch_warnings():
+                        warnings.simplefilter('ignore')
+                        sim = sentence_bleu(
+                            [original_action.split()],
+                            deduped_action.split(),
+                            weights=(0.75, 0.25, 0, 0),
+                        )
+                    new_to_old_sims.append(sim)
+                similarities.append(new_to_old_sims)
+
+            deduped_action_count_dict = defaultdict(lambda: 0)
+            assignment = np.argmax(similarities, axis=0)
+            for assignment_id, old_action in zip(assignment, action_list):
+                deduped_action = deduped_action_list[assignment_id]
+                deduped_action_count_dict[deduped_action] += action_count_dict[
+                    old_action
+                ]
+
+            return deduped_action_count_dict
+
+        except Exception as e:
+            print(e)
+
+    return action_count_dict
 
 
 class WebSearchConfig(SearchConfig):
@@ -82,84 +158,72 @@ class WebSearchConfig(SearchConfig):
         )
 
     def get_actions(self, state):
-        strategy_prompt, answer_keys = prompt_factory.get_strategy_prompt(
-            state['partial_plan'], self.state_history
+        policy_prompt = prompt_factory.get_policy_prompt(
+            state['current_state'], state['history'], state['goal']
         )
-        seen_actions = set()
-        all_action_dicts = []
 
-        num_retries = 0
-        while (
-            len(all_action_dicts) < self.num_actions and num_retries < self.max_retries
-        ):
-            with mp_dummy.Pool(processes=self.num_actions) as pool:
-                arguments = [(strategy_prompt, answer_keys)] * self.num_actions
-                action_dicts = pool.starmap(
-                    apply_function,
-                    [
-                        (self.get_llm_output_fn, arg, {'temperature': 1.0})
-                        for arg in arguments
-                    ],
-                )
-            for action_dict in action_dicts:
-                if action_dict['strategy'] in seen_actions:
-                    continue
-                all_action_dicts.append(action_dict)
-                seen_actions.add(action_dict['strategy'])
-            num_retries += 1
+        # num_retries = 0
+        # actions = set()
+        actions = defaultdict(lambda: 0)
+        # while len(actions) < self.num_actions and num_retries < self.max_retries:
+        with mp_dummy.Pool(processes=self.num_actions * self.max_retries) as pool:
+            action_dicts = pool.starmap(
+                apply_function,
+                [
+                    (
+                        self.get_llm_output_fn,
+                        (policy_prompt, ['instruction']),
+                        {'temperature': 1.0},
+                    )
+                ]
+                * (self.num_actions * self.max_retries),
+            )
+        for action_dict in action_dicts:
+            # self.add_to_log_fn('think', action_dict['think'])
+            # self.add_to_log_fn('instruction', action_dict['instruction'])
+            # actions.add(action_dict['instruction'])
+            actions[action_dict['instruction']] += 1
+            # num_retries += 1
 
-        # if self.add_to_log_fn is not None:
-        #     for action in all_actions:
-        #         self.add_to_log_fn('action_candidate', action)
+        actions = dedup_and_match_actions(actions)
+        actions = [(action, count) for action, count in actions.items()]
+        actions = sorted(actions, key=lambda x: -x[1])
+        actions = actions[: self.num_actions]
 
-        return all_action_dicts
+        # actions = np.random.choice(list(actions), min(len(actions), self.num_actions), replace=False)
+        # actions = np.random.choice(action_list, min(len(action_list), self.num_actions), replace=False)
+        # actions = list(actions)
+        self.add_to_log_fn('action_space', actions)
+
+        return actions
 
     def fast_reward(self, state, action):
-        if isinstance(action, str) or isinstance(action, dict):
+        if not isinstance(action, list):
             action = [action]
-        arguments = []
-        for act in action:
-            prompt, answer_keys = prompt_factory.get_action_reward_prompt(
-                act['strategy'], self.state_history, state['partial_plan']
-            )
-            arguments.append((prompt, answer_keys))
-        # action_reward_prompt, answer_keys = prompt_factory.get_action_reward_prompt(action, self.state_history, state['partial_plan'])
-        with mp_dummy.Pool(processes=min(self.num_actions, len(action))) as pool:
-            # arguments = [(action_reward_prompt, answer_keys)] * self.num_actions
-            answer_dicts = pool.starmap(
-                apply_function, [(self.get_llm_output_fn, arg, {}) for arg in arguments]
-            )
 
-        if self.add_to_log_fn is not None:
-            for act_dict, ans_dict in zip(action, answer_dicts):
-                self.add_to_log_fn('action_think', act_dict['think'])
-                self.add_to_log_fn('action_candidate', act_dict['strategy'])
-                self.add_to_log_fn('reward_think', ans_dict.get('think', 'None'))
-                self.add_to_log_fn('reward', ans_dict.get('response', 'None'))
+        total_action_counts = sum([count for _, count in action])
+        action_freqs = [(act, count / total_action_counts) for act, count in action]
+        fast_rewards = [freq for _, freq in action_freqs]
+        reward_dicts = [{'intuition': freq} for _, freq in action_freqs]
 
-        response2reward = {
-            'goal-achieved': 2,
-            'towards-the-goal': 1,
-            'not-sure': 0,
-            'away-from-the-goal': -1,
+        return fast_rewards, reward_dicts
+
+    def reward(self, state, action, intuition, reward, termination, **kwargs):
+        reward2score = {'closer-to-goal': 1, 'further-from-goal': -1, 'neutral': 0}
+        reward_score = self.reward_scale * reward2score.get(reward, 0)
+        termination_signal = termination == 'yes'
+        reward = self.reward_scale * (
+            intuition + reward_score + int(termination_signal)
+        )
+
+        return reward, {
+            'reward_score': reward_score,
+            'termination_signal': termination_signal,
         }
-
-        rewards = [
-            self.reward_scale * response2reward.get(ans_dict['response'].strip('"'), 0)
-            for ans_dict in answer_dicts
-        ]
-        for ans_dict, reward in zip(answer_dicts, rewards):
-            ans_dict['intuition'] = reward
-        # if len(rewards) == 1:
-        #     return rewards[0], answer_dicts[0]
-        return rewards, answer_dicts
-
-    def reward(self, state, action, completion, intuition, **kwargs):
-        goal_reached = completion.strip('"') == 'finished'
-        reward = self.reward_scale * (intuition + int(goal_reached))
-
-        return reward, {'intuition': intuition, 'goal_reached': goal_reached}
 
     def update_example(self, example, **kwargs):
         super().update_example(example, **kwargs)
-        self.state_history = example['state_history']
+        # self.state_history = example['state_history']
+        self.history = example['history']
+        self.current_state = example['current_state']
+        self.goal = example['goal']

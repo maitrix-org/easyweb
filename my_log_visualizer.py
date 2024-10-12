@@ -170,7 +170,7 @@ class TestSession:
             planning_record = json.loads(message['args']['thought'])
             if 'obs' in planning_record:
                 print('Planning record')
-                webpage = planning_record['obs']['axtree_txt']
+                webpage = planning_record['obs']['clean_axtree_txt']
         return webpage
 
 
@@ -305,7 +305,7 @@ if __name__ == '__main__':
                 blank = Image.new('RGB', (1280, 720), (255, 255, 255))
                 placeholder = '<placeholder>'
 
-                max_tabs = 30
+                max_tabs = 100
                 tabs = []
                 urls = []
                 screenshots = []
