@@ -4,9 +4,8 @@ import os
 import random
 import time
 import traceback
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
-from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.utils.obs import flatten_axtree_to_str
 from openai import OpenAI
 
@@ -18,9 +17,7 @@ from opendevin.events.action import (
     Action,
     AgentFinishAction,
     BrowseInteractiveAction,
-    FinishPlanningAction,
     MessageAction,
-    StartPlanningAction,
 )
 from opendevin.events.event import EventSource
 from opendevin.events.observation import BrowserOutputObservation
@@ -31,9 +28,6 @@ from opendevin.runtime.plugins import (
 from opendevin.runtime.tools import RuntimeTool
 
 from . import prompt_factory
-from .reasoner_connection import WebSearchConfig, WebWorldModel
-from .reasoners import Reasoner
-from .reasoners.algorithm import MCTS
 from .utils import (
     ParseError,
     parse_html_tags_raise,
@@ -56,19 +50,17 @@ OUTPUT_BUFFER = 1100  # added
 # DEFAULT_BROWSER = 'https://www.google.com'  # added
 DEFAULT_BROWSER = None
 
-# DUMP_FOLDER = "../prompt-logs"
-DUMP_FOLDER = None
+DUMP_FOLDER = '../prompt-logs-onepass'
+# DUMP_FOLDER = None
 
 client = OpenAI()
-client_llama = OpenAI(
-    base_url='http://localhost:8003/v1',
-)
+
 
 # class ParseError(Exception):
 #     pass
 
 
-class FewShotWorldModelAgent(Agent):
+class OnepassAgent(Agent):
     VERSION = '1.0'
     """
     An agent that interacts with the browser.
@@ -92,29 +84,17 @@ class FewShotWorldModelAgent(Agent):
         print(self.llm.max_output_tokens)
         # define a configurable action space, with chat functionality, web navigation, and webpage grounding using accessibility tree and HTML.
         # see https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/action/highlevel.py for more details
-        action_subsets = ['chat', 'bid']
-        if USE_NAV:
-            action_subsets.append('nav')
-        self.action_space = HighLevelActionSet(
-            subsets=action_subsets,
-            strict=False,  # less strict on the parsing of the actions
-            multiaction=False,  # enable to agent to take multiple actions at once
-        )
+        # action_subsets = ['chat', 'bid']
+        # if USE_NAV:
+        #     action_subsets.append('nav')
+        # self.action_space = HighLevelActionSet(
+        #     subsets=action_subsets,
+        #     strict=False,  # less strict on the parsing of the actions
+        #     multiaction=False,  # enable to agent to take multiple actions at once
+        # )
         self.temperature = 0.0
         self.max_retry = 4
 
-        num_sampled_actions = 5
-        self.world_model = WebWorldModel(self.get_llm_output_new, self.add_to_log)
-        self.search_config = WebSearchConfig(
-            self.get_llm_output_new, num_sampled_actions, add_to_log_fn=self.add_to_log
-        )
-        self.search_algo = MCTS(output_trace_in_each_iter=True, disable_tqdm=False)
-        self.reasoner = Reasoner(
-            world_model=self.world_model,
-            search_config=self.search_config,
-            search_algo=self.search_algo,
-        )
-        self.do_search = False
         self.reset()
 
         self.dump_counter = 0
@@ -178,24 +158,10 @@ class FewShotWorldModelAgent(Agent):
         self.error_accumulator = 0
 
         self.history = []
-        self.actions: List[str] = []
         self.action_history: List[tuple[str, str]] = []
-        self.current_plan: List[tuple[Optional[str], Optional[str]]] = []
-        self.explanations: List[str] = []
         self.obs_history: List[Dict[str, Any]] = []
-        self.state_history: List[Dict[str, Any]] = []
-        self.states: List[str] = []
-        self.evaluations: List[str] = []
-        self.strategies: List[Optional[str]] = []
-        self.strategy_explanations: List[Optional[str]] = []
-        self.active_strategy: Optional[str] = None
         self.full_output: str = ''
         self.full_output_dict: Dict[str, Any] = {}
-        self.active_strategy_turns: int = 0
-        self.is_planning: bool = False
-        self.finished_planning: bool = False
-        self.world_model: Optional[WebWorldModel] = None
-        self.search_config: Optional[WebSearchConfig] = None
 
     def parse_response(self, response: str, thought: str) -> Action:
         # thought = ''
@@ -219,73 +185,16 @@ class FewShotWorldModelAgent(Agent):
         self,
         messages,
         parser,
-        n_retry=16,
+        n_retry=4,
         log=True,
         min_retry_wait_time=60,
         rate_limit_max_wait_time=60 * 30,
         override_llm=False,
-        use_completions_api=False,
-        **kwargs,
     ):
-        n_retries = 0
         tries = 0
         rate_limit_total_delay = 0
         while tries < n_retry and rate_limit_total_delay < rate_limit_max_wait_time:
-            if override_llm:
-                tmp_llm = 'gpt-4o'
-                logger.info('Overriding LLM with ' + tmp_llm)
-                response = client.chat.completions.create(
-                    model=tmp_llm,
-                    messages=messages,
-                    temperature=self.temperature,
-                    stop=None,
-                )
-                answer = response.choices[0].message.content.strip()
-            elif use_completions_api:
-                logger.info('Using completions API')
-                for message in messages:
-                    if message['role'] == 'user':
-                        prompt = message['content']
-                        break
-                logger.info(prompt)
-                response = client_llama.completions.create(
-                    model='Meta-Llama-3.1-70B',
-                    prompt=prompt,
-                    temperature=self.temperature,
-                    stop=None,
-                )
-                answer = response.choices[0].text.strip()
-                logger.info(answer)
-            elif self.llm.base_url == 'https://openrouter.ai/api/v1':
-                logger.info('Using OpenRouter API with model ' + self.llm.model_name)
-                client_openrouter = OpenAI(
-                    base_url=self.llm.base_url,
-                    api_key=self.llm.api_key,
-                )
-                response = client_openrouter.chat.completions.create(
-                    model=self.llm.model_name.replace('openai/', 'meta-llama/'),
-                    messages=messages,
-                    temperature=self.temperature,
-                    stop=None,
-                )
-                if response.choices is None and 'rate_limit_exceeded' in str(
-                    response.error
-                ):
-                    wait_time = min(5 * (2**n_retries) + random.random() * 3, 30)
-                    n_retries += 1
-                    logger.warning(
-                        f'RateLimitError, waiting {wait_time}s before retrying.'
-                    )
-                    time.sleep(wait_time)
-                    rate_limit_total_delay += wait_time
-                    if rate_limit_total_delay >= rate_limit_max_wait_time:
-                        logger.warning(
-                            f'Total wait time for rate limit exceeded. Waited {rate_limit_total_delay}s > {rate_limit_max_wait_time}s.'
-                        )
-                        raise
-                    continue
-                answer = response.choices[0].message.content.strip()
-            else:
+            if not override_llm:
                 # truncated_messages = self.truncate_messages(
                 #     messages, MAX_TOKENS - OUTPUT_BUFFER
                 # )  # added
@@ -296,11 +205,21 @@ class FewShotWorldModelAgent(Agent):
                     stop=None,
                 )
                 answer = response['choices'][0]['message']['content'].strip()
+            else:
+                tmp_llm = 'gpt-4o'
+                logger.info('Overriding LLM with ' + tmp_llm)
+                response = client.chat.completions.create(
+                    model=tmp_llm,
+                    messages=messages,
+                    temperature=self.temperature,
+                    stop=None,
+                )
+
+                answer = response.choices[0].message.content.strip()
 
             # with open("/home/demo/jinyu/prompts/last_answer.txt", "w") as f:
             #     f.write(answer)
 
-            # if tries < 1:
             messages.append({'role': 'assistant', 'content': answer})
 
             value, valid, retry_message = parser(answer)
@@ -317,20 +236,14 @@ class FewShotWorldModelAgent(Agent):
         raise ValueError(f'Could not parse a valid value after {n_retry} retries.')
 
     def get_llm_output_new(
-        self,
-        prompt,
-        output_keys,
-        with_system_prompt=True,
-        temperature=0.0,
-        logprobs=False,
-        **kwargs,
+        self, prompt, output_keys, with_system_prompt=True, temperature=0.0
     ):
         tmp = self.temperature
         self.temperature = temperature
         # logger.info(system_msg)
         messages = []
         if with_system_prompt:
-            system_msg = prompt_factory.get_few_shot_system_prompt(self.action_space)
+            system_msg = prompt_factory.get_system_prompt()
             messages.append({'role': 'system', 'content': system_msg})
         messages.append({'role': 'user', 'content': prompt})
 
@@ -346,7 +259,7 @@ class FewShotWorldModelAgent(Agent):
             return ans_dict, True, ''
 
         try:
-            ans_dict = self.retry(messages, parser, n_retry=self.max_retry, **kwargs)
+            ans_dict = self.retry(messages, parser, n_retry=self.max_retry)
             ans_dict['n_retry'] = (len(messages) - 3) / 2
         except ValueError as e:
             # Likely due to maximum retry. We catch it here to be able to return
@@ -362,68 +275,18 @@ class FewShotWorldModelAgent(Agent):
         self.temperature = tmp
         return ans_dict
 
-    def _full_module(self, current_obs, history, goal):
-        full_prompt = prompt_factory.get_full_prompt(current_obs, history, goal)
+    def _onepass(self, current_obs, history, goal):
+        onepass_prompt = prompt_factory.get_onepass_prompt(current_obs, history, goal)
         answer_dict = self.get_llm_output_new(
-            full_prompt,
-            ['state', 'instruction', 'action'],
-            temperature=1.0,
-            use_completions_api=False,
+            onepass_prompt, ['state', 'instruction', 'action']
         )
+
+        if DUMP_FOLDER is not None:
+            with open(f'{DUMP_FOLDER}/{self.dump_counter}-onepass.json', 'w') as f:
+                json.dump(answer_dict, f, indent=4)
+            self.dump_counter += 1
+
         return answer_dict['state'], answer_dict['instruction'], answer_dict['action']
-
-    # def _encoder(self, current_obs, last_action, current_plan, state_history):
-    def _encoder(self, current_obs, history, goal):
-        encoder_prompt = prompt_factory.get_encoder_prompt(current_obs, history, goal)
-        answer_dict = self.get_llm_output_new(encoder_prompt, ['state'])
-        # self.add_to_log('state', answer_dict['state'])
-
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-encoder.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
-
-        return answer_dict['state']
-
-    def _policy(self, current_state, history, goal):
-        policy_prompt = prompt_factory.get_policy_prompt(current_state, history, goal)
-        answer_dict = self.get_llm_output_new(
-            policy_prompt, ['instruction'], temperature=1.0
-        )
-        # self.add_to_log('instruction', answer_dict['instruction'])
-        answer_dict = self.get_llm_output_new(policy_prompt, ['instruction'])
-        self.add_to_log('instruction', answer_dict['instruction'])
-
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-policy.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
-
-        return answer_dict['instruction']
-
-    def _effectuator(
-        self, current_obs, current_state, current_instruction, history, goal
-    ):
-        action_prompt = prompt_factory.get_effectuator_prompt(
-            current_obs, current_state, current_instruction, history, goal
-        )
-        answer_dict = self.get_llm_output_new(action_prompt, ['action'])
-        # self.add_to_log('action', answer_dict['action'])
-        self.add_to_log('action', answer_dict['action'])
-
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-effectuator.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
-
-        return answer_dict['action']
-
-        # action_dict = self.get_llm_output_new(action_prompt, answer_keys)
-
-        # self.add_to_log('action', action_dict['action'])
-        # self.add_to_log('explanation', action_dict['explanation'])
-
-        # return action_dict['action'], action_dict['explanation']
 
     def step(self, env_state: State) -> Action:
         """
@@ -451,138 +314,34 @@ class FewShotWorldModelAgent(Agent):
         # actions = self.actions
         # if DEFAULT_BROWSER is not None:
         #     actions = actions[1:]
-        replan = False
-        full_module = True
 
-        if not self.is_planning and not self.finished_planning:
-            last_obs, last_action, return_action = self.process_control_flow(env_state)
-            if return_action is not None:
-                return return_action
+        last_obs, last_action, return_action = self.process_control_flow(env_state)
+        if return_action is not None:
+            return return_action
 
-            current_obs, return_action = self.parse_current_obs(last_obs)
-            if return_action is not None:
-                return return_action
+        current_obs, return_action = self.parse_current_obs(last_obs)
+        if return_action is not None:
+            return return_action
 
-            self.current_obs = current_obs
-            self.obs_history.append(current_obs)
-            self.add_to_log('obs', current_obs['clean_axtree_txt'])
-            self.last_action = (
-                self.action_history[-1]
-                if len(self.action_history) > 0
-                else ('No action taken so far', '')
-            )
-
-            self.full_output = ''
-            self.full_output_dict = {}
-
-            if full_module:
-                self.current_state, self.current_instruction, self.current_action = (
-                    self._full_module(self.current_obs, self.history, self.goal)
-                )
-                self.full_output_dict['obs'] = current_obs
-                self.add_to_log('state', self.current_state)
-                self.add_to_log('instruction', self.current_instruction)
-                self.add_to_log('action', self.current_action)
-                llm_output_logger.info(self.full_output)
-                self.full_output_dict['full_output'] = self.full_output
-
-                self.full_output_json = json.dumps(self.full_output_dict)
-                self.history.append(
-                    (
-                        self.current_obs,
-                        self.current_state,
-                        self.current_instruction,
-                        self.current_action,
-                    )
-                )
-
-                return self.parse_response(self.current_action, self.full_output_json)
-
-            self.current_state = self._encoder(
-                self.current_obs, self.history, self.goal
-            )
-            self.add_to_log('state', self.current_state)
-
-            self.full_output_dict['obs'] = current_obs
-
-            replan = True
-            # self.add_to_log('replan', replan)
-
-        if not self.finished_planning:
-            if replan:
-                self.is_planning = True
-                give_or_take = (random.random() * 4) - 2
-                return StartPlanningAction(30 + give_or_take)
-            elif self.is_planning:
-                example = {
-                    'current_state': self.current_state,
-                    'history': self.history,
-                    'goal': self.goal,
-                }
-                if self.do_search:
-                    result = self.reasoner(example)
-                    # self.add_to_log('result', str(result))
-                    self.current_instruction = result.terminal_state['action_history'][
-                        0
-                    ]
-                else:
-                    self.current_instruction = self._policy(
-                        self.current_state, self.history, self.goal
-                    )
-                self.add_to_log('instruction', self.current_instruction)
-
-                # self.current_plan = selected_plan
-                # current_strategy = selected_plan[0][0]
-
-                # self.active_strategy = current_strategy
-                # # self.active_strategy_explanation = strategy_explanation
-                # self.active_strategy_turns = 0
-                self.is_planning = False
-                self.finished_planning = True
-                # self.current_instruction = self._policy(
-                #     self.current_state, self.history, self.goal
-                # )
-                return FinishPlanningAction(self.current_instruction)
-            # else:
-            # self.strategies.append(None)
-            # self.strategy_explanations.append(None)
-            # self.active_strategy_turns += 1
-
-        self.finished_planning = False
-        # self.add_to_log('active_strategy', self.active_strategy)
-
-        # self.states.append(self.state_dict)
-        # self.state_history.append(self.state_dict)
-
-        # plan_prompt = prompt_factory._get_plan_prompt(self.current_plan)
-        # self.add_to_log('current_plan', plan_prompt)
-
-        # action, explanation = self._effectuator(
-        #     self.current_obs,
-        #     self.state_dict,
-        #     self.last_action,
-        #     self.current_plan,
-        #     self.state_history,
-        # )
-        self.current_action = self._effectuator(
-            self.current_obs,
-            self.current_state,
-            self.current_instruction,
-            self.history,
-            self.goal,
+        self.current_obs = current_obs
+        self.obs_history.append(current_obs)
+        self.add_to_log('obs', current_obs['clean_axtree_txt'])
+        self.last_action = (
+            self.action_history[-1]
+            if len(self.action_history) > 0
+            else ('No action taken so far', '')
         )
-        self.add_to_log('action', self.current_action)
+        self.current_state, self.current_instruction, self.current_action = (
+            self._onepass(self.current_obs, self.history, self.goal)
+        )
+        self.full_output = ''
+        self.full_output_dict = {}
+        self.full_output_dict['obs'] = current_obs
 
         llm_output_logger.info(self.full_output)
         self.full_output_dict['full_output'] = self.full_output
-
         self.full_output_json = json.dumps(self.full_output_dict)
 
-        # time.sleep(random.random() * 5)
-
-        # self.actions.append(action)
-        # self.explanations.append(explanation)
-        # self.action_history.append((action, explanation))
         self.history.append(
             (
                 self.current_obs,
@@ -591,7 +350,6 @@ class FewShotWorldModelAgent(Agent):
                 self.current_action,
             )
         )
-        # return self.parse_response(action, self.full_output)
         return self.parse_response(self.current_action, self.full_output_json)
 
     def process_control_flow(self, env_state: State) -> Action:
@@ -664,8 +422,7 @@ class FewShotWorldModelAgent(Agent):
             # The browser output observation belongs to OpenDevin
             if last_obs.error:
                 # add error recovery prompt prefix
-                # error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'
-                error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\n{last_obs.last_browser_action_error}\nThink again with the current observation of the page.\n'
+                error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'
             try:
                 cur_axtree_txt = flatten_axtree_to_str(
                     last_obs.axtree_object,
@@ -703,39 +460,17 @@ class FewShotWorldModelAgent(Agent):
 
         if error_prefix:
             self.error_accumulator += 1
-            if self.error_accumulator > 3:
+            if self.error_accumulator > 20:
                 return current_obs, MessageAction(
                     'Too many errors encountered. Task failed.'
                 )
-        else:
-            self.error_accumulator = 0
 
         ### Above is record keeping by world model
 
-        # clean_axtree_lines = []
-        # num_static_text_lines = 0
-        # max_static_text_lines = 15
-        # for line in cur_axtree_txt.split('\n'):
-        #     if line.strip().startswith('StaticText') or line.strip().startswith(
-        #         'ListMarker'
-        #     ):
-        #         num_static_text_lines += 1
-        #     else:
-        #         num_static_text_lines = 0
-
-        #     if num_static_text_lines <= max_static_text_lines:
-        #         clean_axtree_lines.append(line)
-
         clean_axtree_lines = []
         num_static_text_lines = 0
-        max_static_text_lines = 20
-        last_bracket_line = 0
-        max_after_last_bracket_lines = 10
-        for i, line in enumerate(cur_axtree_txt.split('\n')):
-            if line.strip().startswith('['):
-                last_bracket_line = i
-
-        for i, line in enumerate(cur_axtree_txt.split('\n')):
+        max_static_text_lines = 10
+        for line in cur_axtree_txt.split('\n'):
             if line.strip().startswith('StaticText') or line.strip().startswith(
                 'ListMarker'
             ):
@@ -743,16 +478,9 @@ class FewShotWorldModelAgent(Agent):
             else:
                 num_static_text_lines = 0
 
-            if num_static_text_lines <= max_static_text_lines and i < (
-                last_bracket_line + max_after_last_bracket_lines
-            ):
+            if num_static_text_lines <= max_static_text_lines:
                 clean_axtree_lines.append(line)
-
         clean_axtree_txt = '\n'.join(clean_axtree_lines)
-
-        obs_prompt = clean_axtree_txt
-        if len(error_prefix) > 0:
-            obs_prompt = f'{error_prefix}\n' + obs_prompt
 
         # current_obs = {
         #     'axtree_txt': clean_axtree_txt,
@@ -762,7 +490,7 @@ class FewShotWorldModelAgent(Agent):
         #     'goal': self.goal,
         # }
         current_obs = {
-            'clean_axtree_txt': obs_prompt,
+            'clean_axtree_txt': clean_axtree_txt,
             'raw_axtree_txt': cur_axtree_txt,
             # 'axtree_txt': "AXSTART "+cur_axtree_txt+" AXEND",
             'error_prefix': error_prefix,
