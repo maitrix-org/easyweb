@@ -56,8 +56,7 @@ OUTPUT_BUFFER = 1100  # added
 # DEFAULT_BROWSER = 'https://www.google.com'  # added
 DEFAULT_BROWSER = None
 
-# DUMP_FOLDER = "../prompt-logs"
-DUMP_FOLDER = None
+DUMP_FOLDER = '../prompt-logs'
 
 client = OpenAI()
 
@@ -312,10 +311,9 @@ class FewShotWorldModelAgent(Agent):
         answer_dict = self.get_llm_output_new(encoder_prompt, ['state'])
         self.add_to_log('state', answer_dict['state'])
 
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-encoder.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
+        with open(f'{DUMP_FOLDER}/{self.dump_counter}-encoder.json', 'w') as f:
+            json.dump(answer_dict, f, indent=4)
+        self.dump_counter += 1
 
         return answer_dict['state']
 
@@ -324,10 +322,9 @@ class FewShotWorldModelAgent(Agent):
         answer_dict = self.get_llm_output_new(policy_prompt, ['instruction'])
         self.add_to_log('instruction', answer_dict['instruction'])
 
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-policy.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
+        with open(f'{DUMP_FOLDER}/{self.dump_counter}-policy.json', 'w') as f:
+            json.dump(answer_dict, f, indent=4)
+        self.dump_counter += 1
 
         return answer_dict['instruction']
 
@@ -340,10 +337,9 @@ class FewShotWorldModelAgent(Agent):
         answer_dict = self.get_llm_output_new(action_prompt, ['action'])
         self.add_to_log('action', answer_dict['action'])
 
-        if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-effectuator.json', 'w') as f:
-                json.dump(answer_dict, f, indent=4)
-            self.dump_counter += 1
+        with open(f'{DUMP_FOLDER}/{self.dump_counter}-effectuator.json', 'w') as f:
+            json.dump(answer_dict, f, indent=4)
+        self.dump_counter += 1
 
         return answer_dict['action']
 
