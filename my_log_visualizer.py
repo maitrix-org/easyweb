@@ -278,11 +278,7 @@ if __name__ == '__main__':
         with gr.Row(equal_height=True):
             with gr.Column(scale=1):
                 with gr.Group():
-                    log_dir_options = [
-                        'frontend_logs',
-                        'my_evaluator_logs',
-                        'discussion_logs',
-                    ]
+                    log_dir_options = glob('**/*_logs/', recursive=True)
                     default_logdir = log_dir_options[-1]
                     log_list = list(
                         reversed(sorted(glob(f'./{default_logdir}/*.json')))

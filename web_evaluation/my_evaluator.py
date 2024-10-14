@@ -6,6 +6,7 @@ import random
 import sys
 import time
 from datetime import datetime
+from glob import glob
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 from my_frontend import OpenDevinSession
@@ -256,6 +257,10 @@ def run_question(args, qs, qid, start_datetime):
     # if qid < 10:
     #     return
     if qid in finished_qids or qs[qid] in finished_questions:
+        return
+
+    if glob(f'my_evaluator_logs/*_{args.job_name}_{qid}_steps.json') != []:
+        print(f'Existing log detected for question {qid}, skipping...')
         return
 
     random.seed(qid)
