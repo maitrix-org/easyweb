@@ -337,6 +337,9 @@ class OnepassAgent(Agent):
         self.full_output = ''
         self.full_output_dict = {}
         self.full_output_dict['obs'] = current_obs
+        self.add_to_log('state', self.current_state)
+        self.add_to_log('instruction', self.current_instruction)
+        self.add_to_log('action', self.current_action)
 
         llm_output_logger.info(self.full_output)
         self.full_output_dict['full_output'] = self.full_output

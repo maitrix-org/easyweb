@@ -3,7 +3,7 @@ import os
 import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
-from web_evaluation.my_evaluator import main
+from web_evaluation.inference import main
 
 data = []
 with open('task_data/flight_questions_train.jsonl') as f:
