@@ -1,9 +1,11 @@
-web_evaluation/*/my_evaluator_logs/
+web_evaluation/*/*_logs/
 
 agenthub/world_model_agent/world_model_agent-*.py
 agenthub/world_model_agent/prompt-*.py
 agenthub/new_world_model_agent/reasoners/*
 agenthub/new_world_model_agent/prompt_factory-*.py
+
+*.pem
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

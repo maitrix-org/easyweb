@@ -17,6 +17,27 @@
         "port": 8006,
         "display_name": "Meta-Llama-3.1-8B-Instruct (Finetuned)"
     },
+    "modularized-group-8B":
+    {
+        "modules": {
+            "encoder": {
+                "model": "Llama-3.1-8B-encoder",
+                "provider": "text-completion-openai",
+                "port": 8010
+            },
+            "policy": {
+                "model": "Llama-3.1-8B-policy",
+                "provider": "text-completion-openai",
+                "port": 8011
+            },
+            "effectuator": {
+                "model": "Llama-3.1-8B-effectuator",
+                "provider": "text-completion-openai",
+                "port": 8012
+            }
+        },
+        "display_name": "Llama-3.1-8B (Modularized)"
+    },
     "gpt-4o":
     {
         "base_url": "https://api.openai.com/v1/",

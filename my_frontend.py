@@ -862,6 +862,7 @@ if __name__ == '__main__':
                             'NewWorldModelAgent',
                             'FewShotWorldModelAgent',
                             'OnepassAgent',
+                            'PolicyAgent',
                         ],
                         value='FewShotWorldModelAgent',
                         interactive=True,
