@@ -848,7 +848,11 @@ if __name__ == '__main__':
         for model, cfg in model_port_config.items()
     }
 
-    default_model = model_list[1]
+    default_model = model_list[0]
+    for model, cfg in model_port_config.items():
+        if cfg.get('default', None):
+            default_model = cfg.get('display_name', model)
+            break
 
     with gr.Blocks() as demo:
         title = gr.Markdown('# OpenQ')
@@ -864,7 +868,7 @@ if __name__ == '__main__':
                             'OnepassAgent',
                             'PolicyAgent',
                         ],
-                        value='FewShotWorldModelAgent',
+                        value='PolicyAgent',
                         interactive=True,
                         label='Agent',
                         # info='Choose your own adventure partner!',

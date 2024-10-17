@@ -53,10 +53,12 @@ def _get_axtree_prompt(obs):
     return axtree
 
 
-def get_encoder_prompt(current_obs, history, goal):
-    current_datetime = datetime.now().strftime('%b %d, %Y %H:%M:%S')
-    current_datetime_prompt = f'# Current Date and Time:\n{current_datetime}'
+def get_datetime_prompt():
+    current_datetime = datetime.now().strftime('%a, %b %d, %Y %H:%M:%S')
+    return f'# Current Date and Time:\n{current_datetime}'
 
+
+def get_encoder_prompt(current_obs, history, goal):
     axtree = _get_axtree_prompt(current_obs)
     history_prompt = get_history_prompt(history)
 
@@ -66,7 +68,7 @@ Review the current observation of a webpage and all other information and summar
 
 {ACTION_SPACE}
 
-{current_datetime_prompt}
+{get_datetime_prompt()}
 
 # Goal:
 {goal}
@@ -84,9 +86,6 @@ Review the current observation of a webpage and all other information and summar
 
 
 def get_policy_prompt(state, history, goal):
-    current_datetime = datetime.now().strftime('%b %d, %Y %H:%M:%S')
-    current_datetime_prompt = f'\n# Current Date and Time:\n{current_datetime}\n\n'
-
     history_prompt = get_history_prompt(history)
 
     example_prompt = f"""\
@@ -95,7 +94,7 @@ Review the current state of the page and all other information to find the best 
 
 {ACTION_SPACE}
 
-{current_datetime_prompt}
+{get_datetime_prompt()}
 
 # Goal:
 {goal}
@@ -113,9 +112,6 @@ Review the current state of the page and all other information to find the best 
 
 
 def get_effectuator_prompt(state, instruction, current_obs, history, goal):
-    current_datetime = datetime.now().strftime('%b %d, %Y %H:%M:%S')
-    current_datetime_prompt = f'\n# Current Date and Time:\n{current_datetime}\n\n'
-
     axtree = _get_axtree_prompt(current_obs)
     history_prompt = get_history_prompt(history)
 
@@ -125,7 +121,7 @@ Review the current state of the page and all other information to find the best 
 
 {ACTION_SPACE}
 
-{current_datetime_prompt}
+{get_datetime_prompt()}
 
 # Goal:
 {goal}

@@ -1,5 +1,5 @@
 from opendevin.controller.agent import Agent
 
-from .onepass_agent import OnepassAgent
+from .policy_agent import PolicyAgent
 
-Agent.register('OnepassAgent', OnepassAgent)
+Agent.register('PolicyAgent', PolicyAgent)

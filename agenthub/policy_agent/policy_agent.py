@@ -208,7 +208,7 @@ class PolicyAgent(Agent):
         answer = self.get_llm_output(encoder_prompt, ENCODER_KEY)
 
         if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-encoder.json', 'w') as f:
+            with open(f'{DUMP_FOLDER}/{self.dump_counter}-encoder.txt', 'w') as f:
                 f.write(encoder_prompt + answer)
             self.dump_counter += 1
 
@@ -219,7 +219,7 @@ class PolicyAgent(Agent):
         answer = self.get_llm_output(policy_prompt, POLICY_KEY)
 
         if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-policy.json', 'w') as f:
+            with open(f'{DUMP_FOLDER}/{self.dump_counter}-policy.txt', 'w') as f:
                 f.write(policy_prompt + answer)
             self.dump_counter += 1
 
@@ -232,7 +232,7 @@ class PolicyAgent(Agent):
         answer = self.get_llm_output(effectuator_prompt, EFF_KEY)
 
         if DUMP_FOLDER is not None:
-            with open(f'{DUMP_FOLDER}/{self.dump_counter}-effectuator.json', 'w') as f:
+            with open(f'{DUMP_FOLDER}/{self.dump_counter}-effectuator.txt', 'w') as f:
                 f.write(effectuator_prompt + answer)
             self.dump_counter += 1
 
@@ -281,9 +281,19 @@ class PolicyAgent(Agent):
             if len(self.action_history) > 0
             else ('No action taken so far', '')
         )
-        self.current_state, self.current_instruction, self.current_action = (
-            self._onepass(self.current_obs, self.history, self.goal)
+
+        self.current_state = self._encoder(self.current_obs, self.history, self.goal)
+        self.current_instruction = self._policy(
+            self.current_state, self.history, self.goal
         )
+        self.current_action = self._effectuator(
+            self.current_state,
+            self.current_instruction,
+            self.current_obs,
+            self.history,
+            self.goal,
+        )
+
         self.full_output = ''
         self.full_output_dict = {}
         self.full_output_dict['obs'] = current_obs
