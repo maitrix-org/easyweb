@@ -11,11 +11,11 @@
         "port": 8000,
         "display_name": "Meta-Llama-3.1-70B-Instruct (Regular)"
     },
-    "ft-Meta-Llama-3-8B-Instruct":
+    "ft-Meta-Llama-3.1-8B-Instruct":
     {
         "provider": "openai",
         "port": 8006,
-        "display_name": "Meta-Llama-3-8B-Instruct (Finetuned)"
+        "display_name": "Meta-Llama-3.1-8B-Instruct (Finetuned)"
     },
     "gpt-4o":
     {

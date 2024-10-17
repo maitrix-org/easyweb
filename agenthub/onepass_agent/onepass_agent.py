@@ -51,6 +51,8 @@ OUTPUT_BUFFER = 1100  # added
 DEFAULT_BROWSER = None
 
 DUMP_FOLDER = '../prompt-logs-onepass'
+if not os.path.exists(DUMP_FOLDER):
+    os.makedirs(DUMP_FOLDER)
 # DUMP_FOLDER = None
 
 client = OpenAI()
@@ -278,7 +280,7 @@ class OnepassAgent(Agent):
     def _onepass(self, current_obs, history, goal):
         onepass_prompt = prompt_factory.get_onepass_prompt(current_obs, history, goal)
         answer_dict = self.get_llm_output_new(
-            onepass_prompt, ['state', 'instruction', 'action']
+            onepass_prompt, ['state', 'instruction', 'action'], temperature=1.0
         )
 
         if DUMP_FOLDER is not None:
