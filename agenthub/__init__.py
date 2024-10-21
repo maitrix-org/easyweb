@@ -21,6 +21,7 @@ from . import (  # noqa: E402
     new_world_model_agent,
     onepass_agent,
     planner_agent,
+    policy_agent,
     world_model_agent,
 )
 
@@ -37,6 +38,7 @@ __all__ = [
     'dummy_web_agent',
     'new_world_model_agent',
     'onepass_agent',
+    'policy_agent',
     'few_shot_world_model_agent',
 ]
 

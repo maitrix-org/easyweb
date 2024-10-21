@@ -106,7 +106,10 @@ class AgentController:
     async def update_state_after_step(self):
         self.state.updated_info = []
         # update metrics especially for cost
-        self.state.metrics = self.agent.llm.metrics
+        if isinstance(self.agent.llm, dict):
+            self.state.metrics = list(self.agent.llm.values())[0].metrics
+        else:
+            self.state.metrics = self.agent.llm.metrics
         if self.max_budget_per_task is not None:
             current_cost = self.state.metrics.accumulated_cost
             if current_cost > self.max_budget_per_task:

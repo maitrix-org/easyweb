@@ -94,24 +94,60 @@ class AgentSession:
         if config.llm.model_port_config_file:
             with open(config.llm.model_port_config_file) as f:
                 model_port_config = json.load(f)[model]
-            api_base = model_port_config.get('base_url', None)
-            if api_base is None:
-                if 'port' not in model_port_config:
-                    raise Exception(
-                        'One of API base URL and local port need to be provided for model {}'.format(
-                            model
+            if 'modules' in model_port_config:
+                module_config = model_port_config['modules']
+                model = {}
+                api_base = {}
+                for k, v in module_config.items():
+                    if 'model' not in v:
+                        raise Exception(
+                            'Model name need to be provided for module {} under {} in model_port_config.json'.format(
+                                k, model
+                            )
                         )
+                    if 'provider' in v:
+                        model[k] = v['provider'] + '/' + v['model']
+                    else:
+                        model[k] = v['model']
+
+                    if 'base_url' in v:
+                        api_base[k] = v['base_url']
+                    else:
+                        if 'port' not in v:
+                            raise Exception(
+                                'One of API base URL and local port need to be provided for module {} under {} in model_port_config.json'.format(
+                                    k, model
+                                )
+                            )
+                        api_base[k] = 'http://localhost:{}/v1/'.format(v['port'])
+            else:
+                if 'base_url' in model_port_config:
+                    api_base = model_port_config['base_url']
+                else:
+                    if 'port' not in model_port_config:
+                        raise Exception(
+                            'One of API base URL and local port need to be provided for model {} in model_port_config.json'.format(
+                                model
+                            )
+                        )
+                    api_base = 'http://localhost:{}/v1/'.format(
+                        model_port_config['port']
                     )
-                port = model_port_config['port']
-                api_base = 'http://localhost:{}/v1/'.format(port)
-            if 'provider' in model_port_config:
-                model = model_port_config['provider'] + '/' + model
-        max_iterations = args.get(ConfigType.MAX_ITERATIONS, config.max_iterations)
-        max_chars = args.get(ConfigType.MAX_CHARS, config.llm.max_chars)
+                if 'provider' in model_port_config:
+                    model = model_port_config['provider'] + '/' + model
 
         logger.info(f'Creating agent {agent_cls} using LLM {model}')
-        llm = LLM(model=model, api_key=api_key, base_url=api_base)
+        if isinstance(model, dict):
+            llm = {
+                k: LLM(model=model[k], api_key=api_key, base_url=api_base[k])
+                for k in model.keys()
+            }
+        else:
+            llm = LLM(model=model, api_key=api_key, base_url=api_base)
         agent = Agent.get_cls(agent_cls)(llm)
+
+        max_iterations = args.get(ConfigType.MAX_ITERATIONS, config.max_iterations)
+        max_chars = args.get(ConfigType.MAX_CHARS, config.llm.max_chars)
         if isinstance(agent, CodeActAgent):
             if not self.runtime or not isinstance(self.runtime.sandbox, DockerSSHBox):
                 logger.warning(

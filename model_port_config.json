@@ -1,21 +1,43 @@
 {
-    "Meta-Llama-3.1-70B-Instruct-Backup":
-    {
-        "provider": "openai",
-        "port": 8004,
-        "display_name": "Meta-Llama-3.1-70B-Instruct (Backup)"
-    },
     "Meta-Llama-3.1-70B-Instruct":
     {
         "provider": "openai",
         "port": 8000,
         "display_name": "Meta-Llama-3.1-70B-Instruct (Regular)"
     },
+    "Meta-Llama-3.1-70B-Instruct-Backup":
+    {
+        "provider": "openai",
+        "port": 8004,
+        "display_name": "Meta-Llama-3.1-70B-Instruct (Backup)"
+    },
     "ft-Meta-Llama-3.1-8B-Instruct":
     {
         "provider": "openai",
         "port": 8006,
         "display_name": "Meta-Llama-3.1-8B-Instruct (Finetuned)"
+    },
+    "modularized-group-8B":
+    {
+        "modules": {
+            "encoder": {
+                "model": "Llama-3.1-8B-encoder",
+                "provider": "text-completion-openai",
+                "port": 8100
+            },
+            "policy": {
+                "model": "Llama-3.1-8B-policy",
+                "provider": "text-completion-openai",
+                "port": 8101
+            },
+            "effectuator": {
+                "model": "Llama-3.1-8B-effectuator",
+                "provider": "text-completion-openai",
+                "port": 8102
+            }
+        },
+        "display_name": "Llama-3.1-8B (Modularized)",
+        "default": true
     },
     "gpt-4o":
     {
