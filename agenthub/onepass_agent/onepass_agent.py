@@ -204,6 +204,7 @@ class OnepassAgent(Agent):
                     messages=messages,
                     # messages=truncated_messages,  # added
                     temperature=self.temperature,
+                    top_p=0.7,
                     stop=None,
                 )
                 answer = response['choices'][0]['message']['content'].strip()

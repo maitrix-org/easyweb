@@ -1,13 +1,27 @@
+import json
+import os
+import sys
 from glob import glob
 
 from evaluator import FlightSearchEvaluator
+from helpers import tqdm_joblib
+from joblib import Parallel, delayed
+from tqdm import tqdm
 
+# '/Users/mingkaid/Documents/Tech-Life/lwm/web-agent-application/formal_evaluation_logs/onepass_8b_inst_flight_logs'
 if __name__ == '__main__':
     evaluator = FlightSearchEvaluator('./task_data/flight_questions_train.jsonl')
 
-    my_evaluator_log_paths = glob('./my_evaluator_logs/*')
+    log_dir = sys.argv[1]
+    log_paths = glob(os.path.join(log_dir, '*.json'))
 
-    n_correct = 0
-    for path in my_evaluator_log_paths:
-        n_correct += evaluator.evaluate(path)['correct']
-    print(n_correct / len(my_evaluator_log_paths))
+    with tqdm_joblib(tqdm(desc='Evaluating', disable=False)) as progress_bar:
+        results = Parallel(n_jobs=4, backend='threading')(
+            delayed(evaluator.evaluate)(path) for path in log_paths
+        )
+
+    result_metrics = evaluator.get_result_metrics(results)
+    result_metrics['log_dir'] = log_dir
+    result_metrics['num_logs'] = len(log_paths)
+    with open('./result_metrics.jsonl', 'a') as f:
+        f.write(json.dumps(result_metrics) + '\n')

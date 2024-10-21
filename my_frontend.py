@@ -818,8 +818,11 @@ def pause_resume_task(is_paused, session, status):
     return button, is_paused, session, status
 
 
+current_dir = os.path.dirname(__file__)
+print(os.path.dirname(__file__))
+
 default_port = 5000
-with open('Makefile') as f:
+with open(os.path.join(current_dir, 'Makefile')) as f:
     while True:
         line = f.readline()
         if 'BACKEND_PORT' in line:
@@ -831,7 +834,7 @@ default_agent = 'WorldModelAgent'
 
 global model_port_config
 model_port_config = {}
-with open('model_port_config.json') as f:
+with open(os.path.join(current_dir, 'model_port_config.json')) as f:
     model_port_config = json.load(f)
 # model_list = list(model_port_config.keys())
 # model_list = [cfg.get('display_name', model) for model, cfg in model_port_config.items()]
@@ -1012,4 +1015,4 @@ with gr.Blocks() as demo:
 if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
     demo.queue()
-    demo.launch(share=True)
+    demo.launch(share=False)

@@ -13,12 +13,12 @@ with gr.Blocks() as demo:
                     'frontend_logs',
                     'my_evaluator_logs',
                     'discussion_logs',
-                    'fanout_logs',
-                    'flight_logs',
-                ]
+                ] + glob('./formal_evaluation_logs/*/')
                 default_logdir = log_dir_options[1]
                 # print(f'./{default_logdir}/*.json')
-                log_list = list(reversed(sorted(glob(f'./{default_logdir}/*.json'))))
+                log_list = list(
+                    reversed(sorted(glob(f'./{default_logdir.strip("/")}/*.json')))
+                )
                 # print(log_list)
                 log_dir_selection = gr.Dropdown(
                     log_dir_options, value=default_logdir, label='Log Directory'

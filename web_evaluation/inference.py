@@ -245,11 +245,12 @@ questions = gaia_web_questions
 
 # finished_qids = [12, 13, 15, 16, 0, 1, 3, 4, 5, 6]
 # finished_qids = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17, 18, 19]
-finished_qids = []
-finished_questions = [
-    'Can you find a one-way flight from New York to London departing next Friday?',
-    'Can you find a round-trip, non-stop business class flight from Chicago to Tokyo, departing on October 20th and returning on October 27th?',
-]
+finished_qids = [0, 1, 2, 3, 4, 5, 6, 7, 10, 11, 14, 8, 9, 12]
+# finished_questions = [
+#     'Can you find a one-way flight from New York to London departing next Friday?',
+#     'Can you find a round-trip, non-stop business class flight from Chicago to Tokyo, departing on October 20th and returning on October 27th?',
+# ]
+finished_questions = []
 
 
 def run_question(args, qs, qid, start_datetime):
