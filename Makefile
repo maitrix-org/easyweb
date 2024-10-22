@@ -3,7 +3,9 @@ SHELL=/bin/bash
 
 # Variables
 DOCKER_IMAGE = ghcr.io/opendevin/sandbox
-BACKEND_PORT = 3000
+BACKEND_PORT = 5000
+BACKEND_PORT2 = 5001
+BACKEND_PORT3 = 4999
 BACKEND_HOST = "127.0.0.1:$(BACKEND_PORT)"
 FRONTEND_PORT = 3001
 DEFAULT_WORKSPACE_DIR = "./workspace"
@@ -198,6 +200,8 @@ build-frontend:
 start-backend:
 	@echo "$(YELLOW)Starting backend...$(RESET)"
 	@poetry run uvicorn opendevin.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
+	# & @poetry run uvicorn opendevin.server.listen:app --port $(BACKEND_PORT2) --reload --reload-exclude "workspace/*"
+	# & @poetry run uvicorn opendevin.server.listen:app --port $(BACKEND_PORT3) --reload --reload-exclude "workspace/*"
 
 # Start frontend
 start-frontend:
