@@ -38,7 +38,11 @@ def _get_axtree_prompt(obs):
 
 
 def get_onepass_prompt(current_obs, history, goal):
+    # current_datetime = datetime.now().strftime('%a, %b %d, %Y %H:%M:%S')
     current_datetime = datetime.now().strftime('%b %d, %Y %H:%M:%S')
+    # current_datetime = datetime.strptime(
+    #     '2024-10-12-20:32:02', '%Y-%m-%d-%H:%M:%S'
+    # ).strftime('%b %d, %Y %H:%M:%S')
     current_datetime_prompt = f'\n# Current Date and Time:\n{current_datetime}\n\n'
 
     axtree = _get_axtree_prompt(current_obs)

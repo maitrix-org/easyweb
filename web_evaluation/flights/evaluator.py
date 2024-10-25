@@ -3,6 +3,7 @@ import re
 from datetime import datetime
 
 import numpy as np
+import pandas as pd
 from helpers import field_patterns, get_obs, parse_pattern_matches, parser, tqdm_joblib
 from joblib import Parallel, delayed
 from openai import OpenAI
@@ -56,7 +57,9 @@ class FlightSearchEvaluator:
             )
         ) as _:
             flight_description_jsons = Parallel(n_jobs=8, backend='threading')(
-                delayed(self._parse_flight_description)(d) for d in flight_descriptions
+                delayed(self._parse_flight_description)(d)
+                for d in flight_descriptions
+                if d is not None
             )
         # flight_description_jsons = [self._parse_flight_description(d) for d in tqdm(flight_descriptions, desc='Parsing flight descriptions')]
 
@@ -87,6 +90,9 @@ class FlightSearchEvaluator:
                     self._get_flight_precision(flight_message, f)
                     for f in flight_description_jsons
                 ]
+                if len(flight_precisions) == 0:
+                    grounded = False
+                    break
                 # Retrieve the one with highest precision
                 max_idx = np.argmax(flight_precisions)
                 max_precision = flight_precisions[max_idx]
@@ -417,3 +423,53 @@ This gives you more flight options that depart from different airports within th
         ans_dict, success, error = parser(response, ['think', 'response'])
 
         return ans_dict['response']
+
+    def get_result_metrics(self, results):
+        results_df = pd.DataFrame(results)
+        questions_df = pd.DataFrame(self.questions_data)
+
+        results_df['constraints'] = results_df['constraints'].apply(
+            lambda x: tuple(sorted(x))
+        )
+        questions_df['constraints'] = questions_df['constraints'].apply(
+            lambda x: tuple(sorted(x))
+        )
+
+        question_result_df = pd.merge(
+            questions_df, results_df, how='left', on=['question', 'constraints']
+        )
+        question_result_df = question_result_df.query('level < 3')
+
+        question_result_df['correct'] = question_result_df['correct'].fillna(False)
+        question_result_df['grounded'] = question_result_df['grounded'].fillna(False)
+        question_result_df['relevant'] = question_result_df['relevant'].fillna(False)
+        question_result_df['agent_response_data'] = question_result_df[
+            'agent_response_data'
+        ].apply(lambda x: [] if x is np.nan else x)
+        question_result_df['has_response'] = question_result_df[
+            'agent_response_data'
+        ].apply(lambda x: len(x) > 0)
+
+        judgments = []
+        for i, row in question_result_df.iterrows():
+            if row['correct']:
+                judgments.append('Correct')
+            elif not row['has_response']:
+                if row['search_datetime'] is not np.nan:
+                    judgments.append('No Response')
+                else:
+                    judgments.append('Browsing Error')
+            else:
+                judgments.append('Wrong Answer')
+        question_result_df['judgment'] = judgments
+        judgment_summary = (
+            question_result_df.judgment.value_counts() / question_result_df.shape[0]
+        )
+
+        return {
+            'correct': question_result_df['correct'].mean(),
+            'grounded': question_result_df['grounded'].mean(),
+            'relevant': question_result_df['relevant'].mean(),
+            'has_response': question_result_df['has_response'].mean(),
+            'judgments': judgment_summary.to_dict(),
+        }

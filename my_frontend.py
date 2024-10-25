@@ -818,126 +818,180 @@ def pause_resume_task(is_paused, session, status):
     return button, is_paused, session, status
 
 
-if __name__ == '__main__':
-    default_port = 5000
-    with open('Makefile') as f:
-        while True:
-            line = f.readline()
-            if 'BACKEND_PORT' in line:
-                default_port = int(line.split('=')[1].strip())
-                break
-            if not line:
-                break
-    default_agent = 'WorldModelAgent'
+def toggle_options(visible):
+    new_visible = not visible
+    toggle_text = 'Hide Advanced Options' if new_visible else 'Show Advanced Options'
+    return (
+        # gr.update(visible=new_visible),
+        gr.update(visible=new_visible),
+        new_visible,
+        gr.update(value=toggle_text),
+    )
 
-    global model_port_config
-    model_port_config = {}
-    with open('model_port_config.json') as f:
-        model_port_config = json.load(f)
-    # model_list = list(model_port_config.keys())
-    # model_list = [cfg.get('display_name', model) for model, cfg in model_port_config.items()]
-    global model_display2name
-    model_display2name = {
-        cfg.get('display_name', model): model
-        for model, cfg in model_port_config.items()
-    }
-    model_list = list(model_display2name.keys())
-    global model_requires_key
-    model_requires_key = {
-        model: cfg.get('requires_key', False)
-        for model, cfg in model_port_config.items()
-    }
 
-    default_model = model_list[0]
-    for model, cfg in model_port_config.items():
-        if cfg.get('default', None):
-            default_model = cfg.get('display_name', model)
+current_dir = os.path.dirname(__file__)
+print(os.path.dirname(__file__))
+
+default_port = 5000
+with open(os.path.join(current_dir, 'Makefile')) as f:
+    while True:
+        line = f.readline()
+        if 'BACKEND_PORT' in line:
+            default_port = int(line.split('=')[1].strip())
             break
+        if not line:
+            break
+default_agent = 'WorldModelAgent'
 
-    with gr.Blocks() as demo:
-        title = gr.Markdown('# OpenQ')
-        with gr.Row(equal_height=True):
-            with gr.Column(scale=1):
-                with gr.Group():
-                    agent_selection = gr.Dropdown(
-                        [
-                            'DummyWebAgent',
-                            'WorldModelAgent',
-                            'NewWorldModelAgent',
-                            'FewShotWorldModelAgent',
-                            'OnepassAgent',
-                            'PolicyAgent',
-                        ],
-                        value='PolicyAgent',
-                        interactive=True,
-                        label='Agent',
-                        # info='Choose your own adventure partner!',
-                    )
-                    model_selection = gr.Dropdown(
-                        model_list,
-                        value=default_model,
-                        interactive=True,
-                        label='Backend LLM',
-                        # info='Choose the model you would like to use',
-                    )
-                    api_key = gr.Textbox(
-                        label='API Key', placeholder='Your API Key', visible=False
-                    )
-                    chatbot = gr.Chatbot()
-                with gr.Group():
-                    with gr.Row():
-                        msg = gr.Textbox(container=False, show_label=False, scale=7)
-                        submit = gr.Button(
-                            'Submit',
-                            variant='primary',
-                            scale=1,
-                            min_width=150,
-                        )
-                        submit_triggers = [msg.submit, submit.click]
+global model_port_config
+model_port_config = {}
+with open(os.path.join(current_dir, 'model_port_config.json')) as f:
+    model_port_config = json.load(f)
+# model_list = list(model_port_config.keys())
+# model_list = [cfg.get('display_name', model) for model, cfg in model_port_config.items()]
+global model_display2name
+model_display2name = {
+    cfg.get('display_name', model): model for model, cfg in model_port_config.items()
+}
+model_list = list(model_display2name.keys())
+global model_requires_key
+model_requires_key = {
+    model: cfg.get('requires_key', False) for model, cfg in model_port_config.items()
+}
+
+default_model = model_list[0]
+for model, cfg in model_port_config.items():
+    if cfg.get('default', None):
+        default_model = cfg.get('display_name', model)
+        break
+
+with gr.Blocks() as demo:
+    title = gr.Markdown('# OpenQ')
+    with gr.Row(equal_height=True):
+        with gr.Column(scale=1):
+            with gr.Group():
+                agent_selection = gr.Dropdown(
+                    [
+                        'DummyWebAgent',
+                        'WorldModelAgent',
+                        'NewWorldModelAgent',
+                        'FewShotWorldModelAgent',
+                        'OnepassAgent',
+                        'PolicyAgent',
+                    ],
+                    value='PolicyAgent',
+                    interactive=True,
+                    label='Agent',
+                    # info='Choose your own adventure partner!',
+                )
+                model_selection = gr.Dropdown(
+                    model_list,
+                    value=default_model,
+                    interactive=True,
+                    label='Backend LLM',
+                    # info='Choose the model you would like to use',
+                )
+                api_key = gr.Textbox(
+                    label='API Key', placeholder='Your API Key', visible=False
+                )
+                chatbot = gr.Chatbot()
+            with gr.Group():
                 with gr.Row():
-                    pause_resume = gr.Button('Pause')
-                    clear = gr.Button('Clear')
+                    msg = gr.Textbox(container=False, show_label=False, scale=7)
+                    submit = gr.Button(
+                        'Submit',
+                        variant='primary',
+                        scale=1,
+                        min_width=150,
+                    )
+                    submit_triggers = [msg.submit, submit.click]
+            with gr.Row():
+                toggle_button = gr.Button('Hide Advanced Options')
+                pause_resume = gr.Button('Pause')
+                clear = gr.Button('Clear')
 
-                status = gr.Markdown('Agent Status: 🔴 Inactive')
+            status = gr.Markdown('Agent Status: 🔴 Inactive')
 
-            with gr.Column(scale=2):
-                # with gr.Group():
-                #     start_url = 'about:blank'
-                #     url = gr.Textbox(
-                #         start_url, label='URL', interactive=False, max_lines=1
-                #     )
-                #     blank = Image.new('RGB', (1280, 720), (255, 255, 255))
-                #     screenshot = gr.Image(blank, interactive=False, label='Webpage')
-                #     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
+        # with gr.Column(scale=2):
+        with gr.Column(scale=2, visible=True) as visualization_column:
+            # with gr.Group():
+            #     start_url = 'about:blank'
+            #     url = gr.Textbox(
+            #         start_url, label='URL', interactive=False, max_lines=1
+            #     )
+            #     blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+            #     screenshot = gr.Image(blank, interactive=False, label='Webpage')
+            #     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
 
-                with gr.Tab('Web Browser') as browser_tab:
-                    with gr.Group():
-                        start_url = 'about:blank'
-                        url = gr.Textbox(
-                            start_url, label='URL', interactive=False, max_lines=1
-                        )
-                        blank = Image.new('RGB', (1280, 720), (255, 255, 255))
-                        screenshot = gr.Image(blank, interactive=False, label='Webpage')
+            with gr.Tab('Web Browser') as browser_tab:
+                with gr.Group():
+                    start_url = 'about:blank'
+                    url = gr.Textbox(
+                        start_url, label='URL', interactive=False, max_lines=1
+                    )
+                    blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+                    screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
-                with gr.Tab('Planning Process') as planning_tab:
-                    plot = gr.Plot(go.Figure(), label='Agent Planning Process')
+            with gr.Tab('Planning Process') as planning_tab:
+                plot = gr.Plot(go.Figure(), label='Agent Planning Process')
 
-                with gr.Tab('Action History') as history_tab:
-                    action_history = gr.Markdown('No Action Taken Yet')
+            with gr.Tab('Action History') as history_tab:
+                action_history = gr.Markdown('No Action Taken Yet')
 
-        action_messages = gr.State([])
-        browser_history = gr.State([(blank, start_url)])
-        session = gr.State(
-            OpenDevinSession(
-                agent=default_agent, port=default_port, model=default_model
-            )
-        )
-        is_paused = gr.State(False)
-        # chat_msg = msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False)
-        chat_msg = gr.events.on(
-            submit_triggers, user, [msg, chatbot], [msg, chatbot], queue=False
-        )
-        bot_msg = chat_msg.then(
+    action_messages = gr.State([])
+    browser_history = gr.State([(blank, start_url)])
+    session = gr.State(
+        OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
+    )
+    options_visible = gr.State(True)
+    toggle_button.click(
+        toggle_options,
+        inputs=[options_visible],
+        outputs=[
+            visualization_column,
+            options_visible,
+            toggle_button,
+        ],  # advanced_options_group
+        queue=False,
+    )
+    is_paused = gr.State(False)
+    # chat_msg = msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False)
+    chat_msg = gr.events.on(
+        submit_triggers, user, [msg, chatbot], [msg, chatbot], queue=False
+    )
+    bot_msg = chat_msg.then(
+        get_messages,
+        [
+            chatbot,
+            action_messages,
+            browser_history,
+            session,
+            status,
+            agent_selection,
+            model_selection,
+            api_key,
+        ],
+        [
+            chatbot,
+            screenshot,
+            url,
+            action_messages,
+            browser_history,
+            session,
+            status,
+            clear,
+            plot,
+            action_history,
+        ],
+        concurrency_limit=10,
+    )
+    (
+        pause_resume.click(
+            pause_resume_task,
+            [is_paused, session, status],
+            [pause_resume, is_paused, session, status],
+            queue=False,
+        ).then(
             get_messages,
             [
                 chatbot,
@@ -963,62 +1017,31 @@ if __name__ == '__main__':
             ],
             concurrency_limit=10,
         )
-        (
-            pause_resume.click(
-                pause_resume_task,
-                [is_paused, session, status],
-                [pause_resume, is_paused, session, status],
-                queue=False,
-            ).then(
-                get_messages,
-                [
-                    chatbot,
-                    action_messages,
-                    browser_history,
-                    session,
-                    status,
-                    agent_selection,
-                    model_selection,
-                    api_key,
-                ],
-                [
-                    chatbot,
-                    screenshot,
-                    url,
-                    action_messages,
-                    browser_history,
-                    session,
-                    status,
-                    clear,
-                    plot,
-                    action_history,
-                ],
-                concurrency_limit=10,
-            )
-        )
-        clear.click(
-            clear_page,
-            [browser_history, session],
-            [
-                chatbot,
-                pause_resume,
-                is_paused,
-                screenshot,
-                url,
-                action_messages,
-                browser_history,
-                session,
-                status,
-                plot,
-                action_history,
-            ],
-            queue=False,
-        )
+    )
+    clear.click(
+        clear_page,
+        [browser_history, session],
+        [
+            chatbot,
+            pause_resume,
+            is_paused,
+            screenshot,
+            url,
+            action_messages,
+            browser_history,
+            session,
+            status,
+            plot,
+            action_history,
+        ],
+        queue=False,
+    )
 
-        model_selection.select(
-            check_requires_key, [model_selection, api_key], api_key, queue=False
-        )
+    model_selection.select(
+        check_requires_key, [model_selection, api_key], api_key, queue=False
+    )
 
+if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
     demo.queue()
-    demo.launch(share=True)
+    demo.launch(share=False)
