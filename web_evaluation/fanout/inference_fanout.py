@@ -13,3 +13,4 @@ questions = [row['question'] for row in data]
 
 if __name__ == '__main__':
     main(questions[:20])
+    # main(questions[:])
