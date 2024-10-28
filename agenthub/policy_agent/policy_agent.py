@@ -45,8 +45,8 @@ OUTPUT_BUFFER = 1100  # added
 # DEFAULT_BROWSER = 'https://www.google.com'  # added
 DEFAULT_BROWSER = None
 
-DUMP_FOLDER = '../prompt-logs-policy'
-# DUMP_FOLDER = None
+# DUMP_FOLDER = '../prompt-logs-policy'
+DUMP_FOLDER = None
 
 client = OpenAI()
 

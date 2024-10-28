@@ -287,9 +287,21 @@ def run_question(args, qs, qid, start_datetime):
 
     os.makedirs('my_evaluator_logs', exist_ok=True)
 
-    output_path = f'my_evaluator_logs/{start_datetime}_{args.job_name}_{qid}_steps.json'
-    print('Saving log to', output_path)
-    json.dump(session.raw_messages, open(output_path, 'w'))
+    for msg in session.raw_messages:
+        if (
+            'args' in msg
+            and 'content' in msg['args']
+            and msg['args']['content'] == 'Error encountered when browsing.'
+        ):
+            print(f'Question {qid} is skipped due to error encountered when browsing.')
+            break
+    else:
+        output_path = (
+            f'my_evaluator_logs/{start_datetime}_{args.job_name}_{qid}_steps.json'
+        )
+        print('Saving log to', output_path)
+        with open(output_path, 'w') as f:
+            json.dump(session.raw_messages, f, indent=4)
 
     # session._close()
 

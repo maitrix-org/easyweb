@@ -818,6 +818,17 @@ def pause_resume_task(is_paused, session, status):
     return button, is_paused, session, status
 
 
+def toggle_options(visible):
+    new_visible = not visible
+    toggle_text = 'Hide Advanced Options' if new_visible else 'Show Advanced Options'
+    return (
+        # gr.update(visible=new_visible),
+        gr.update(visible=new_visible),
+        new_visible,
+        gr.update(value=toggle_text),
+    )
+
+
 current_dir = os.path.dirname(__file__)
 print(os.path.dirname(__file__))
 
@@ -896,12 +907,14 @@ with gr.Blocks() as demo:
                     )
                     submit_triggers = [msg.submit, submit.click]
             with gr.Row():
+                toggle_button = gr.Button('Hide Advanced Options')
                 pause_resume = gr.Button('Pause')
                 clear = gr.Button('Clear')
 
             status = gr.Markdown('Agent Status: 🔴 Inactive')
 
-        with gr.Column(scale=2):
+        # with gr.Column(scale=2):
+        with gr.Column(scale=2, visible=True) as visualization_column:
             # with gr.Group():
             #     start_url = 'about:blank'
             #     url = gr.Textbox(
@@ -930,6 +943,17 @@ with gr.Blocks() as demo:
     browser_history = gr.State([(blank, start_url)])
     session = gr.State(
         OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
+    )
+    options_visible = gr.State(True)
+    toggle_button.click(
+        toggle_options,
+        inputs=[options_visible],
+        outputs=[
+            visualization_column,
+            options_visible,
+            toggle_button,
+        ],  # advanced_options_group
+        queue=False,
     )
     is_paused = gr.State(False)
     # chat_msg = msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False)

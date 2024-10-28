@@ -1,8 +1,16 @@
 #!/bin/bash
 set -x
 
+# python inference_fanout.py \
+#     --agent PolicyAgent \
+#     --port 3000 \
+#     --model modularized-group-8B \
+#     --n_processes 1 \
+#     overfit_test
+
 python inference_fanout.py \
-    --agent OnepassAgent \
+    --agent PolicyAgent \
     --port 3000 \
-    --model ft-Meta-Llama-3.1-8B-Instruct \
+    --model modularized-group-8B \
+    --n_processes 1 \
     overfit_test
