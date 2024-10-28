@@ -62,8 +62,12 @@ class TestSession:
             agent_output = json.loads(message['args']['thought'])
 
             obs = agent_output.get('obs', {}).get('clean_axtree_txt', '')
+            if not obs:
+                obs = agent_output.get('observation', {}).get('clean_axtree_txt', '')
             state = agent_output.get('state', '')
             instruction = agent_output.get('instruction', '')
+            if not instruction:
+                instruction = agent_output.get('intent', '')
             action = agent_output.get('action', '')
 
         return obs, state, instruction, action

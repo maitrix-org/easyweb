@@ -867,6 +867,7 @@ with gr.Blocks() as demo:
                         'FewShotWorldModelAgent',
                         'OnepassAgent',
                         'PolicyAgent',
+                        'AgentModelAgent',
                     ],
                     value='PolicyAgent',
                     interactive=True,
@@ -894,15 +895,6 @@ with gr.Blocks() as demo:
                         min_width=150,
                     )
                     submit_triggers = [msg.submit, submit.click]
-            with gr.Row():
-                msg = gr.Textbox(container=False, show_label=False, scale=7)
-                submit = gr.Button(
-                    'Submit',
-                    variant='primary',
-                    scale=1,
-                    min_width=150,
-                )
-                submit_triggers = [msg.submit, submit.click]
             with gr.Row():
                 pause_resume = gr.Button('Pause')
                 clear = gr.Button('Clear')
