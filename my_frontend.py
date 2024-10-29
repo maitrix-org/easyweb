@@ -878,8 +878,9 @@ with gr.Blocks() as demo:
                         'FewShotWorldModelAgent',
                         'OnepassAgent',
                         'PolicyAgent',
+                        'WebPlanningAgent',
                     ],
-                    value='PolicyAgent',
+                    value='WebPlanningAgent',
                     interactive=True,
                     label='Agent',
                     # info='Choose your own adventure partner!',
@@ -891,9 +892,8 @@ with gr.Blocks() as demo:
                     label='Backend LLM',
                     # info='Choose the model you would like to use',
                 )
-                api_key = gr.Textbox(
-                    label='API Key', placeholder='Your API Key', visible=False
-                )
+                api_key = check_requires_key(default_model, None)
+
                 chatbot = gr.Chatbot()
             with gr.Group():
                 with gr.Row():

@@ -12,5 +12,5 @@ data = json.load(open('./task_data/fanout-dev-0-30.json'))
 questions = [row['question'] for row in data]
 
 if __name__ == '__main__':
-    main(questions[:20])
+    main(questions[:1])
     # main(questions[:])
