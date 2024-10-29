@@ -865,6 +865,8 @@ for model, cfg in model_port_config.items():
         default_model = cfg.get('display_name', model)
         break
 
+default_api_key = os.environ.get('OPENAI_API_KEY')
+
 with gr.Blocks() as demo:
     title = gr.Markdown('# OpenQ')
     with gr.Row(equal_height=True):
@@ -893,7 +895,7 @@ with gr.Blocks() as demo:
                     label='Backend LLM',
                     # info='Choose the model you would like to use',
                 )
-                api_key = check_requires_key(default_model, None)
+                api_key = check_requires_key(default_model, default_api_key)
 
                 chatbot = gr.Chatbot()
             with gr.Group():
