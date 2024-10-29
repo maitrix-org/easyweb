@@ -12,7 +12,7 @@ from PIL import Image, UnidentifiedImageError
 
 # from openai import OpenAI
 
-api_key = os.environ.get('OPENAI_API_KEY')
+default_api_key = os.environ.get('OPENAI_API_KEY')
 LINE_LEN = 100
 LABEL_LEN = 20
 WIDTH = 18
@@ -44,7 +44,7 @@ class OpenDevinSession:
         port,
         model,
         language='en',
-        api_key=api_key,
+        api_key=default_api_key,
     ):
         self.model = model
         self.agent = agent
