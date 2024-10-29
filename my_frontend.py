@@ -879,6 +879,7 @@ with gr.Blocks() as demo:
                         'OnepassAgent',
                         'PolicyAgent',
                         'WebPlanningAgent',
+                        'AgentModelAgent',
                     ],
                     value='WebPlanningAgent',
                     interactive=True,
