@@ -883,7 +883,7 @@ with gr.Blocks() as demo:
                         'WebPlanningAgent',
                         'AgentModelAgent',
                     ],
-                    value='WebPlanningAgent',
+                    value='AgentModelAgent',
                     interactive=True,
                     label='Agent',
                     # info='Choose your own adventure partner!',
