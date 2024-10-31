@@ -1,4 +1,5 @@
 web_evaluation/*/*_logs/
+*.log
 
 agenthub/world_model_agent/world_model_agent-*.py
 agenthub/world_model_agent/prompt-*.py
