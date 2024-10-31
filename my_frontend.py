@@ -841,7 +841,10 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
             break
         if not line:
             break
-default_agent = 'WorldModelAgent'
+# default_agent = 'WorldModelAgent'
+default_agent = 'AgentModelAgent'
+with open('./default_api_key.txt', 'r') as fr:
+    default_api_key = fr.read().strip()
 
 global model_port_config
 model_port_config = {}
@@ -859,7 +862,8 @@ model_requires_key = {
     model: cfg.get('requires_key', False) for model, cfg in model_port_config.items()
 }
 
-default_model = model_list[0]
+# default_model = model_list[0]
+default_model = 'gpt-4o'
 for model, cfg in model_port_config.items():
     if cfg.get('default', None):
         default_model = cfg.get('display_name', model)
@@ -880,7 +884,7 @@ with gr.Blocks() as demo:
                         'PolicyAgent',
                         'AgentModelAgent',
                     ],
-                    value='PolicyAgent',
+                    value=default_agent,
                     interactive=True,
                     label='Agent',
                     # info='Choose your own adventure partner!',
@@ -893,7 +897,10 @@ with gr.Blocks() as demo:
                     # info='Choose the model you would like to use',
                 )
                 api_key = gr.Textbox(
-                    label='API Key', placeholder='Your API Key', visible=False
+                    label='API Key',
+                    placeholder='Your API Key',
+                    value=default_api_key,
+                    visible=True,
                 )
                 chatbot = gr.Chatbot()
             with gr.Group():

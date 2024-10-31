@@ -36,13 +36,13 @@
                 "port": 8102
             }
         },
-        "display_name": "Llama-3.1-8B (Modularized)",
-        "default": true
+        "display_name": "Llama-3.1-8B (Modularized)"
     },
     "gpt-4o":
     {
         "base_url": "https://api.openai.com/v1/",
-        "requires_key": true
+        "requires_key": true,
+        "default": true
     },
     "llama-3.1-405b-instruct:free":
     {

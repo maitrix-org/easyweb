@@ -1,20 +1,22 @@
 import json
+from datetime import datetime
 from functools import partial
 
 from opendevin.controller.agent import Agent
-from opendevin.core.logger import opendevin_logger as logger
 from opendevin.llm.llm import LLM
 from opendevin.runtime.plugins import (
     PluginRequirement,
 )
 from opendevin.runtime.tools import RuntimeTool
 
-from .agent_model.llms import OpenDevinParserLLM
+from .agent_model.llms import OpenDevinParserLLM, OpenDevinParserMultiResponseLLM
 from .agent_model.modules import (
-    PolicyPlanner,
+    LLMReasonerPlanner,
     PromptedActor,
+    PromptedCritic,
     PromptedEncoder,
     PromptedPolicy,
+    PromptedWorldModel,
 )
 from .agent_model.variables import (
     AgentInstructionEnvironmentIdentity,
@@ -24,9 +26,12 @@ from .agent_model.variables import (
 )
 from .agent_model_prompts import (
     actor_prompt_template,
+    critic_prompt_template,
     encoder_prompt_template,
     policy_prompt_template,
+    world_model_prompt_template,
 )
+from .logger import AgentLogger
 from .utils import ParseError, parse_html_tags_raise
 
 
@@ -87,12 +92,36 @@ impossible to answer the question or carry out the instruction.'
         self.memory = StepKeyValueMemory(['state', 'intent'])
         # self.encoder = StateMemoryEncoder(state=self.state, memory=self.memory)
 
-        policy_parser = partial(parser, keys=['intent'])
-        self.policy_llm = OpenDevinParserLLM(llm, default_parser=policy_parser)
+        policy_parser = partial(parser, keys=['intent'], optional_keys=['think'])
+        self.policy_llm = OpenDevinParserMultiResponseLLM(
+            llm, default_parser=policy_parser
+        )
         self.policy = PromptedPolicy(
             self.identity, self.policy_llm, prompt_template=policy_prompt_template
         )
-        self.planner = PolicyPlanner(self.policy)
+
+        world_model_parser = partial(parser, keys=['next_state'])
+        self.world_model_llm = OpenDevinParserLLM(
+            llm, default_parser=world_model_parser
+        )
+        self.world_model = PromptedWorldModel(
+            self.identity,
+            self.world_model_llm,
+            prompt_template=world_model_prompt_template,
+        )
+
+        critic_parser = partial(
+            parser, keys=['status', 'on_the_right_track'], optional_keys=['think']
+        )
+        self.critic_llm = OpenDevinParserMultiResponseLLM(
+            llm, default_parser=critic_parser
+        )
+        self.critic = PromptedCritic(
+            self.identity, self.critic_llm, prompt_template=critic_prompt_template
+        )
+
+        # self.planner = PolicyPlanner(self.policy)
+        self.planner = LLMReasonerPlanner(self.policy, self.world_model, self.critic)
 
         action_parser = partial(parser, keys=['action'])
         self.actor_llm = OpenDevinParserLLM(llm, default_parser=action_parser)
@@ -105,6 +134,10 @@ impossible to answer the question or carry out the instruction.'
     def reset(self):
         self.identity.reset()
         self.memory.reset()
+        timestamp = datetime.now().strftime('%Y-%m-%d-%H-%M-%S-%f')
+        log_file = f'{timestamp}.log'
+        self.logger = AgentLogger(log_file)
+        self.planner.logger = self.logger
 
     def step(self, env_state):
         observation, info = self.observation_space.parse_observation(env_state)
@@ -113,16 +146,17 @@ impossible to answer the question or carry out the instruction.'
         self.identity.update(user_instruction=observation['goal'])
 
         obs_txt = observation['clean_axtree_txt']
-        logger.info(f'*Observation*: {obs_txt}')
+        # logger.info(f'*Observation*: {obs_txt}')
+        self.logger.info(f'*Observation*: {obs_txt}')
 
         state = self.encoder(obs_txt, self.memory)['state']
-        logger.info(f'*State*: {state}')
+        self.logger.info(f'*State*: {state}')
 
         intent = self.planner(state, self.memory)['intent']
-        logger.info(f'*Intent*: {intent}')
+        self.logger.info(f'*Intent*: {intent}')
 
         action = self.actor(obs_txt, state, self.memory, intent)['action']
-        logger.info(f'*Action*: {action}')
+        self.logger.info(f'*Action*: {action}')
 
         step = {
             'observation': observation,

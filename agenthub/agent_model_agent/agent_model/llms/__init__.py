@@ -1,3 +1,3 @@
-from .llm import OpenDevinParserLLM
+from .llm import OpenDevinParserLLM, OpenDevinParserMultiResponseLLM
 
-__all__ = ['OpenDevinParserLLM']
+__all__ = ['OpenDevinParserLLM', 'OpenDevinParserMultiResponseLLM']
