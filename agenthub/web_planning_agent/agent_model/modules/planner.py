@@ -9,8 +9,8 @@ class PolicyPlanner(AgentModule):
         super().__init__()
         self.policy = policy
 
-    def __call__(self, state, memory):
-        intent_response = self.policy(state=state, memory=memory)
+    def __call__(self, state, memory, **kwargs):
+        intent_response = self.policy(state=state, memory=memory, **kwargs)
         return intent_response
 
 

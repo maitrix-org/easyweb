@@ -9,11 +9,12 @@ with gr.Blocks() as demo:
     with gr.Row(equal_height=True):
         with gr.Column(scale=1):
             with gr.Group():
-                log_dir_options = [
-                    'frontend_logs',
-                    'my_evaluator_logs',
-                    'discussion_logs',
-                ] + glob('./formal_evaluation_logs/*/')
+                # log_dir_options = [
+                #     'frontend_logs',
+                #     'my_evaluator_logs',
+                #     'discussion_logs',
+                # ] + glob('./formal_evaluation_logs/*/')
+                log_dir_options = glob('**/*_logs/', recursive=True)
                 default_logdir = log_dir_options[1]
                 # print(f'./{default_logdir}/*.json')
                 log_list = list(

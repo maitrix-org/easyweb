@@ -68,9 +68,10 @@ class WebPlanningAgent(Agent):
         self.observation_space = OpenDevinBrowserObservationSpace(eval_mode=False)
 
         agent_name = 'Web Browsing Agent'
-        agent_description = 'An information and automation assistant who responds to \
-user instructions by browsing the internet. The assistant strives to answer each question \
-accurately, thoroughly, efficiently, and politely, and to be forthright when it is \
+        agent_description = 'An automation assistant who responds to \
+user instructions by browsing the internet. The assistant strives to \
+complete each step accurately, thoroughly, efficiently, and only based on contents \
+derived from web observations. It is important to be forthright when it is \
 impossible to answer the question or carry out the instruction.'
         self.identity = AgentInstructionEnvironmentIdentity(
             agent_name=agent_name,
@@ -115,13 +116,15 @@ impossible to answer the question or carry out the instruction.'
         obs_txt = observation['clean_axtree_txt']
         logger.info(f'*Observation*: {obs_txt}')
 
-        state = self.encoder(obs_txt, self.memory)['state']
+        state = self.encoder(obs_txt, self.memory, temperature=0)['state']
         logger.info(f'*State*: {state}')
 
-        intent = self.planner(state, self.memory)['intent']
+        intent = self.planner(state, self.memory, temperature=0)['intent']
         logger.info(f'*Intent*: {intent}')
 
-        action = self.actor(obs_txt, state, self.memory, intent)['action']
+        action = self.actor(obs_txt, state, self.memory, intent, temperature=0)[
+            'action'
+        ]
         logger.info(f'*Action*: {action}')
 
         step = {

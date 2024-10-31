@@ -841,7 +841,6 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
             break
         if not line:
             break
-default_agent = 'WorldModelAgent'
 
 global model_port_config
 model_port_config = {}
@@ -865,8 +864,7 @@ for model, cfg in model_port_config.items():
         default_model = cfg.get('display_name', model)
         break
 
-default_api_key = os.environ.get('OPENAI_API_KEY')
-
+default_agent = 'AgentModelAgent'
 with gr.Blocks() as demo:
     title = gr.Markdown('# OpenQ')
     with gr.Row(equal_height=True):
@@ -883,7 +881,7 @@ with gr.Blocks() as demo:
                         'WebPlanningAgent',
                         'AgentModelAgent',
                     ],
-                    value='AgentModelAgent',
+                    value=default_agent,
                     interactive=True,
                     label='Agent',
                     # info='Choose your own adventure partner!',

@@ -13,7 +13,8 @@ interactive elements. Include any inferred information that may help achieve \
 the goal. Information from steps earlier are for reference only. Focus on \
 objective description of the current observation and any inferences you can \
 draw from it. Report any error messages displayed. Do not include your next \
-planned actions; focus solely on providing an objective summary.
+planned actions; focus solely on providing an objective summary. Do not share \
+false information that only depends on external knowledge.
 
 Wrap your response in the tag <state> and </state>.\
 """
@@ -32,10 +33,11 @@ proceed.". Avoid ending with phrases like "to execute the search." \
 Describe one action at a time and avoid combining multiple steps. \
 Refrain from mentioning specific element IDs as they may change \
 during execution. Limit your response to one phrase and include any details \
-that help select the correct action. Be creative and propose novel \
-methods to achieve the goal. Avoid creating accounts without user \
+that help select the correct action. Avoid creating accounts without user \
 permission or providing personal information. A concrete example \
-would be "Go to the home page of Google Flights."
+would be "Go to the home page of Google Flights." Check the history section \
+and avoid repeating previous intents. When repetition happens, \
+be creative and propose novel methods to achieve the goal.
 
 Wrap your response in the tag <intent> and </intent>.\
 """
