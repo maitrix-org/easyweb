@@ -12,7 +12,7 @@ from PIL import Image, UnidentifiedImageError
 
 # from openai import OpenAI
 
-api_key = os.environ.get('OPENAI_API_KEY')
+default_api_key = os.environ.get('OPENAI_API_KEY')
 LINE_LEN = 100
 LABEL_LEN = 20
 WIDTH = 18
@@ -44,7 +44,7 @@ class OpenDevinSession:
         port,
         model,
         language='en',
-        api_key=api_key,
+        api_key=default_api_key,
     ):
         self.model = model
         self.agent = agent
@@ -843,8 +843,6 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
             break
 # default_agent = 'WorldModelAgent'
 default_agent = 'AgentModelAgent'
-with open('./default_api_key.txt', 'r') as fr:
-    default_api_key = fr.read().strip()
 
 global model_port_config
 model_port_config = {}
@@ -869,6 +867,12 @@ for model, cfg in model_port_config.items():
         default_model = cfg.get('display_name', model)
         break
 
+# default_api_key = os.environ.get('OPENAI_API_KEY')
+
+with open('./default_api_key.txt', 'r') as fr:
+    default_api_key = fr.read().strip()
+
+
 with gr.Blocks() as demo:
     title = gr.Markdown('# OpenQ')
     with gr.Row(equal_height=True):
@@ -882,6 +886,7 @@ with gr.Blocks() as demo:
                         'FewShotWorldModelAgent',
                         'OnepassAgent',
                         'PolicyAgent',
+                        'WebPlanningAgent',
                         'AgentModelAgent',
                     ],
                     value=default_agent,
@@ -896,12 +901,8 @@ with gr.Blocks() as demo:
                     label='Backend LLM',
                     # info='Choose the model you would like to use',
                 )
-                api_key = gr.Textbox(
-                    label='API Key',
-                    placeholder='Your API Key',
-                    value=default_api_key,
-                    visible=True,
-                )
+                api_key = check_requires_key(default_model, default_api_key)
+
                 chatbot = gr.Chatbot()
             with gr.Group():
                 with gr.Row():

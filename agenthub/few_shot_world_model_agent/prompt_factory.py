@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 
 from .prompt import AXTree, Error
@@ -13,7 +14,9 @@ few_shot_example_paths = [
     # 'agenthub/few_shot_world_model_agent/few_shot_examples/search-example-1-datetime.json'
     'agenthub/few_shot_world_model_agent/few_shot_examples/flight-example-2-datetime.json'
 ]
-few_shot_example_data = [json.load(open(path)) for path in few_shot_example_paths]
+few_shot_example_data = [
+    json.load(open(path)) for path in few_shot_example_paths if os.path.isfile(path)
+]
 
 
 def get_history_prompt(history, include_action=True):
