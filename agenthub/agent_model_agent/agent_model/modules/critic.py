@@ -1,12 +1,12 @@
 from ..base import AgentModule
 
 
-class BasePolicy(AgentModule):
+class BaseCritic(AgentModule):
     def __init__(self, identity, *args, **kwargs):
         self.identity = identity
 
 
-class PromptedPolicy(BasePolicy):
+class PromptedCritic(BaseCritic):
     def __init__(self, identity, llm, prompt_template):
         super().__init__(identity)
         self.llm = llm

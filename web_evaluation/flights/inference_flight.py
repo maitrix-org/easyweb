@@ -15,5 +15,5 @@ print(questions)
 
 if __name__ == '__main__':
     # skip = [2, 4, 1, 6, 7, 9, 10, 11, 12, 16]
-    main(questions[:])
+    main(questions[:5])
     # main([questions[i] for i in range(len(questions)) if i not in skip])

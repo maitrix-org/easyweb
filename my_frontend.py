@@ -841,6 +841,8 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
             break
         if not line:
             break
+# default_agent = 'WorldModelAgent'
+default_agent = 'AgentModelAgent'
 
 global model_port_config
 model_port_config = {}
@@ -858,13 +860,19 @@ model_requires_key = {
     model: cfg.get('requires_key', False) for model, cfg in model_port_config.items()
 }
 
-default_model = model_list[0]
+# default_model = model_list[0]
+default_model = 'gpt-4o'
 for model, cfg in model_port_config.items():
     if cfg.get('default', None):
         default_model = cfg.get('display_name', model)
         break
 
-default_agent = 'AgentModelAgent'
+# default_api_key = os.environ.get('OPENAI_API_KEY')
+
+with open('./default_api_key.txt', 'r') as fr:
+    default_api_key = fr.read().strip()
+
+
 with gr.Blocks() as demo:
     title = gr.Markdown('# OpenQ')
     with gr.Row(equal_height=True):
