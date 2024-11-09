@@ -102,6 +102,13 @@ class DummyWebAgent(Agent):
 
         time.sleep(3)
         self.actions.append('foo')
+
+        # action_list = [
+        #     'noop()',
+        #     "goto('https://www.google.com')",
+        # ]
+        # while True:
+
         if len(self.actions) == 1:
             return MessageAction('test')
         elif len(self.actions) == 2:

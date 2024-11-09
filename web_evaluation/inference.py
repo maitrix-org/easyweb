@@ -324,6 +324,8 @@ def main(qs):
     parser.add_argument('--model', type=str, default='Meta-Llama-3.1-70B-Instruct')
     parser.add_argument('--api_key', type=str, default='token-abc123')
     parser.add_argument('--n_processes', type=int, default=3)
+    parser.add_argument('--start_idx', type=int, default=0)
+    parser.add_argument('--end_idx', type=int, default=9999999)
 
     # Parse the arguments
     args = parser.parse_args()
@@ -331,7 +333,8 @@ def main(qs):
     start_datetime = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
 
     # args_list = [(args, qid, start_datetime) for qid in range(len(questions)) if qid in [9, 13, 14]]
-    args_list = [(args, qs, qid, start_datetime) for qid in range(len(qs))]
+    q_range = range(args.start_idx, min(args.end_idx, len(qs)))
+    args_list = [(args, qs, qid, start_datetime) for qid in q_range]
     # args_list = [(args, qid, start_datetime) for qid in range(7, len(questions))]
     with multiprocessing.Pool(processes=args.n_processes) as pool:
         pool.starmap(run_question, args_list)

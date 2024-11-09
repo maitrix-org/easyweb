@@ -14,7 +14,9 @@ with gr.Blocks() as demo:
                     'my_evaluator_logs',
                     'discussion_logs',
                     'web_evaluation/fanout/my_evaluator_logs',
+                    'web_evaluation/fanout/frontend_logs',
                     'web_evaluation/flights/my_evaluator_logs',
+                    'web_evaluation/flights/frontend_logs',
                     'web_evaluation/assistantbench/my_evaluator_logs',
                 ] + glob('./formal_evaluation_logs/*/')
                 default_logdir = log_dir_options[1]

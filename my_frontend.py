@@ -842,7 +842,8 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
         if not line:
             break
 # default_agent = 'WorldModelAgent'
-default_agent = 'AgentModelAgent'
+# default_agent = 'AgentModelAgent'
+default_agent = 'ModularWebAgent'
 
 global model_port_config
 model_port_config = {}
@@ -868,8 +869,9 @@ for model, cfg in model_port_config.items():
         break
 
 # default_api_key = os.environ.get('OPENAI_API_KEY')
+current_dir = os.path.dirname(__file__)
 
-with open('./default_api_key.txt', 'r') as fr:
+with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
     default_api_key = fr.read().strip()
 
 
@@ -881,6 +883,7 @@ with gr.Blocks() as demo:
                 agent_selection = gr.Dropdown(
                     [
                         'DummyWebAgent',
+                        'BrowsingAgent',
                         'WorldModelAgent',
                         'NewWorldModelAgent',
                         'FewShotWorldModelAgent',
@@ -888,6 +891,7 @@ with gr.Blocks() as demo:
                         'PolicyAgent',
                         'WebPlanningAgent',
                         'AgentModelAgent',
+                        'ModularWebAgent',
                     ],
                     value=default_agent,
                     interactive=True,
