@@ -1,4 +1,5 @@
 web_evaluation/*/*_logs/
+*.log
 
 *.jsonl
 *.ipynb
