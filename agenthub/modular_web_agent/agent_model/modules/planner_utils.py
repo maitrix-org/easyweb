@@ -95,7 +95,7 @@ class WorldModelWrapper(ReasonersWorldModel):
 
 current_dir = os.path.dirname(__file__)
 
-with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
+with open(os.path.join(current_dir, '../../../..', 'default_api_key.txt'), 'r') as fr:
     default_api_key = fr.read().strip()
 
 

@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime
 from functools import partial
 
@@ -9,6 +10,7 @@ from opendevin.runtime.plugins import (
 )
 from opendevin.runtime.tools import RuntimeTool
 
+from .agent_configs import default_config, webarena_config
 from .agent_model.llms import OpenDevinParserLLM, OpenDevinParserMultiResponseLLM
 from .agent_model.modules import (
     LLMReasonerPlanner,
@@ -29,16 +31,40 @@ from .agent_model.variables import (
     StepPromptedMemory,
 )
 from .agent_prompts import (
+    actor_concice_instruction,
     actor_prompt_template_dict,
     critic_prompt_template,
     encoder_memory_prompt_template,
     encoder_prompt_template_dict,
     memory_prompt_template,
+    policy_inline_example_dict_with_nav,
     policy_prompt_template_dict,
     world_model_prompt_template_dict,
 )
 from .logger import AgentLogger
 from .utils import ParseError, parse_html_tags_raise
+
+AGENT_SELECTION = os.environ.get('AGENT_SELECTION', 'default')
+
+
+def dict_update(d1, d2):
+    d = d1.copy()
+    d.update(d2)
+    return d
+
+
+AGENT_LIBRARY = {
+    'default': default_config,
+    'webarena': dict_update(default_config, webarena_config),
+    'webarena_noplan': dict_update(
+        dict_update(default_config, webarena_config),
+        {'use_world_model_planning': False},
+    ),
+    'webarena_plan': dict_update(
+        dict_update(default_config, webarena_config),
+        {'use_world_model_planning': True},
+    ),
+}
 
 
 def parser(text, keys, optional_keys=()):
@@ -70,32 +96,28 @@ class ModularWebAgent(Agent):
         """
         super().__init__(llm)
 
-        self.use_state_memory_encoder = False
-        self.memory_type = 'step_prompted'
-        self.encoder_prompt_type = 'no_memory'
-        self.policy_prompt_type = 'no_update'
-        self.actor_prompt_type = 'with_memory'
-        self.world_model_prompt_type = 'no_memory_with_update'
-        self.use_world_model_planning = False
+        agent_config = AGENT_LIBRARY[AGENT_SELECTION]
+
+        self.use_state_memory_encoder = agent_config['use_state_memory_encoder']
+        self.memory_type = agent_config['memory_type']
+        self.encoder_prompt_type = agent_config['encoder_prompt_type']
+        self.policy_prompt_type = agent_config['policy_prompt_type']
+        self.actor_prompt_type = agent_config['actor_prompt_type']
+        self.world_model_prompt_type = agent_config['world_model_prompt_type']
+        self.use_world_model_planning = agent_config['use_world_model_planning']
 
         self.action_space = OpenDevinBrowserActionSpace(
             action_subsets=['chat', 'bid'],
-            use_nav=True,
+            use_nav=agent_config['use_nav'],
             strict=False,
             multiaction=False,
         )
         self.observation_space = OpenDevinBrowserObservationSpace(eval_mode=False)
 
         # Agent identity
-        agent_name = 'Web Browsing Agent'
-        agent_description = 'An information and automation assistant who responds to \
-user instructions by browsing the internet. The assistant strives to answer each question \
-accurately, thoroughly, efficiently, and politely, and to be forthright when it is \
-impossible to answer the question or carry out the instruction. The assistant will \
-end the task once it sends a message to the user.'
         self.identity = AgentInstructionEnvironmentIdentity(
-            agent_name=agent_name,
-            agent_description=agent_description,
+            agent_name=agent_config['agent_name'],
+            agent_description=agent_config['agent_description'],
             observation_space=self.observation_space,
             action_space=self.action_space,
         )
@@ -150,6 +172,9 @@ end the task once it sends a message to the user.'
 
         # Planner
         policy_prompt_template = policy_prompt_template_dict[self.policy_prompt_type]
+        policy_prompt_template = policy_prompt_template.format(
+            inline_example=policy_inline_example_dict_with_nav[agent_config['use_nav']]
+        )
         if self.use_world_model_planning:
             policy_parser = partial(parser, keys=['intent'], optional_keys=['think'])
             self.policy_llm = OpenDevinParserMultiResponseLLM(
@@ -200,6 +225,12 @@ end the task once it sends a message to the user.'
         action_parser = partial(parser, keys=['action'])
         self.actor_llm = OpenDevinParserLLM(llm, default_parser=action_parser)
         actor_prompt_template = actor_prompt_template_dict[self.actor_prompt_type]
+        if agent_config['use_actor_concice_instruction']:
+            actor_prompt_template = actor_prompt_template.format(
+                concise_instruction=actor_concice_instruction
+            )
+        else:
+            actor_prompt_template = actor_prompt_template.format(concise_instruction='')
         self.actor = PromptedActor(
             self.identity, self.actor_llm, prompt_template=actor_prompt_template
         )
