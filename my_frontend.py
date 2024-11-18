@@ -676,6 +676,7 @@ def get_messages(
     if (
         session.agent_state is None or session.agent_state in ['paused', 'finished']
     ) and user_message is None:
+        clear = gr.Button('Clear', interactive=True)
         status = get_status(session.agent_state)
         screenshot, url = browser_history[-1]
 
