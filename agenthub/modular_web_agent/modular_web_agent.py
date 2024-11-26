@@ -112,7 +112,10 @@ class ModularWebAgent(Agent):
             strict=False,
             multiaction=False,
         )
-        self.observation_space = OpenDevinBrowserObservationSpace(eval_mode=False)
+        self.observation_space = OpenDevinBrowserObservationSpace(
+            eval_mode=agent_config['eval_mode'],
+            truncation=agent_config['truncate_axtree'],
+        )
 
         # Agent identity
         self.identity = AgentInstructionEnvironmentIdentity(

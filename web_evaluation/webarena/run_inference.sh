@@ -11,24 +11,66 @@ export WIKIPEDIA="$BASE_URL:8888/wikipedia_en_all_maxi_2022-05/A/User:The_other_
 export MAP="$BASE_URL:3000"
 export HOMEPAGE="$BASE_URL:4399"
 
-export AGENT_SELECTION="webarena_noplan"
+# export AGENT_SELECTION="webarena_noplan"
 # export AGENT_SELECTION="webarena_plan"
 
-poetry run python inference_webarena.py \
-    --agent-cls ModularWebAgent \
-    --eval-output-dir baseline \
-    --model gpt-4o \
-    --eval-n-limit 10 \
-    --shuffle true \
-    --seed 99 \
-    --max-iterations 15 \
-    --eval-num-workers 1
+cd ../..
 
-# poetry run python inference_webarena.py \
+# # Fullset, BrowsingAgent + Llama3.1
+# poetry run python web_evaluation/webarena/inference_webarena.py \
 #     --agent-cls BrowsingAgent \
-#     --eval-output-dir browsingagent-baseline \
+#     --eval-output-dir web_evaluation/webarena/browsingagent-llama \
+#     --llm-config llm \
+#     --model Meta-Llama-3.1-70B-Instruct \
+#     --max-iterations 15 \
+#     --eval-num-workers 4
+
+# bash ~/reset_webarena_host.sh
+# bash ~/run_webarena_host.sh
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls BrowsingAgent \
+#     --eval-output-dir web_evaluation/webarena/browsingagent-rand20-1 \
+#     --llm-config llm \
 #     --model gpt-4o \
-#     --eval-n-limit 10 \
-#     --seed 99 \
+#     --eval-n-limit 20 \
+#     --shuffle \
+#     --seed 25 \
 #     --max-iterations 15 \
 #     --eval-num-workers 1
+
+bash ~/reset_webarena_host.sh
+bash ~/run_webarena_host.sh
+export AGENT_SELECTION="webarena_noplan"
+poetry run python web_evaluation/webarena/inference_webarena.py \
+    --agent-cls ModularWebAgent \
+    --eval-output-dir web_evaluation/webarena/results/singlepolicy-rand20-1 \
+    --llm-config llm \
+    --model gpt-4o \
+    --eval-n-limit 20 \
+    --shuffle \
+    --seed 25 \
+    --max-iterations 15 \
+    --eval-num-workers 4
+
+bash ~/reset_webarena_host.sh
+bash ~/run_webarena_host.sh
+export AGENT_SELECTION="webarena_plan"
+poetry run python web_evaluation/webarena/inference_webarena.py \
+    --agent-cls ModularWebAgent \
+    --eval-output-dir web_evaluation/webarena/results/wmp-rand20-1 \
+    --llm-config llm \
+    --model gpt-4o \
+    --eval-n-limit 20 \
+    --shuffle \
+    --seed 25 \
+    --max-iterations 15 \
+    --eval-num-workers 4
+
+# export AGENT_SELECTION="webarena_noplan"
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls ModularWebAgent \
+#     --eval-output-dir web_evaluation/webarena/singlepolicy-llama \
+#     --llm-config llm \
+#     --model Meta-Llama-3.1-70B-Instruct \
+#     --max-iterations 15 \
+#     --eval-num-workers 4

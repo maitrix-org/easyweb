@@ -160,9 +160,10 @@ class BrowserGymObservationSpace(BaseObservationSpace):
 class OpenDevinBrowserObservationSpace(BaseObservationSpace):
     """An identity that describes the agent and the environment it is in."""
 
-    def __init__(self, eval_mode):
+    def __init__(self, eval_mode, truncation=True):
         super().__init__()
         self.eval_mode = eval_mode
+        self.truncation = truncation
         self.reset()
 
     def reset(self):
@@ -317,32 +318,35 @@ class OpenDevinBrowserObservationSpace(BaseObservationSpace):
 
         #     if num_static_text_lines <= max_static_text_lines:
         #         clean_axtree_lines.append(line)
+        if self.truncation:
+            clean_axtree_lines = []
+            num_static_text_lines = 0
+            max_static_text_lines = 20
+            last_bracket_line = 0
+            max_after_last_bracket_lines = 10
+            for i, line in enumerate(cur_axtree_txt.split('\n')):
+                if line.strip().startswith('['):
+                    last_bracket_line = i
 
-        clean_axtree_lines = []
-        num_static_text_lines = 0
-        max_static_text_lines = 20
-        last_bracket_line = 0
-        max_after_last_bracket_lines = 10
-        for i, line in enumerate(cur_axtree_txt.split('\n')):
-            if line.strip().startswith('['):
-                last_bracket_line = i
+            for i, line in enumerate(cur_axtree_txt.split('\n')):
+                if line.strip().startswith('StaticText') or line.strip().startswith(
+                    'ListMarker'
+                ):
+                    num_static_text_lines += 1
+                else:
+                    num_static_text_lines = 0
 
-        for i, line in enumerate(cur_axtree_txt.split('\n')):
-            if line.strip().startswith('StaticText') or line.strip().startswith(
-                'ListMarker'
-            ):
-                num_static_text_lines += 1
-            else:
-                num_static_text_lines = 0
+                if num_static_text_lines <= max_static_text_lines and i < (
+                    last_bracket_line + max_after_last_bracket_lines
+                ):
+                    clean_axtree_lines.append(line)
 
-            if num_static_text_lines <= max_static_text_lines and i < (
-                last_bracket_line + max_after_last_bracket_lines
-            ):
-                clean_axtree_lines.append(line)
+            clean_axtree_txt = '\n'.join(clean_axtree_lines)
 
-        clean_axtree_txt = '\n'.join(clean_axtree_lines)
+            obs_prompt = clean_axtree_txt
+        else:
+            obs_prompt = cur_axtree_txt
 
-        obs_prompt = clean_axtree_txt
         if len(error_prefix) > 0:
             obs_prompt = f'{error_prefix}\n' + obs_prompt
 

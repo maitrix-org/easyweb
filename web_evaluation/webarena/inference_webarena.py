@@ -86,11 +86,14 @@ def process_instance(
     ) as f:
         instruction = f.read()
     # read reward
-    with open(
-        os.path.join(browsergym_eval_dir, 'rewards.json'), 'r', encoding='utf-8'
-    ) as f:
-        rewards = json.load(f)
-        reward = max(rewards)
+    if os.path.isfile(os.path.join(browsergym_eval_dir, 'rewards.json')):
+        with open(
+            os.path.join(browsergym_eval_dir, 'rewards.json'), 'r', encoding='utf-8'
+        ) as f:
+            rewards = json.load(f)
+            reward = max(rewards)
+    else:
+        reward = 0
 
     # Save the output
     output = {
@@ -124,8 +127,12 @@ if __name__ == '__main__':
         type=int,
         default=42,
     )
+    webarena_parser.add_argument(
+        '--max-retry',
+        type=int,
+        default=1,
+    )
     webarena_args = webarena_parser.parse_known_args()[0]
-    print(webarena_args.shuffle, webarena_args.shuffle, webarena_args.shuffle)
 
     if webarena_args.shuffle:
         random.Random(webarena_args.seed).shuffle(env_ids)
@@ -178,7 +185,7 @@ if __name__ == '__main__':
     # LIMIT EVALUATION
     eval_n_limit = args.eval_n_limit
     if eval_n_limit:
-        env_ids = env_ids[:eval_n_limit]
+        env_ids = sorted(env_ids[:eval_n_limit])
         logger.info(f'Limiting evaluation to first {eval_n_limit} instances.')
 
     # OUTPUT FILE
@@ -217,18 +224,39 @@ if __name__ == '__main__':
 
     docker_sandbox = DockerSSHBox()
     for env_id in tqdm(env_ids):
-        try:
-            output = process_instance(
-                env_id=env_id,
-                metadata=metadata,
-                eval_output_dir=eval_output_dir,
-                docker_sandbox=docker_sandbox,
-                reset_logger=False,
-            )
-            output_fp.write(json.dumps(output) + '\n')
-            output_fp.flush()
-        except Exception as e:
-            logger.error(f'Error processing instance {env_id}: {e}')
+        n_retry = 0
+        failed = False
+        while n_retry < webarena_args.max_retry:
+            try:
+                output = process_instance(
+                    env_id=env_id,
+                    metadata=metadata,
+                    eval_output_dir=eval_output_dir,
+                    docker_sandbox=docker_sandbox,
+                    reset_logger=False,
+                )
+            except IOError:
+                n_retry += 1
+                if n_retry == webarena_args.max_retry:
+                    failed = True
+                continue
+            break
+        if failed:
+            raise RuntimeError('Max retry attempted, failure keeps occurring.')
+        output_fp.write(json.dumps(output) + '\n')
+        output_fp.flush()
+        # try:
+        #     output = process_instance(
+        #         env_id=env_id,
+        #         metadata=metadata,
+        #         eval_output_dir=eval_output_dir,
+        #         docker_sandbox=docker_sandbox,
+        #         reset_logger=False,
+        #     )
+        #     output_fp.write(json.dumps(output) + '\n')
+        #     output_fp.flush()
+        # except Exception as e:
+        #     logger.error(f'Error processing instance {env_id}: {e}')
 
     output_fp.close()
     logger.info('Evaluation finished.')
