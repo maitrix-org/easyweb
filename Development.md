@@ -67,7 +67,10 @@ There is also [documentation for running with local models using ollama](./docs/
     ```bash
     make start-backend
     ```
-
+- **Start multiple Backend Server with Specified Port:** If you prefer, you can also start multiple backend server independently on different terminals with custom ports for running multiple requests (one request per backend)
+    ```bash
+    BACKEND_PORT={port_of_your_choice} make start-backend
+    ```
 - **Start the Frontend Server:** Similarly, you can start the frontend server on its own to work on frontend-related components or interface enhancements.
     ```bash
     make start-frontend
