@@ -1289,4 +1289,4 @@ with gr.Blocks(css=css) as demo:
 if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=True)
