@@ -20,8 +20,8 @@ parser = argparse.ArgumentParser(description='Specify the number of backends to 
 parser.add_argument(
     '--num-backends',
     type=int,
-    default=2,
-    help='The number of backends to initialize (default: 2)',
+    default=1,
+    help='The number of backends to initialize (default: 1)',
 )
 args = parser.parse_args()
 
