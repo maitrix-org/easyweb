@@ -1,11 +1,10 @@
-import json
 from typing import Optional
 
 from agenthub.codeact_agent.codeact_agent import CodeActAgent
 from opendevin.controller import AgentController
 from opendevin.controller.agent import Agent
 from opendevin.controller.state.state import State
-from opendevin.core.config import config
+from opendevin.core.config import config, get_model_port_arg
 from opendevin.core.logger import opendevin_logger as logger
 from opendevin.core.schema import ConfigType
 from opendevin.events.stream import EventStream
@@ -92,50 +91,9 @@ class AgentSession:
         api_key = args.get(ConfigType.LLM_API_KEY, config.llm.api_key)
         api_base = config.llm.base_url
         if config.llm.model_port_config_file:
-            with open(config.llm.model_port_config_file) as f:
-                model_port_config = json.load(f)[model]
-            if 'modules' in model_port_config:
-                module_config = model_port_config['modules']
-                model = {}
-                api_base = {}
-                for k, v in module_config.items():
-                    if 'model' not in v:
-                        raise Exception(
-                            'Model name need to be provided for module {} under {} in model_port_config.json'.format(
-                                k, model
-                            )
-                        )
-                    if 'provider' in v:
-                        model[k] = v['provider'] + '/' + v['model']
-                    else:
-                        model[k] = v['model']
-
-                    if 'base_url' in v:
-                        api_base[k] = v['base_url']
-                    else:
-                        if 'port' not in v:
-                            raise Exception(
-                                'One of API base URL and local port need to be provided for module {} under {} in model_port_config.json'.format(
-                                    k, model
-                                )
-                            )
-                        api_base[k] = 'http://localhost:{}/v1/'.format(v['port'])
-            else:
-                if 'base_url' in model_port_config:
-                    api_base = model_port_config['base_url']
-                else:
-                    if 'port' not in model_port_config:
-                        raise Exception(
-                            'One of API base URL and local port need to be provided for model {} in model_port_config.json'.format(
-                                model
-                            )
-                        )
-                    api_base = 'http://localhost:{}/v1/'.format(
-                        model_port_config['port']
-                    )
-                if 'provider' in model_port_config:
-                    model = model_port_config['provider'] + '/' + model
-
+            model, api_base = get_model_port_arg(
+                config.llm.model_port_config_file, model
+            )
         logger.info(f'Creating agent {agent_cls} using LLM {model}')
         if isinstance(model, dict):
             llm = {

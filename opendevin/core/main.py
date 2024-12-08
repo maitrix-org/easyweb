@@ -7,7 +7,7 @@ import agenthub  # noqa F401 (we import this to get the agents registered)
 from opendevin.controller import AgentController
 from opendevin.controller.agent import Agent
 from opendevin.controller.state.state import State
-from opendevin.core.config import args, get_llm_config_arg
+from opendevin.core.config import args, get_llm_config_arg, get_model_port_arg
 from opendevin.core.logger import opendevin_logger as logger
 from opendevin.core.schema import AgentState
 from opendevin.events import EventSource, EventStream, EventStreamSubscriber
@@ -68,12 +68,25 @@ async def main(
         if llm_config is None:
             raise ValueError(f'Invalid toml file, cannot read {args.llm_config}')
 
-        logger.info(
-            f'Running agent {args.agent_cls} (model: {llm_config.model}, llm_config: {args.llm_config}) with task: "{task}"'
-        )
-
-        # create LLM instance with the given config
-        llm = LLM(llm_config=llm_config)
+        if llm_config.model_port_config_file and args.model_name:
+            logger.info(
+                f'Running agent {args.agent_cls} (model: {args.model_name}, llm_config: {args.llm_config}) with task: "{task}"'
+            )
+            model, api_base = get_model_port_arg(
+                llm_config.model_port_config_file, args.model_name
+            )
+            if isinstance(model, dict):
+                llm = {
+                    k: LLM(model=model[k], base_url=api_base[k]) for k in model.keys()
+                }
+            else:
+                llm = LLM(model=model, base_url=api_base)
+        else:
+            logger.info(
+                f'Running agent {args.agent_cls} (model: {llm_config.model}, llm_config: {args.llm_config}) with task: "{task}"'
+            )
+            # create LLM instance with the given config
+            llm = LLM(llm_config=llm_config)
     else:
         # --model-name model_name
         logger.info(

@@ -81,24 +81,29 @@ Wrap your response in the tag <updated_memory> and </update_memory>.\
 
 # Policy
 
+policy_inline_example_nav = '"Go to the home page of Google Flights."'
+policy_inline_example_nonav = '"Fill ... in the search bar."'
+policy_inline_example_dict_with_nav = {
+    True: policy_inline_example_nav,
+    False: policy_inline_example_nonav,
+}
+
 policy_prompt_template_no_memory_update = """\
-{memory}
+{{memory}}
 
 # Current State:
-{state}
+{{state}}
 
 # Intent:
 Describe the action the assistant should take next to carry out the user's \
 instruction. \
-Avoid using phrases such as "To accomplish the goal," "I will," "To \
-proceed.". Avoid ending with phrases like "to execute the search." \
 Describe one action at a time and avoid combining multiple steps. \
-Refrain from mentioning specific element IDs as they may change \
-during execution. Limit your response to one phrase and include any details \
+Limit your response to one phrase and include any details \
 that help select the correct action. Be creative and propose novel \
 methods to achieve the goal. Avoid creating accounts without user \
 permission or providing personal information. Concrete example \
-would be "Go to the home page of Google Flights." and "Click on the 'Search' button."
+would be {inline_example} and "Click on the 'Search' button." \
+Review history and propose novel intent if an intent has been tried multiple times and never succeed.
 
 Wrap your response in the following format:
 
@@ -112,26 +117,24 @@ Description of the action to perform next
 """
 
 policy_prompt_template_with_memory_update = """\
-{memory}
+{{memory}}
 
 # Current State:
-{state}
+{{state}}
 
 # Memory Update:
-{memory_update}
+{{memory_update}}
 
 # Intent:
 Describe the action the assistant should take next to carry out the user's \
 instruction. \
-Avoid using phrases such as "To accomplish the goal," "I will," "To \
-proceed.". Avoid ending with phrases like "to execute the search." \
 Describe one action at a time and avoid combining multiple steps. \
-Refrain from mentioning specific element IDs as they may change \
-during execution. Limit your response to one phrase and include any details \
+Limit your response to one phrase and include any details \
 that help select the correct action. Be creative and propose novel \
 methods to achieve the goal. Avoid creating accounts without user \
 permission or providing personal information. Concrete example \
-would be "Go to the home page of Google Flights." and "Click on the 'Search' button."
+would be {inline_example} and "Click on the 'Search' button." \
+Review memory and propose novel intent if an intent has been tried multiple times and never succeed.
 
 Wrap your response in the following format:
 
@@ -247,7 +250,7 @@ critic_prompt_template = """\
 
 # Task Success and Progress:
 Your task is to evaluate the performance of the agent. Given the agent's instruction, interaction history, the final \
-state of the webpage, and the agent’s responses to the user if any, your goal is to decide whether the agent’s execution \
+state of the webpage, and the agent's responses to the user if any, your goal is to decide whether the agent's execution \
 is successful or not. If the current state is a failure but it looks like the agent is on the right track towards \
 success, you should also output as such.
 
@@ -267,16 +270,16 @@ Your thoughts and reasoning process
 """
 
 actor_prompt_template_with_memory = """\
-{memory}
+{{memory}}
 
 # Observation:
-{observation}
+{{observation}}
 
 # Current State:
-{state}
+{{state}}
 
 # Current Intent:
-{intent}
+{{intent}}
 
 # Action:
 Choose an API call that will carry out the intent when executed in the webpage. \
@@ -284,19 +287,20 @@ Use only one action at a time. You must not enclose bid inputs in [brackets] but
 Interact only with elements in the current step observation. Your response \
 will be executed as a Python function call, so ensure it adheres to the format \
 and argument data type specifications defined in the action space.
+{concise_instruction}
 
 Wrap your response in the tag <action> and </action>.\
 """
 
 actor_prompt_template_no_memory = """\
 # Observation:
-{observation}
+{{observation}}
 
 # Current State:
-{state}
+{{state}}
 
 # Current Intent:
-{intent}
+{{intent}}
 
 # Action:
 Choose an API call that will carry out the intent when executed in the webpage. \
@@ -304,8 +308,14 @@ Use only one action at a time. You must not enclose bid inputs in [brackets] but
 Interact only with elements in the current step observation. Your response \
 will be executed as a Python function call, so ensure it adheres to the format \
 and argument data type specifications defined in the action space.
+{concise_instruction}
 
 Wrap your response in the tag <action> and </action>.\
+"""
+
+actor_concice_instruction = """\
+If you are sending a message to the user, give very short answer in words, numerics, or the requested url \
+and only include the direct answer to the question given in the user instruction.
 """
 
 actor_prompt_template_with_memory_with_update = """\

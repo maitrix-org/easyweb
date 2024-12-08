@@ -1,4 +1,5 @@
 import argparse
+import json
 import logging
 import os
 import pathlib
@@ -455,6 +456,50 @@ def get_llm_config_arg(llm_config_arg: str):
         return LLMConfig(**toml_config[llm_config_arg])
     logger.debug(f'Loading from toml failed for {llm_config_arg}')
     return None
+
+
+def get_model_port_arg(model_port_config_file: str, model_name: str):
+    def _get_model_full_name(v):
+        if 'model' in v:
+            model = v['model']
+        else:
+            model = model_name
+        if 'provider' in v:
+            return v['provider'] + '/' + model
+        else:
+            return model
+
+    def _get_api_base(v, model_name):
+        if 'base_url' in v:
+            return v['base_url']
+        else:
+            if 'port' not in v:
+                raise Exception(
+                    'One of API base URL and local port need to be provided for model {} in model_port_config.json'.format(
+                        model_name
+                    )
+                )
+            return 'http://localhost:{}/v1/'.format(v['port'])
+
+    with open(model_port_config_file) as f:
+        model_port_config = json.load(f)[model_name]
+    if 'modules' in model_port_config:
+        module_config = model_port_config['modules']
+        model = {}
+        api_base = {}
+        for k, v in module_config.items():
+            if 'model' not in v:
+                raise Exception(
+                    'Model name need to be provided for module {} under {} in model_port_config.json'.format(
+                        k, model_name
+                    )
+                )
+            model[k] = _get_model_full_name(v)
+            api_base[k] = _get_api_base(v, model_name)
+    else:
+        api_base = _get_api_base(model_port_config, model_name)
+        model = _get_model_full_name(model_port_config)
+    return model, api_base
 
 
 # Command line arguments
