@@ -772,7 +772,7 @@ def get_messages(
                 stop_flag = False
                 clear = gr.Button('Clear', interactive=False)
                 screenshot, url = browser_history[-1]
-                session._close()
+                session._reset()
                 chat_history = chat_history[-1:]
                 action_messages = []
 
@@ -924,7 +924,7 @@ def get_messages(
 def clear_page(browser_history, session):
     browser_history = browser_history[:1]
     current_screenshot, current_url = browser_history[-1]
-    session._close()
+    session._reset()
     status = get_status(session.agent_state)
     # pause_resume = gr.Button("Pause", interactive=False)
     return (
@@ -1012,7 +1012,7 @@ def display_history(history, messages_history, action_messages):
     # if it is a gr.ChatMessage(), need to reference differently from dictionary
     if 'goto' in action_messages[-1]:
         history_title = 'Browsing ' + message + '...'
-    if isinstance(history[-1], {}):
+    if not isinstance(history[-1], dict):
         if history[-1].metadata is None or history[-1].role != 'assistant':
             history.append(
                 gr.ChatMessage(
