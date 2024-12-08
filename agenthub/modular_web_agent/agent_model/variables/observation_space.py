@@ -251,8 +251,8 @@ class OpenDevinBrowserObservationSpace(BaseObservationSpace):
 
         if isinstance(last_obs, BrowserOutputObservation):
             # The browser output observation belongs to OpenDevin
-            if last_obs.restarted:
-                error_prefix += 'IMPORTANT! Due to an error, the browser has been restarted.\nThink again with the current observation of the page.\n'
+            # if last_obs.restarted:
+            #     error_prefix += 'IMPORTANT! Due to an error, the browser has been restarted.\nThink again with the current observation of the page.\n'
             if last_obs.error:
                 # add error recovery prompt prefix
                 # error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'

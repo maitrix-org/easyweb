@@ -94,6 +94,17 @@ class OpenDevinSession:
 
         self.agent_state = 'pausing'
 
+    def stop(self):
+        if self.agent_state != 'running':
+            raise ValueError('Agent not running, nothing to stop')
+        print('Stopping')
+
+        payload = {'action': 'change_agent_state', 'args': {'agent_state': 'stopped'}}
+        self.ws.send(json.dumps(payload))
+
+        self.agent_state = 'stopped'
+        self._reset
+
     def resume(self):
         if self.agent_state != 'paused':
             raise ValueError('Agent not paused, nothing to resume')
@@ -114,7 +125,7 @@ class OpenDevinSession:
             payload = {'action': 'message', 'args': {'content': task}}
             self.ws.send(json.dumps(payload))
 
-        while self.agent_state not in ['finished', 'paused']:
+        while self.agent_state not in ['finished', 'paused', 'stopped']:
             message = self._get_message()
             self._read_message(message)
 
@@ -636,6 +647,30 @@ def get_action_history_markdown(action_history):
     return text
 
 
+#     return (
+#         None,
+#         current_screenshot,
+#         current_url,
+#         [],
+#         browser_history,
+#         session,
+#         status,
+#         clear,
+#         go.Figure(),
+#         'No Action Taken Yet',
+#     )
+# chatbot,
+# screenshot,
+# url,
+# action_messages,
+# browser_history,
+# session,
+# status,
+# clear,
+# plot,
+# action_history,
+
+
 def get_messages(
     chat_history,
     action_messages,
@@ -648,6 +683,8 @@ def get_messages(
 ):
     model_selection = model_display2name[model_selection]
     print('Get Messages', session.agent_state)
+    stop_flag = session.agent_state == 'stopped'
+
     if len(chat_history) > 0:
         if chat_history[-1][1] is None:
             user_message = chat_history[-1][0]
@@ -657,9 +694,11 @@ def get_messages(
             chat_history[-1][1] = chat_history[-1][1].strip() + '\n\n'
     else:
         user_message = None
+    print(session.agent_state)
 
     if (
-        session.agent_state is None or session.agent_state in ['paused', 'finished']
+        session.agent_state is None
+        or session.agent_state in ['paused', 'finished', 'stopped']
     ) and user_message is None:
         clear = gr.Button('Clear', interactive=True)
         if len(chat_history) > 0:
@@ -688,8 +727,29 @@ def get_messages(
             action_history,
         )
     else:
-        clear = gr.Button('Clear', interactive=False)
+        clear = gr.Button('Clear', interactive=True)
         if session.agent_state not in ['init', 'running', 'pausing', 'resuming']:
+            if stop_flag:
+                stop_flag = False
+                clear = gr.Button('Clear', interactive=False)
+                screenshot, url = browser_history[-1]
+                session._close()
+                chat_history = chat_history[-1:]
+                action_messages = []
+
+                yield (
+                    chat_history,
+                    screenshot,
+                    url,
+                    [],
+                    browser_history,
+                    session,
+                    status,
+                    clear,
+                    go.Figure(),
+                    'No Action Taken Yet',
+                )
+
             session.agent = agent_selection
             # session.model = model_port_config[model_selection]["provider"] + '/' + model_selection
             session.model = model_selection
@@ -818,6 +878,20 @@ def pause_resume_task(is_paused, session, status):
     return button, is_paused, session, status
 
 
+def stop_task(session):
+    if session.agent_state == 'running':
+        session.stop()
+    # clear everything on resubmit
+    # save to session logs
+    # pull and merge
+    # when its running, disable submit, enable stop like chatgpt
+    # change submit to stop button when running?
+    # dont submit if nothing in box
+    status = get_status(session.agent_state)
+    clear = gr.Button('Clear', interactive=True)
+    return session, status, clear
+
+
 def toggle_options(visible):
     new_visible = not visible
     toggle_text = 'Hide Advanced Options' if new_visible else 'Show Advanced Options'
@@ -921,6 +995,7 @@ with gr.Blocks() as demo:
             with gr.Row():
                 toggle_button = gr.Button('Hide Advanced Options')
                 pause_resume = gr.Button('Pause')
+                stop = gr.Button('Stop')
                 clear = gr.Button('Clear')
 
             status = gr.Markdown('Agent Status: 🔴 Inactive')
@@ -1029,6 +1104,14 @@ with gr.Blocks() as demo:
                 action_history,
             ],
             concurrency_limit=10,
+        )
+    )
+    (
+        stop.click(
+            stop_task,
+            [session],
+            [session, status, clear],
+            queue=False,
         )
     )
     clear.click(
