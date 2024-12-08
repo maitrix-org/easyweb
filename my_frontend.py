@@ -726,7 +726,6 @@ def get_messages(
         status = get_status(session.agent_state)
 
         screenshot, url = browser_history[-1]
-        print('agent state bruh', session.agent_state)
         submit = gr.Button(
             'Submit',
             variant='primary',
@@ -776,7 +775,6 @@ def get_messages(
                 chat_history = chat_history[-1:]
                 action_messages = []
 
-                print('agent state bruh', session.agent_state)
                 submit = gr.Button(
                     'Submit',
                     variant='primary',
@@ -823,7 +821,6 @@ def get_messages(
                 status = get_status(agent_state)
                 screenshot, url = browser_history[-1]
 
-                print('agent state bruh', session.agent_state)
                 submit = gr.Button(
                     'Submit',
                     variant='primary',
@@ -895,7 +892,6 @@ def get_messages(
             # action_history = get_action_history_markdown(session.action_history)
             # action_history = action_history if action_history else 'No Action Taken Yet'
 
-            print('agent state bruh', session.agent_state)
             submit = gr.Button(
                 'Submit',
                 variant='primary',
