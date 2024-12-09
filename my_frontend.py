@@ -77,7 +77,7 @@ class OpenDevinSession:
 
         self.agent_state = None
         if self.ws:
-            self._close()
+            self._reset()
         self.ws = websocket.WebSocket()
         self.ws.connect(f'ws://127.0.0.1:{self.port}/ws')
 
@@ -228,9 +228,9 @@ class OpenDevinSession:
         self.figure = go.Figure()
 
     # changed the creation of the output to above. _close() may now be an unneccesary function, with the addition of save_log
-    def _close(self):
-        self.save_log()
-        self._reset()
+    # def _close(self):
+    #     self.save_log()
+    #     self._reset()
 
     # partly copied from _close() function, but is activated immediately when the session moves to "finished"
     def save_log(self):
@@ -243,8 +243,8 @@ class OpenDevinSession:
             json.dump(self.raw_messages, open(self.output_path, 'w'))
         # print(self.output_path)
 
-    def __del__(self):
-        self._close()
+    # def __del__(self):
+    #     self._close()
 
 
 # opens the existing file that was saved, and adds {user_feedback: x} at the top.
@@ -669,9 +669,9 @@ def get_messages(
     agent_selection,
     model_selection,
     api_key,
+    options_visible,
 ):
     model_selection = model_display2name[model_selection]
-    print('Get Messages', session.agent_state)
     user_message = None
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
@@ -683,6 +683,8 @@ def get_messages(
         clear = gr.Button('Clear', interactive=True)
         status = get_status(session.agent_state)
         screenshot, url = browser_history[-1]
+        feedback = gr.Button('Submit Feedback', visible=False)
+        stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
 
         # if session.figure:
         #     figure = session.figure
@@ -703,11 +705,12 @@ def get_messages(
             clear,
             feedback,
             stars,
+            options_visible,
         )
     else:
         # make sure that the buttons and stars aren't shown yet
         clear = gr.Button('Clear', interactive=False)
-        feedback = gr.Button('Submit Feedback', visible=False)
+        feedback = gr.Button('Submit Feedback')
         stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
         if session.agent_state not in ['init', 'running', 'pausing', 'resuming']:
             session.agent = agent_selection
@@ -741,7 +744,6 @@ def get_messages(
                 # action_history = (
                 #     action_history if action_history else 'No Action Taken Yet'
                 # )
-
                 yield (
                     chat_history,
                     screenshot,
@@ -753,9 +755,14 @@ def get_messages(
                     clear,
                     feedback,
                     stars,
+                    options_visible,
                 )
 
+        website_counter = 0
         for message in session.run(user_message):
+            # this is so that the swingout (hide/show advanced options) will only pop out right when the user submits something
+            if website_counter == 1:
+                options_visible = True
             # only enable the stars and feedback if the session.agent_state == finished
             clear = gr.Button('Clear', interactive=(session.agent_state == 'finished'))
             feedback = gr.Button(
@@ -763,8 +770,9 @@ def get_messages(
             )
             if session.agent_state == 'finished':
                 # add the last output message once it is finished
+                # find the last message
                 chat_history.append(
-                    gr.ChatMessage(role='assistant', content=action_messages[-1])
+                    gr.ChatMessage(role='assistant', content=message['content'])
                 )
                 stars = gr.Textbox(elem_id='dummy_textbox', value=0)
                 session.save_log()
@@ -774,7 +782,9 @@ def get_messages(
                 action_messages.append(session.action_messages[-diff])
                 # create sites_visited list from browser_history, use it in display history
                 sites_visited = []
+                website_counter = 0
                 for item in browser_history:
+                    website_counter += 1
                     sites_visited.append(item[1])
                 chat_history = display_history(
                     chat_history, sites_visited, action_messages
@@ -803,13 +813,15 @@ def get_messages(
                 clear,
                 feedback,
                 stars,
+                options_visible,
             )
 
 
-def clear_page(browser_history, session):
+def clear_page(browser_history, session, feedback):
+    feedback = gr.Button('Submit Feedback', visible=False)
     browser_history = browser_history[:1]
     current_screenshot, current_url = browser_history[-1]
-    session._close()
+    session._reset()
     status = get_status(session.agent_state)
     # pause_resume = gr.Button("Pause", interactive=False)
     return (
@@ -822,8 +834,7 @@ def clear_page(browser_history, session):
         browser_history,
         session,
         status,
-        go.Figure(),
-        'No Action Taken Yet',
+        feedback,
     )
 
 
@@ -939,11 +950,13 @@ def process_user_message(user_message, history):
     return '', history
 
 
-def toggle_options(visible):
-    new_visible = not visible
+def toggle_options(visible, ifClick):
+    if ifClick:
+        new_visible = not visible
+    else:
+        new_visible = visible
     toggle_text = 'Hide Advanced Options' if new_visible else 'Show Advanced Options'
     return (
-        # gr.update(visible=new_visible),
         gr.update(visible=new_visible),
         new_visible,
         gr.update(value=toggle_text),
@@ -1028,7 +1041,6 @@ async () => {
             for (let i = 0; i < starElements.length; i++) {
                 starElements[i].style.color = i < stars ? "#ffd700" : "gray";
             }
-            submitted = true;
         }
     }
 
@@ -1042,12 +1054,18 @@ async () => {
         } else {
             confirmationText.innerText = "Please select a rating before submitting.";
         }
+        submitted = true;
         return currentRating;
     }
 
     //show the stars by setting their display to inline-block
     globalThis.showStars = () => {
         document.getElementById("feedback").style.display = "inline-block";
+        document.getElementById("feedback").scrollIntoView({ behavior: "smooth" });
+    }
+    //hide the stars by setting their display to none
+    globalThis.hideStars = () => {
+        document.getElementById("feedback").style.display = "none";
     }
 
 }
@@ -1060,6 +1078,14 @@ function(){
     return currentRating;
 }
 """
+
+# make this in python for the clear button
+hide_stars = """
+function(){
+    hideStars();
+}
+"""
+
 # random css for other formatting and whatnot
 css = """
 #submit-button{
@@ -1080,40 +1106,52 @@ with gr.Blocks(css=css) as demo:
     session = gr.State(
         OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
     )
-    title = gr.Markdown('# OpenQ')
-    with gr.Row(equal_height=False):
-        with gr.Column(scale=1):
-            with gr.Group():
-                agent_selection = gr.Dropdown(
-                    [
-                        'DummyWebAgent',
-                        'BrowsingAgent',
-                        'WorldModelAgent',
-                        'NewWorldModelAgent',
-                        'FewShotWorldModelAgent',
-                        'OnepassAgent',
-                        'PolicyAgent',
-                        'WebPlanningAgent',
-                        'AgentModelAgent',
-                        'ModularWebAgent',
-                        # 'ReasonerWebAgent',
-                    ],
-                    value=default_agent,
-                    interactive=True,
-                    label='Agent',
-                    # info='Choose your own adventure partner!',
-                )
-                model_selection = gr.Dropdown(
-                    model_list,
-                    value=default_model,
-                    interactive=True,
-                    label='Backend LLM',
-                    # info='Choose the model you would like to use',
-                )
-                api_key = check_requires_key(default_model, default_api_key)
+    title = gr.Markdown('# 🚀 OpenQ: An Open-Source LLM-Powered Web Agent')
+    # header = gr.Markdown('''## How it works:''')
+    tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
+                            - 💬 **Ask the Agent** to perform advanced web-related tasks. **For example:**
+                              - "What were box office values of the Star Wars films in the prequel and sequel trilogies?"
+                              - "Can you search for a round-trip flight from Los Angeles to Tokyo in business class?"
+                            - ✍️ **Share your feedback** using the form below once the Agent completes its task!""")
 
-                # change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
-                chatbot = gr.Chatbot(type='messages', height=320)
+    privacy_title = gr.Markdown(
+        """❗️**Important: Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.**"""
+    )
+
+    with gr.Row(equal_height=False):
+        with gr.Column(scale=2):
+            with gr.Group():
+                with gr.Row():
+                    agent_selection = gr.Dropdown(
+                        [
+                            'DummyWebAgent',
+                            'BrowsingAgent',
+                            'WorldModelAgent',
+                            'NewWorldModelAgent',
+                            'FewShotWorldModelAgent',
+                            'OnepassAgent',
+                            'PolicyAgent',
+                            'WebPlanningAgent',
+                            'AgentModelAgent',
+                            'ModularWebAgent',
+                            # 'ReasonerWebAgent',
+                        ],
+                        value=default_agent,
+                        interactive=True,
+                        label='Agent',
+                        # info='Choose your own adventure partner!',
+                    )
+                    model_selection = gr.Dropdown(
+                        model_list,
+                        value=default_model,
+                        interactive=True,
+                        label='Backend LLM',
+                        # info='Choose the model you would like to use',
+                    )
+                    api_key = check_requires_key(default_model, default_api_key)
+
+            # change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
+            chatbot = gr.Chatbot(type='messages', height=320)
             with gr.Group():
                 with gr.Row():
                     msg = gr.Textbox(container=False, show_label=False, scale=7)
@@ -1124,7 +1162,7 @@ with gr.Blocks(css=css) as demo:
                         min_width=150,
                     )
                     submit_triggers = [msg.submit, submit.click]
-        with gr.Column(scale=2, visible=False) as visualization_column:
+        with gr.Column(scale=4, visible=False) as visualization_column:
             # with gr.Group():
             #     start_url = 'about:blank'
             #     url = gr.Textbox(
@@ -1161,14 +1199,24 @@ with gr.Blocks(css=css) as demo:
     status = gr.Markdown('Agent Status: 🔴 Inactive')
     browser_history = gr.State([(blank, start_url)])
     options_visible = gr.State(False)
-    toggle_button.click(
+    options_visible.change(
         toggle_options,
-        inputs=[options_visible],
+        inputs=[options_visible, gr.State(False)],
         outputs=[
             visualization_column,
             options_visible,
             toggle_button,
-        ],  # advanced_options_group
+        ],
+        queue=False,
+    )
+    toggle_click = toggle_button.click(
+        toggle_options,
+        inputs=[options_visible, gr.State(True)],
+        outputs=[
+            visualization_column,
+            options_visible,
+            toggle_button,
+        ],
         queue=False,
     )
     is_paused = gr.State(False)
@@ -1191,6 +1239,7 @@ with gr.Blocks(css=css) as demo:
             agent_selection,
             model_selection,
             api_key,
+            options_visible,
         ],
         [
             chatbot,
@@ -1203,6 +1252,7 @@ with gr.Blocks(css=css) as demo:
             clear,
             feedback,
             stars,
+            options_visible,
         ],
         concurrency_limit=10,
     )
@@ -1223,6 +1273,7 @@ with gr.Blocks(css=css) as demo:
                 agent_selection,
                 model_selection,
                 api_key,
+                options_visible,
             ],
             [
                 chatbot,
@@ -1235,27 +1286,30 @@ with gr.Blocks(css=css) as demo:
                 clear,
                 feedback,
                 stars,
+                options_visible,
             ],
             concurrency_limit=10,
         )
     )
-    clear.click(
-        clear_page,
-        [browser_history, session],
-        [
-            chatbot,
-            pause_resume,
-            is_paused,
-            screenshot,
-            url,
-            action_messages,
-            browser_history,
-            session,
-            status,
-        ],
-        queue=False,
+    (
+        clear.click(
+            clear_page,
+            [browser_history, session, feedback],
+            [
+                chatbot,
+                pause_resume,
+                is_paused,
+                screenshot,
+                url,
+                action_messages,
+                browser_history,
+                session,
+                status,
+                feedback,
+            ],
+            queue=False,
+        ).then(fn=None, js=hide_stars)
     )
-
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False
     )
