@@ -2,16 +2,16 @@ import base64
 import json
 import os
 import time
+from datetime import datetime
 from io import BytesIO
 
-import gradio as gr # type: ignore
+import gradio as gr  # type: ignore
 import networkx as nx
-import plotly.graph_objects as go #type: ignore
-import websocket
-from PIL import Image, UnidentifiedImageError
+import plotly.graph_objects as go  # type: ignore
 import requests
+import websocket
 from bs4 import BeautifulSoup
-from datetime import datetime
+from PIL import Image, UnidentifiedImageError
 
 # from openai import OpenAI
 
@@ -21,6 +21,7 @@ LABEL_LEN = 20
 WIDTH = 18
 HEIGHT = 4
 RADIUS = 1
+
 
 class Node:
     def __init__(self, state, in_action, state_info, status, reward, parent):
@@ -53,15 +54,15 @@ class OpenDevinSession:
         self.language = language
         self.api_key = api_key
         self.port = port
-        self.output_path = ""
+        self.output_path = ''
 
         self.figure = None
 
         self._reset()
 
     def initialize(self, as_generator=False):
-        #create an output path that is global to all functions called within the OpenDevinSession class, so that it can be referred back to later
-        #this code is copied from _close() function
+        # create an output path that is global to all functions called within the OpenDevinSession class, so that it can be referred back to later
+        # this code is copied from _close() function
         now = time.time()
         os.makedirs('frontend_logs', exist_ok=True)
 
@@ -72,8 +73,8 @@ class OpenDevinSession:
         formatted_model = self.model.replace('/', '-')
         self.output_path = (
             f'frontend_logs/{formatted_now}_{self.agent}_{formatted_model}_steps.json'
-        )    
-            
+        )
+
         self.agent_state = None
         if self.ws:
             self._close()
@@ -226,24 +227,27 @@ class OpenDevinSession:
         self.action_messages = []
         self.figure = go.Figure()
 
-    #changed the creation of the output to above. _close() may now be an unneccesary function, with the addition of save_log
+    # changed the creation of the output to above. _close() may now be an unneccesary function, with the addition of save_log
     def _close(self):
         self.save_log()
         self._reset()
 
-    #partly copied from _close() function, but is activated immediately when the session moves to "finished"
+    # partly copied from _close() function, but is activated immediately when the session moves to "finished"
     def save_log(self):
         print(f'Closing connection {self.token}')
         if self.ws:
             self.ws.close()
-        print('Saving log to', self.output_path)
-        json.dump(self.raw_messages, open(self.output_path, 'w'))
-        print(self.output_path)
+
+        if self.output_path:
+            print('Saving log to', self.output_path)
+            json.dump(self.raw_messages, open(self.output_path, 'w'))
+        # print(self.output_path)
 
     def __del__(self):
         self._close()
 
-#opens the existing file that was saved, and adds {user_feedback: x} at the top. 
+
+# opens the existing file that was saved, and adds {user_feedback: x} at the top.
 def save_user_feedback(stars, session):
     path = session.output_path
     # print("other output path", path)
@@ -251,11 +255,11 @@ def save_user_feedback(stars, session):
         try:
             with open(path, 'r') as file:
                 f = json.load(file)
-            f.insert(0, {"user feedback: ": stars})
+            f.insert(0, {'user feedback: ': stars})
             json.dump(f, open(path, 'w'))
-            print("User feedback saved!")
-        except:
-            print("Couldn't find output log: " + str(path) + ".")
+            print('User feedback saved!')
+        except Exception:
+            print("Couldn't find output log: " + str(path) + '.')
 
 
 def process_string(string, line_len):
@@ -670,9 +674,9 @@ def get_messages(
     print('Get Messages', session.agent_state)
     user_message = None
     if len(chat_history) > 0:
-        #check to see if user has sent a message previously
-        if chat_history[-1]["role"] == "user":
-            user_message = chat_history[-1]["content"]
+        # check to see if user has sent a message previously
+        if chat_history[-1]['role'] == 'user':
+            user_message = chat_history[-1]['content']
     if (
         session.agent_state is None or session.agent_state in ['paused', 'finished']
     ) and user_message is None:
@@ -701,10 +705,10 @@ def get_messages(
             stars,
         )
     else:
-        #make sure that the buttons and stars aren't shown yet
+        # make sure that the buttons and stars aren't shown yet
         clear = gr.Button('Clear', interactive=False)
         feedback = gr.Button('Submit Feedback', visible=False)
-        stars = gr.Textbox(elem_id="dummy_textbox", value=-1)
+        stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
         if session.agent_state not in ['init', 'running', 'pausing', 'resuming']:
             session.agent = agent_selection
             # session.model = model_port_config[model_selection]["provider"] + '/' + model_selection
@@ -752,23 +756,29 @@ def get_messages(
                 )
 
         for message in session.run(user_message):
-            #only enable the stars and feedback if the session.agent_state == finished
+            # only enable the stars and feedback if the session.agent_state == finished
             clear = gr.Button('Clear', interactive=(session.agent_state == 'finished'))
-            feedback = gr.Button('Submit Feedback', visible=(session.agent_state == 'finished'))
+            feedback = gr.Button(
+                'Submit Feedback', visible=(session.agent_state == 'finished')
+            )
             if session.agent_state == 'finished':
-                #add the last output message once it is finished
-                chat_history.append(gr.ChatMessage(role="assistant", content=action_messages[-1]))
-                stars = gr.Textbox(elem_id="dummy_textbox", value=0)
+                # add the last output message once it is finished
+                chat_history.append(
+                    gr.ChatMessage(role='assistant', content=action_messages[-1])
+                )
+                stars = gr.Textbox(elem_id='dummy_textbox', value=0)
                 session.save_log()
             status = get_status(session.agent_state)
             while len(session.action_messages) > len(action_messages):
                 diff = len(session.action_messages) - len(action_messages)
                 action_messages.append(session.action_messages[-diff])
-                #create sites_visited list from browser_history, use it in display history
+                # create sites_visited list from browser_history, use it in display history
                 sites_visited = []
                 for item in browser_history:
                     sites_visited.append(item[1])
-                chat_history = display_history(chat_history, sites_visited, action_messages)
+                chat_history = display_history(
+                    chat_history, sites_visited, action_messages
+                )
             while len(session.browser_history) > (len(browser_history) - 1):
                 diff = len(session.browser_history) - (len(browser_history) - 1)
                 browser_history.append(session.browser_history[-diff])
@@ -822,11 +832,19 @@ def check_requires_key(model_selection, api_key):
     requires_key = model_requires_key[model_real_name]
     if requires_key:
         api_key = gr.Textbox(
-            api_key, label='API Key', placeholder='Your API Key', visible=True, max_lines=2
+            api_key,
+            label='API Key',
+            placeholder='Your API Key',
+            visible=True,
+            max_lines=2,
         )
     else:
         api_key = gr.Textbox(
-            api_key, label='API Key', placeholder='Your API Key', visible=False, max_lines=2
+            api_key,
+            label='API Key',
+            placeholder='Your API Key',
+            visible=False,
+            max_lines=2,
         )
     return api_key
 
@@ -843,68 +861,83 @@ def pause_resume_task(is_paused, session, status):
     status = get_status(session.agent_state)
     return button, is_paused, session, status
 
-#for display history, this is the dropdown box that shows up
+
+# for display history, this is the dropdown box that shows up
 def display_history(history, messages_history, action_messages):
-    #parse everything into a string so that it is in one message instead of multiple, for the dropdown effect
-    links_string = ""
-    #count total links for the title
+    # parse everything into a string so that it is in one message instead of multiple, for the dropdown effect
+    links_string = ''
+    # count total links for the title
     total_links = 0
-    #fix the issue of multiple titles in a row
-    previous_titles = [""]
+    # fix the issue of multiple titles in a row
+    previous_titles = ['']
     for message in messages_history:
-        #try and get the title, if it doesn't work, just use the previous message
+        # try and get the title, if it doesn't work, just use the previous message
         try:
             url = message
-            print("URL", url)
+            print('URL', url)
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             title = soup.title.string
-        except:
+        except Exception:
             title = message
-        #check for duplicate entries in a row
+        # check for duplicate entries in a row
         if title != previous_titles[-1]:
-            links_string += (f'<a href="{message}" style="float: left;" target="_blank">{title}</a>\n')
+            links_string += f'<a href="{message}" style="float: left;" target="_blank">{title}</a>\n'
             previous_titles.append(title)
             total_links += 1
-    #add total links to title
+    # add total links to title
     if total_links == 1:
-        history_title = "Searched 1 site"
+        history_title = 'Searched 1 site'
     else:
-        history_title = "Searched " + str(total_links) + " sites"
-    #replace the last message unless it is the user's message
-    #sometimes represented as a dictionary, sometimes as a gr.ChatMessage() class. Not really sure when is which.
-    #if it is a gr.ChatMessage(), need to reference differently from dictionary
-    if "goto" in action_messages[-1]:
-        history_title = "Browsing " + message + "..."
-    if type(history[-1]) != type({}):
-        if history[-1].metadata == None or history[-1].role != "assistant":
-            history.append(gr.ChatMessage(role="assistant",
-                            content=(links_string),
-                            metadata={"title": history_title}))
-        else: 
-            history[-1] = gr.ChatMessage(role="assistant",
-                            content=(links_string),
-                            metadata={"title": history_title})
-    #this else exists just in case it is a dictionary:
+        history_title = 'Searched ' + str(total_links) + ' sites'
+    # replace the last message unless it is the user's message
+    # sometimes represented as a dictionary, sometimes as a gr.ChatMessage() class. Not really sure when is which.
+    # if it is a gr.ChatMessage(), need to reference differently from dictionary
+    if 'goto' in action_messages[-1]:
+        history_title = 'Browsing ' + message + '...'
+    if isinstance(history[-1], dict):
+        if history[-1].metadata is None or history[-1].role != 'assistant':
+            history.append(
+                gr.ChatMessage(
+                    role='assistant',
+                    content=(links_string),
+                    metadata={'title': history_title},
+                )
+            )
+        else:
+            history[-1] = gr.ChatMessage(
+                role='assistant',
+                content=(links_string),
+                metadata={'title': history_title},
+            )
+    # this else exists just in case it is a dictionary:
     else:
-        if history[-1]["metadata"] == None or history[-1]["role"] != "assistant":
-            history.append(gr.ChatMessage(role="assistant",
-                            content=(links_string),
-                            metadata={"title": history_title}))
-        else: 
-            history[-1] = gr.ChatMessage(role="assistant",
-                            content=(links_string),
-                            metadata={"title": history_title})
-            
-    #return history returns the chatbot itself
+        if history[-1]['metadata'] is None or history[-1]['role'] != 'assistant':
+            history.append(
+                gr.ChatMessage(
+                    role='assistant',
+                    content=(links_string),
+                    metadata={'title': history_title},
+                )
+            )
+        else:
+            history[-1] = gr.ChatMessage(
+                role='assistant',
+                content=(links_string),
+                metadata={'title': history_title},
+            )
+
+    # return history returns the chatbot itself
     return history
 
-#replaced previous function called user() which basically processes the user input into the gr.Chatbot class
+
+# replaced previous function called user() which basically processes the user input into the gr.Chatbot class
 def process_user_message(user_message, history):
     # return '', history + [[user_message, None]]
-    chat_message = gr.ChatMessage(role="user", content=user_message)
+    chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
-    return "", history
+    return '', history
+
 
 def toggle_options(visible):
     new_visible = not visible
@@ -932,6 +965,7 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
 # default_agent = 'WorldModelAgent'
 # default_agent = 'AgentModelAgent'
 default_agent = 'ModularWebAgent'
+# default_agent = 'ReasonerWebAgent'
 
 global model_port_config
 model_port_config = {}
@@ -987,7 +1021,7 @@ async () => {
     globalThis.setRating = (stars) => {
         currentRating = stars; // Update the current rating
         // document.getElementById("rating-text").innerText = `Your rating: ${stars} stars`;
-        
+
         // Highlight stars up to the selected rating
         let starElements = document.getElementById("stars").children;
         if (!submitted){
@@ -1015,18 +1049,18 @@ async () => {
     globalThis.showStars = () => {
         document.getElementById("feedback").style.display = "inline-block";
     }
-    
+
 }
 """
 
-#different so that the function can be called by gradio elements in the python code
+# different so that the function can be called by gradio elements in the python code
 get_rating = """
 function(){
     let currentRating = submitRating();
     return currentRating;
 }
 """
-#random css for other formatting and whatnot
+# random css for other formatting and whatnot
 css = """
 #submit-button{
     width: 20%;
@@ -1062,6 +1096,7 @@ with gr.Blocks(css=css) as demo:
                         'WebPlanningAgent',
                         'AgentModelAgent',
                         'ModularWebAgent',
+                        # 'ReasonerWebAgent',
                     ],
                     value=default_agent,
                     interactive=True,
@@ -1077,7 +1112,7 @@ with gr.Blocks(css=css) as demo:
                 )
                 api_key = check_requires_key(default_model, default_api_key)
 
-                #change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
+                # change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
                 chatbot = gr.Chatbot(type='messages', height=320)
             with gr.Group():
                 with gr.Row():
@@ -1099,11 +1134,9 @@ with gr.Blocks(css=css) as demo:
             #     screenshot = gr.Image(blank, interactive=False, label='Webpage')
             #     plot = gr.Plot(go.Figure(), label='Agent Planning Process')
             with gr.Group():
-                #starting url can be changed
+                # starting url can be changed
                 start_url = 'about:blank'
-                url = gr.Textbox(
-                    start_url, label='URL', interactive=False, max_lines=1
-                )
+                url = gr.Textbox(start_url, label='URL', interactive=False, max_lines=1)
                 blank = Image.new('RGB', (1280, 720), (255, 255, 255))
                 screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
@@ -1113,15 +1146,17 @@ with gr.Blocks(css=css) as demo:
         clear = gr.Button('Clear')
     with gr.Row():
         rating_html = gr.HTML(html_content)
-        #dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
-        stars = gr.Textbox(elem_id="dummy_textbox", value=-1, visible=False)
-        #when the stars dummy textbox is changed, trigger all of this
-        stars.change(None, None, None, js="() => {showStars()}")
+        # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
+        stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
+        # when the stars dummy textbox is changed, trigger all of this
+        stars.change(None, None, None, js='() => {showStars()}')
         stars.change(save_user_feedback, inputs=[stars, session])
         # Load the JavaScript code to initialize the interactive stars
         demo.load(None, None, None, js=js_code)
-    #feedback button, in a different row. 
-    feedback = gr.Button('Submit Feedback', variant='secondary', elem_id = "submit-button", visible=False)
+    # feedback button, in a different row.
+    feedback = gr.Button(
+        'Submit Feedback', variant='secondary', elem_id='submit-button', visible=False
+    )
     feedback.click(None, inputs=None, outputs=stars, js=get_rating)
     status = gr.Markdown('Agent Status: 🔴 Inactive')
     browser_history = gr.State([(blank, start_url)])
@@ -1139,7 +1174,11 @@ with gr.Blocks(css=css) as demo:
     is_paused = gr.State(False)
     # chat_msg = msg.submit(user, [msg, chatbot], [msg, chatbot], queue=False)
     chat_msg = gr.events.on(
-        submit_triggers, process_user_message, [msg, chatbot], [msg, chatbot], queue=False
+        submit_triggers,
+        process_user_message,
+        [msg, chatbot],
+        [msg, chatbot],
+        queue=False,
     )
     bot_msg = chat_msg.then(
         get_messages,

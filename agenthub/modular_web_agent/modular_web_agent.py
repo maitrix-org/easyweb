@@ -4,6 +4,7 @@ from datetime import datetime
 from functools import partial
 
 from opendevin.controller.agent import Agent
+from opendevin.events.action import Action
 from opendevin.llm.llm import LLM
 from opendevin.runtime.plugins import (
     PluginRequirement,
@@ -251,7 +252,7 @@ class ModularWebAgent(Agent):
         self.last_action = ''
         self.num_repeats = 0
 
-    def step(self, env_state):
+    def step(self, env_state) -> Action:
         observation, info = self.observation_space.parse_observation(env_state)
         if info.get('return_action') is not None:
             return info['return_action']
