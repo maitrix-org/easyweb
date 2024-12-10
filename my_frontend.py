@@ -706,6 +706,8 @@ def get_messages(
     api_key,
     options_visible,
 ):
+    # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
+    # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
     model_selection = model_display2name[model_selection]
     user_message = None
     if len(chat_history) > 0:
@@ -719,7 +721,7 @@ def get_messages(
         session.agent_state is None
         or session.agent_state in ['paused', 'finished', 'stopped']
     ) and user_message is None:
-        clear = gr.Button('Clear', interactive=True)
+        clear = gr.Button('🗑️ Clear', interactive=True)
         status = get_status(session.agent_state)
 
         screenshot, url = browser_history[-1]
@@ -753,12 +755,14 @@ def get_messages(
             feedback,
             stars,
             options_visible,
+            # upvote,
+            # downvote,
             submit,
             stop,
         )
     else:
-        # make sure that the buttons and stars aren't shown yet
-        clear = gr.Button('Clear', interactive=False)
+        #make sure that the buttons and stars aren't shown yet
+        clear = gr.Button('🗑️ Clear', interactive=False)
         feedback = gr.Button('Submit Feedback')
         stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
         if session.agent_state not in [
@@ -852,27 +856,39 @@ def get_messages(
                     feedback,
                     stars,
                     options_visible,
+                    # upvote,
+                    # downvote,
                     submit,
                     stop,
                 )
 
         website_counter = 0
+        message_list = []
         for message in session.run(user_message):
-            # this is so that the swingout (hide/show advanced options) will only pop out right when the user submits something
+            # if "content" in message.keys():
+                # print("MESSAGEEEE", message['message'])
+            message_list.append(message['message'])
+            # else:
+                # print("No content:", message)
+            #this is so that the swingout (hide/show browser) will only pop out right when the user submits something
             if website_counter == 1:
                 options_visible = True
-            # only enable the stars and feedback if the session.agent_state == finished
-            clear = gr.Button('Clear', interactive=(session.agent_state == 'finished'))
-            feedback = gr.Button(
-                'Submit Feedback', visible=(session.agent_state == 'finished')
-            )
+            #only enable the stars and feedback if the session.agent_state == finished
+            clear = gr.Button('🗑️ Clear', interactive=(session.agent_state == 'finished'))
+            feedback = gr.Button('Submit Feedback', visible=(session.agent_state == 'finished'))
+            # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
+            # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
             if session.agent_state == 'finished':
-                # add the last output message once it is finished
-                # find the last message
-                chat_history.append(
-                    gr.ChatMessage(role='assistant', content=message['content'])
-                )
-                stars = gr.Textbox(elem_id='dummy_textbox', value=0)
+                #add the last output message once it is finished
+                #find the last message
+                if len(message_list) >= 3:
+                    if message_list[-3] != "":
+                        chat_history.append(gr.ChatMessage(role="assistant", content=message_list[-3]))
+                    if message_list[-2] != "":
+                        chat_history.append(gr.ChatMessage(role="assistant", content=message_list[-2]))
+                    if message_list[-2] == "" and message_list[-3] == "":
+                        chat_history.append(gr.ChatMessage(role="assistant", content="Task Complete! How can I assist you next?"))
+                stars = gr.Textbox(elem_id="dummy_textbox", value=0)
                 session.save_log()
             status = get_status(session.agent_state)
             while len(session.action_messages) > len(action_messages):
@@ -921,6 +937,8 @@ def get_messages(
                 feedback,
                 stars,
                 options_visible,
+                # upvote,
+                # downvote,
                 submit,
                 stop,
             )
@@ -1004,7 +1022,7 @@ def display_history(history, messages_history, action_messages):
             title = message
         # check for duplicate entries in a row
         if title != previous_titles[-1]:
-            links_string += f'<a href="{message}" style="float: left;" target="_blank">{title}</a>\n'
+            links_string += (f'<a href="{message}" style="float: left; text-align: left;" target="_blank">{title}</a>\n')
             previous_titles.append(title)
             total_links += 1
     # add total links to title
@@ -1052,15 +1070,12 @@ def display_history(history, messages_history, action_messages):
     # return history returns the chatbot itself
     return history
 
-
 # replaced previous function called user() which basically processes the user input into the gr.Chatbot class
-
-
 def process_user_message(user_message, history):
     # return '', history + [[user_message, None]]
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
-    return '', history
+    return "", history
 
 
 def stop_task(session):
@@ -1077,12 +1092,13 @@ def stop_task(session):
     return session, status, clear
 
 
+#toggle hiding and showing the browser. IfClick is basically because I call this function sometimes without the user specifically clicking on the button.
 def toggle_options(visible, ifClick):
     if ifClick:
         new_visible = not visible
     else:
         new_visible = visible
-    toggle_text = 'Hide Advanced Options' if new_visible else 'Show Advanced Options'
+    toggle_text = '🔍 Hide Browser' if new_visible else '🔍 Show Browser'
     return (
         gr.update(visible=new_visible),
         new_visible,
@@ -1215,18 +1231,25 @@ function(){
 # random css for other formatting and whatnot
 css = """
 #submit-button{
-    width: 20%;
+    width: 200px;
 }
 #feedback{
     padding-left: 20px;
+    max-width: 230px;
     padding-bottom: 20px;
-    max-width: 400px;
+    background-color: #f4f4f7;
 }
 #confirmation-text{
     margin-top: 8px;
 }
 """
 
+
+def vote(upvote):
+    if upvote:
+        print("Upvoted!")
+    else:
+        print("Downvoted.")
 
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
@@ -1278,6 +1301,18 @@ with gr.Blocks(css=css) as demo:
 
             # change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
             chatbot = gr.Chatbot(type='messages', height=320)
+            with gr.Row():
+                rating_html = gr.HTML(html_content)
+                #dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
+                stars = gr.Textbox(elem_id="dummy_textbox", value=-1, visible=False)
+                #when the stars dummy textbox is changed, trigger all of this
+                stars.change(None, None, None, js="() => {showStars()}")
+                stars.change(save_user_feedback, inputs=[stars, session])
+                # Load the JavaScript code to initialize the interactive stars
+                demo.load(None, None, None, js=js_code)
+            #feedback button, in a different row. 
+            feedback = gr.Button('Submit Feedback', variant='secondary', elem_id = "submit-button", visible=False)
+            feedback.click(None, inputs=None, outputs=stars, js=get_rating)
             with gr.Group():
                 with gr.Row():
                     msg = gr.Textbox(container=False, show_label=False, scale=7)
@@ -1307,27 +1342,16 @@ with gr.Blocks(css=css) as demo:
                 screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
     with gr.Row():
-        toggle_button = gr.Button('Show Advanced Options')
-        pause_resume = gr.Button('Pause')
-        # stop = gr.Button('Stop')
-        clear = gr.Button('Clear')
-    with gr.Row():
-        rating_html = gr.HTML(html_content)
-        # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
-        stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
-        # when the stars dummy textbox is changed, trigger all of this
-        stars.change(None, None, None, js='() => {showStars()}')
-        stars.change(save_user_feedback, inputs=[stars, session])
-        # Load the JavaScript code to initialize the interactive stars
-        demo.load(None, None, None, js=js_code)
-    # feedback button, in a different row.
-    feedback = gr.Button(
-        'Submit Feedback', variant='secondary', elem_id='submit-button', visible=False
-    )
-    feedback.click(None, inputs=None, outputs=stars, js=get_rating)
+        toggle_button = gr.Button('🔍 Show Browser')
+        pause_resume = gr.Button('Pause', visible=False)
+        # upvote = gr.Button('👍 Upvote', interactive=False)
+        # downvote = gr.Button('👎 Downvote', interactive=False)
+        clear = gr.Button('🗑️ Clear')
     status = gr.Markdown('Agent Status: 🔴 Inactive')
     browser_history = gr.State([(blank, start_url)])
     options_visible = gr.State(False)
+    # upvote.click(vote, inputs=[gr.State(True)])
+    # downvote.click(vote, inputs=[gr.State(False)])
     options_visible.change(
         toggle_options,
         inputs=[options_visible, gr.State(False)],
@@ -1382,6 +1406,8 @@ with gr.Blocks(css=css) as demo:
             feedback,
             stars,
             options_visible,
+            # upvote,
+            # downvote,
             submit,
             stop,
         ],
@@ -1451,6 +1477,8 @@ with gr.Blocks(css=css) as demo:
                 feedback,
                 stars,
                 options_visible,
+                # upvote,
+                # downvote
             ],
             concurrency_limit=10,
         )
