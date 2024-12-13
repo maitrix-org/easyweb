@@ -906,7 +906,7 @@ def display_history(history, messages_history, action_messages):
     # if it is a gr.ChatMessage(), need to reference differently from dictionary
     if 'goto' in action_messages[-1]:
         history_title = 'Browsing ' + message + '...'
-    if isinstance(history[-1], dict):
+    if not isinstance(history[-1], dict):
         if history[-1].metadata is None or history[-1].role != 'assistant':
             history.append(
                 gr.ChatMessage(
@@ -977,8 +977,8 @@ with open(os.path.join(current_dir, 'Makefile')) as f:
             break
 # default_agent = 'WorldModelAgent'
 # default_agent = 'AgentModelAgent'
-default_agent = 'ModularWebAgent'
-# default_agent = 'ReasonerWebAgent'
+# default_agent = 'ModularWebAgent'
+default_agent = 'ReasonerWebAgent'
 
 global model_port_config
 model_port_config = {}
@@ -1134,7 +1134,7 @@ with gr.Blocks(css=css) as demo:
                             'WebPlanningAgent',
                             'AgentModelAgent',
                             'ModularWebAgent',
-                            # 'ReasonerWebAgent',
+                            'ReasonerWebAgent',
                         ],
                         value=default_agent,
                         interactive=True,
