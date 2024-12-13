@@ -303,7 +303,7 @@ class OpenDevinBrowserObservationSpace(BaseObservationSpace):
         else:
             self.error_accumulator = 0
 
-        ### Above is record keeping by world model
+        # Above is record keeping by world model
 
         # clean_axtree_lines = []
         # num_static_text_lines = 0
