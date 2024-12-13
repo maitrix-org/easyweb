@@ -31,7 +31,10 @@ class ReasonerWebAgent(Agent):
         - llm (LLM): The llm to be used by this agent
         """
         super().__init__(llm)
-        self.config_name = 'opendevin'
+        if 'Meta-Llama-3.1-70B-Instruct' in llm.model_name:
+            self.config_name = 'opendevin_llama'
+        else:
+            self.config_name = 'opendevin'
         self.agent = ReasonerAgent(llm, config_name=self.config_name, logger=logger)
         self.reset()
 
