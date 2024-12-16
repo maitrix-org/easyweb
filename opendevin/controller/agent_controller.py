@@ -153,6 +153,7 @@ class AgentController:
 
     async def on_event(self, event: Event):
         if isinstance(event, ChangeAgentStateAction):
+            print(event)
             await self.set_agent_state_to(event.agent_state)  # type: ignore
         elif isinstance(event, MessageAction):
             if event.source == EventSource.USER:

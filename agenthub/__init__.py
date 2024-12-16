@@ -24,6 +24,7 @@ from . import (  # noqa: E402
     onepass_agent,
     planner_agent,
     policy_agent,
+    reasoner_web_agent,
     web_planning_agent,
     world_model_agent,
 )
@@ -46,6 +47,7 @@ __all__ = [
     'agent_model_agent',
     'web_planning_agent',
     'modular_web_agent',
+    'reasoner_web_agent',
 ]
 
 for agent in all_microagents.values():
