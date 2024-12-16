@@ -1,19 +1,31 @@
+# from openai import OpenAI
+import argparse
 import base64
 import json
 import os
+import queue
 import time
 from datetime import datetime
 from io import BytesIO
 
 import gradio as gr  # type: ignore
 import networkx as nx
-import plotly.graph_objects as go  # type: ignore  # type: ignore
+import plotly.graph_objects as go  # type: ignore
 import requests
 import websocket
 from bs4 import BeautifulSoup
 from PIL import Image, UnidentifiedImageError
 
-# from openai import OpenAI
+parser = argparse.ArgumentParser(description='Specify the number of backends to use.')
+parser.add_argument(
+    '--num-backends',
+    type=int,
+    default=1,
+    help='The number of backends to initialize (default: 1)',
+)
+args = parser.parse_args()
+
+backend_ports = [5000 + i for i in range(args.num_backends)]
 
 default_api_key = os.environ.get('OPENAI_API_KEY')
 LINE_LEN = 100
@@ -22,6 +34,33 @@ WIDTH = 18
 HEIGHT = 4
 RADIUS = 1
 
+
+
+class BackendManager:
+    def __init__(self, backend_ports):
+        self.available_ports = queue.Queue()
+        for port in backend_ports:
+            self.available_ports.put(port)
+
+    def acquire_backend(self):
+        try:
+            # Wait indefinitely until a port becomes available
+            port = self.available_ports.get(block=True)
+            print(f'Acquired backend on port {port}')
+            return port
+        except Exception as e:
+            print(f'Error acquiring backend: {e}')
+            return None
+
+    def release_backend(self, port):
+        try:
+            self.available_ports.put(port, block=True)
+            print(f'Released backend on port {port}')
+        except Exception as e:
+            print(f'Error releasing backend: {e}')
+
+
+backend_manager = BackendManager(backend_ports)
 
 class Node:
     def __init__(self, state, in_action, state_info, status, reward, parent):
@@ -61,8 +100,6 @@ class OpenDevinSession:
         self._reset()
 
     def initialize(self, as_generator=False):
-        # create an output path that is global to all functions called within the OpenDevinSession class, so that it can be referred back to later
-        # this code is copied from _close() function
         # create an output path that is global to all functions called within the OpenDevinSession class, so that it can be referred back to later
         # this code is copied from _close() function
         now = time.time()
@@ -153,6 +190,8 @@ class OpenDevinSession:
 
             print(self.agent_state)
             yield message
+
+        backend_manager.release_backend(self.port)
 
     def _get_message(self):
         # try:
@@ -258,7 +297,6 @@ class OpenDevinSession:
 
 
 # opens the existing file that was saved, and adds {user_feedback: x} at the top.
-
 
 def save_user_feedback(stars, session):
     path = session.output_path
@@ -746,7 +784,6 @@ def get_messages(
 
         # action_history = get_action_history_markdown(session.action_history)
         # action_history = action_history if action_history else 'No Action Taken Yet'
-
         yield (
             chat_history,
             screenshot,
@@ -775,6 +812,16 @@ def get_messages(
             'pausing',
             'resuming',
         ]:
+            # Initialize a new session if it doesn't exist
+            new_session = OpenDevinSession(
+                agent=agent_selection,
+                port=backend_manager.acquire_backend(),
+                model=model_selection,
+                api_key=api_key
+                if model_requires_key[model_selection]
+                else default_api_key,
+            )
+            session = new_session
             if stop_flag:
                 stop_flag = False
                 clear = gr.Button('Clear', interactive=False)
@@ -838,7 +885,6 @@ def get_messages(
                     visible=session.agent_state != 'running',
                 )
                 stop = gr.Button('Stop', visible=session.agent_state == 'running')
-
                 # if session.figure:
                 #     figure = session.figure
                 # else:
@@ -917,6 +963,7 @@ def get_messages(
                 for item in browser_history:
                     website_counter += 1
                     sites_visited.append(item[1])
+              
                 chat_history = display_history(
                     chat_history, sites_visited, action_messages
                 )
@@ -924,7 +971,6 @@ def get_messages(
                 diff = len(session.browser_history) - (len(browser_history) - 1)
                 browser_history.append(session.browser_history[-diff])
             screenshot, url = browser_history[-1]
-
             # if session.figure:
             #     figure = session.figure
             # else:
@@ -932,7 +978,6 @@ def get_messages(
 
             # action_history = get_action_history_markdown(session.action_history)
             # action_history = action_history if action_history else 'No Action Taken Yet'
-
             submit = gr.Button(
                 'Submit',
                 variant='primary',
@@ -941,7 +986,6 @@ def get_messages(
                 visible=session.agent_state != 'running',
             )
             stop = gr.Button('Stop', visible=session.agent_state == 'running')
-
             yield (
                 chat_history,
                 screenshot,
@@ -965,6 +1009,7 @@ def clear_page(browser_history, session, feedback):
     feedback = gr.Button('Submit Feedback', visible=False)
     browser_history = browser_history[:1]
     current_screenshot, current_url = browser_history[-1]
+
     session._reset()
     status = get_status(session.agent_state)
     # pause_resume = gr.Button("Pause", interactive=False)
@@ -976,7 +1021,7 @@ def clear_page(browser_history, session, feedback):
         current_url,
         [],
         browser_history,
-        session,
+        None,  # Reset session to None
         status,
         feedback,
     )
@@ -1050,6 +1095,7 @@ def display_history(history, messages_history, action_messages):
     # if it is a gr.ChatMessage(), need to reference differently from dictionary
     if 'goto' in action_messages[-1]:
         history_title = 'Browsing ' + message + '...'
+
     if not isinstance(history[-1], dict):
         if history[-1].metadata is None or history[-1].role != 'assistant':
             history.append(
@@ -1093,7 +1139,6 @@ def process_user_message(user_message, history):
     history.append(chat_message)
     return '', history
 
-
 def stop_task(session):
     if session.agent_state == 'running':
         session.stop()
@@ -1106,7 +1151,6 @@ def stop_task(session):
     status = get_status(session.agent_state)
     clear = gr.Button('Clear', interactive=True)
     return session, status, clear
-
 
 # toggle hiding and showing the browser. IfClick is basically because I call this function sometimes without the user specifically clicking on the button.
 def toggle_options(visible, ifClick):
@@ -1125,15 +1169,15 @@ def toggle_options(visible, ifClick):
 current_dir = os.path.dirname(__file__)
 print(os.path.dirname(__file__))
 
-default_port = 5000
-with open(os.path.join(current_dir, 'Makefile')) as f:
-    while True:
-        line = f.readline()
-        if 'BACKEND_PORT' in line:
-            default_port = int(line.split('=')[1].strip())
-            break
-        if not line:
-            break
+# default_port = 5000
+# with open(os.path.join(current_dir, 'Makefile')) as f:
+#     while True:
+#         line = f.readline()
+#         if 'BACKEND_PORT' in line:
+#             default_port = int(line.split('=')[1].strip())
+#             break
+#         if not line:
+#             break
 # default_agent = 'WorldModelAgent'
 # default_agent = 'AgentModelAgent'
 # default_agent = 'ModularWebAgent'
@@ -1222,6 +1266,7 @@ async () => {
         document.getElementById("feedback").style.display = "inline-block";
         document.getElementById("feedback").scrollIntoView({ behavior: "smooth" });
     }
+
     //hide the stars by setting their display to none
     globalThis.hideStars = () => {
         document.getElementById("feedback").style.display = "none";
@@ -1238,13 +1283,13 @@ function(){
 }
 """
 
+
 # make this in python for the clear button
 hide_stars = """
 function(){
     hideStars();
 }
 """
-
 # random css for other formatting and whatnot
 css = """
 #submit-button{
@@ -1271,9 +1316,10 @@ def vote(upvote):
 
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
-    session = gr.State(
-        OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
-    )
+#     session = gr.State(
+#         OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
+#     )
+    session = gr.State(None)
     title = gr.Markdown('# 🚀 OpenQ: An Open-Source LLM-Powered Web Agent')
     # header = gr.Markdown('''## How it works:''')
     tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
@@ -1285,7 +1331,6 @@ with gr.Blocks(css=css) as demo:
     privacy_title = gr.Markdown(
         """❗️**Important: Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.**"""
     )
-
     with gr.Row(equal_height=False):
         with gr.Column(scale=2):
             with gr.Group():
@@ -1447,7 +1492,7 @@ with gr.Blocks(css=css) as demo:
             submit,
             stop,
         ],
-        concurrency_limit=10,
+        concurrency_limit=args.num_backends,
     )
     # (
     #     pause_resume.click(
@@ -1516,7 +1561,7 @@ with gr.Blocks(css=css) as demo:
                 # upvote,
                 # downvote
             ],
-            concurrency_limit=10,
+            concurrency_limit=args.num_backends,
         )
     )
     (
@@ -1545,4 +1590,4 @@ with gr.Blocks(css=css) as demo:
 if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=True)
