@@ -112,6 +112,7 @@ def process_instance(
 
 
 if __name__ == '__main__':
+    banned_instance = {461}
     env_ids = [
         id for id in gym.envs.registry.keys() if id.startswith('browsergym/webarena')
     ]
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     # LIMIT EVALUATION
     eval_n_limit = args.eval_n_limit
     if eval_n_limit:
-        env_ids = sorted(env_ids[:eval_n_limit])
+        env_ids = sorted(env_ids[:eval_n_limit], key=lambda s: int(s.split('.')[-1]))
         logger.info(f'Limiting evaluation to first {eval_n_limit} instances.')
 
     # OUTPUT FILE
@@ -210,10 +211,13 @@ if __name__ == '__main__':
     # filter out finished instances
     new_env_ids = []
     for idx in env_ids:
-        if idx in finished_instance_ids:
-            logger.info(f'Skipping instance {idx} as it is already finished.')
+        n_idx = idx
+        if int(idx.split('.')[-1]) in banned_instance:
+            n_idx = '.'.join([idx.split('.')[0], str(int(idx.split('.')[-1]) - 1)])
+        if n_idx in finished_instance_ids:
+            logger.info(f'Skipping instance {n_idx} as it is already finished.')
             continue
-        new_env_ids.append(idx)
+        new_env_ids.append(n_idx)
 
     env_ids = new_env_ids
     logger.info(

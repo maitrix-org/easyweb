@@ -12,10 +12,11 @@ end the task once it sends a message to the user.""",
     'encoder_prompt_type': 'no_memory',
     'policy_prompt_type': 'no_update',
     'actor_prompt_type': 'with_memory',
-    'world_model_prompt_type': 'no_memory_with_update',
+    'world_model_prompt_type': 'with_update',
     'use_world_model_planning': True,
     'eval_mode': False,
     'truncate_axtree': True,
+    'identity_with_datetime': True,
 }
 
 webarena_config = {
@@ -32,4 +33,5 @@ The assistant will end the task once it sends a message to the user.""",
     'use_actor_concice_instruction': True,
     'eval_mode': True,
     'truncate_axtree': False,
+    'identity_with_datetime': False,
 }

@@ -9,7 +9,7 @@ parser = argparse.ArgumentParser(description='Calculate average reward.')
 parser.add_argument(
     'output_root', type=str, help='path to dictionary containing output.jsonl'
 )
-parser.add_argument('--index_success', action='store_true')
+parser.add_argument('--index_success', '-v', action='store_true')
 
 args = parser.parse_args()
 
@@ -36,9 +36,9 @@ if __name__ == '__main__':
             total_cost += data['metrics']['accumulated_cost']
             total_reward += data['test_result']
             if args.index_success and data['test_result'] > 0:
-                success_cases.append(data['instance_id'].split('.')[-1])
+                success_cases.append(int(data['instance_id'].split('.')[-1]))
     if args.index_success:
-        print(f'Successful instances: {str(success_cases)}')
+        print(f'Successful instances: {str(sorted(success_cases))}')
 
     avg_reward = total_reward / total_num
     print('Success Rate: ', avg_reward)
