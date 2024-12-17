@@ -1,5 +1,6 @@
 web_evaluation/*/*_logs/
 *.log
+reasoners
 
 *.jsonl
 *.ipynb
