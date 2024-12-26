@@ -35,7 +35,6 @@ HEIGHT = 4
 RADIUS = 1
 
 
-
 class BackendManager:
     def __init__(self, backend_ports):
         self.available_ports = queue.Queue()
@@ -61,6 +60,7 @@ class BackendManager:
 
 
 backend_manager = BackendManager(backend_ports)
+
 
 class Node:
     def __init__(self, state, in_action, state_info, status, reward, parent):
@@ -160,6 +160,7 @@ class OpenDevinSession:
         self.ws.send(json.dumps(payload))
 
         self.agent_state = 'stopped'
+        # self.save_log()
         self._reset
 
     def resume(self):
@@ -190,8 +191,8 @@ class OpenDevinSession:
 
             print(self.agent_state)
             yield message
-
-        backend_manager.release_backend(self.port)
+        if self.agent_state != 'stopped':
+            backend_manager.release_backend(self.port)
 
     def _get_message(self):
         # try:
@@ -278,6 +279,7 @@ class OpenDevinSession:
         self.last_active_strategy = ''
         self.action_messages = []
         self.figure = go.Figure()
+        # session = gr.State(None)
 
     # changed the creation of the output to above. _close() may now be an unneccesary function, with the addition of save_log
     # def _close(self):
@@ -297,6 +299,7 @@ class OpenDevinSession:
 
 
 # opens the existing file that was saved, and adds {user_feedback: x} at the top.
+
 
 def save_user_feedback(stars, session):
     path = session.output_path
@@ -757,7 +760,16 @@ def get_messages(
         if chat_history[-1]['role'] == 'user':
             user_message = chat_history[-1]['content']
 
-    stop_flag = session.agent_state == 'stopped'
+    # Initialize a new session if it doesn't exist
+    if session is None or session.agent_state in ['finished', 'paused']:
+        new_session = OpenDevinSession(
+            agent=agent_selection,
+            port=backend_manager.acquire_backend(),
+            model=model_selection,
+            api_key=api_key if model_requires_key[model_selection] else default_api_key,
+        )
+        session = new_session
+    stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
         session.agent_state is None
@@ -812,16 +824,6 @@ def get_messages(
             'pausing',
             'resuming',
         ]:
-            # Initialize a new session if it doesn't exist
-            new_session = OpenDevinSession(
-                agent=agent_selection,
-                port=backend_manager.acquire_backend(),
-                model=model_selection,
-                api_key=api_key
-                if model_requires_key[model_selection]
-                else default_api_key,
-            )
-            session = new_session
             if stop_flag:
                 stop_flag = False
                 clear = gr.Button('Clear', interactive=False)
@@ -846,6 +848,7 @@ def get_messages(
                     [],
                     browser_history,
                     session,
+                    # None,
                     status,
                     clear,
                     go.Figure(),
@@ -952,7 +955,7 @@ def get_messages(
                             )
                         )
                 stars = gr.Textbox(elem_id='dummy_textbox', value=0)
-                session.save_log()
+                session.save_log()  # add if finished if we don't want to save log on stop
             status = get_status(session.agent_state)
             while len(session.action_messages) > len(action_messages):
                 diff = len(session.action_messages) - len(action_messages)
@@ -963,7 +966,7 @@ def get_messages(
                 for item in browser_history:
                     website_counter += 1
                     sites_visited.append(item[1])
-              
+
                 chat_history = display_history(
                     chat_history, sites_visited, action_messages
                 )
@@ -1021,7 +1024,8 @@ def clear_page(browser_history, session, feedback):
         current_url,
         [],
         browser_history,
-        None,  # Reset session to None
+        # None,  # Reset session to None
+        session,
         status,
         feedback,
     )
@@ -1139,18 +1143,23 @@ def process_user_message(user_message, history):
     history.append(chat_message)
     return '', history
 
+
 def stop_task(session):
     if session.agent_state == 'running':
         session.stop()
+        # session._reset()
     # clear everything on resubmit
     # save to session logs
     # pull and merge
     # when its running, disable submit, enable stop like chatgpt
     # change submit to stop button when running?
     # dont submit if nothing in box
+    # session.save_log()
     status = get_status(session.agent_state)
     clear = gr.Button('Clear', interactive=True)
     return session, status, clear
+    # return None, status, clear
+
 
 # toggle hiding and showing the browser. IfClick is basically because I call this function sometimes without the user specifically clicking on the button.
 def toggle_options(visible, ifClick):
@@ -1169,7 +1178,7 @@ def toggle_options(visible, ifClick):
 current_dir = os.path.dirname(__file__)
 print(os.path.dirname(__file__))
 
-# default_port = 5000
+default_port = 5000
 # with open(os.path.join(current_dir, 'Makefile')) as f:
 #     while True:
 #         line = f.readline()
@@ -1316,9 +1325,9 @@ def vote(upvote):
 
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
-#     session = gr.State(
-#         OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
-#     )
+    # session = gr.State(
+    #     OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
+    # )
     session = gr.State(None)
     title = gr.Markdown('# 🚀 OpenQ: An Open-Source LLM-Powered Web Agent')
     # header = gr.Markdown('''## How it works:''')
@@ -1411,23 +1420,23 @@ with gr.Blocks(css=css) as demo:
                 screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
     with gr.Row():
-        toggle_button = gr.Button('Show Advanced Options')
+        toggle_button = gr.Button('🔍 Show Browser')
         pause_resume = gr.Button('Pause')
         clear = gr.Button('Clear')
-    with gr.Row():
-        rating_html = gr.HTML(html_content)
-        # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
-        stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
-        # when the stars dummy textbox is changed, trigger all of this
-        stars.change(None, None, None, js='() => {showStars()}')
-        stars.change(save_user_feedback, inputs=[stars, session])
-        # Load the JavaScript code to initialize the interactive stars
-        demo.load(None, None, None, js=js_code)
-    # feedback button, in a different row.
-    feedback = gr.Button(
-        'Submit Feedback', variant='secondary', elem_id='submit-button', visible=False
-    )
-    feedback.click(None, inputs=None, outputs=stars, js=get_rating)
+    # with gr.Row():
+    #     rating_html = gr.HTML(html_content)
+    #     # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
+    #     stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
+    #     # when the stars dummy textbox is changed, trigger all of this
+    #     stars.change(None, None, None, js='() => {showStars()}')
+    #     stars.change(save_user_feedback, inputs=[stars, session])
+    #     # Load the JavaScript code to initialize the interactive stars
+    #     demo.load(None, None, None, js=js_code)
+    # # feedback button, in a different row.
+    # feedback = gr.Button(
+    #     'Submit Feedback', variant='secondary', elem_id='submit-button', visible=False
+    # )
+    # feedback.click(None, inputs=None, outputs=stars, js=get_rating)
     status = gr.Markdown('Agent Status: 🔴 Inactive')
     browser_history = gr.State([(blank, start_url)])
     options_visible = gr.State(False)
