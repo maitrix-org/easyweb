@@ -83,6 +83,7 @@ class BrowserEnv:
                 wait_for_user_message=False,
                 headless=True,
                 disable_env_checker=True,
+                timeout=10000,
             )
         obs, info = env.reset()
         # EVAL only: save the goal into file for evaluation

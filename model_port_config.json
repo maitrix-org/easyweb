@@ -44,6 +44,11 @@
         "requires_key": true,
         "default": true
     },
+    "gpt-4o-2024-05-13":
+    {
+        "base_url": "https://api.openai.com/v1/",
+        "requires_key": true
+    },
     "llama-3.1-405b-instruct:free":
     {
         "provider": "openai",

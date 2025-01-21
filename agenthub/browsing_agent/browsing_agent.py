@@ -2,6 +2,7 @@ import ast
 import os
 import random
 import time
+from datetime import datetime
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.utils.obs import flatten_axtree_to_str
@@ -180,10 +181,13 @@ class BrowsingAgent(Agent):
             self.error_accumulator += 1
             if self.error_accumulator > 5:
                 return MessageAction('Too many errors encountered. Task failed.')
+
+        current_datetime = datetime.now().strftime('%a, %b %d, %Y %H:%M:%S')
         system_msg = f"""\
 # Instructions
 Review the current state of the page and all other information to find the best
-possible next action to accomplish your goal. Your answer will be interpreted
+possible next action to accomplish your goal. Use Google Flights for questions
+related to flight search. Your answer will be interpreted
 and executed by a program, make sure to follow the formatting instructions.
 
 # Goal:
@@ -191,7 +195,24 @@ and executed by a program, make sure to follow the formatting instructions.
 
 # Action Space
 {self.action_space.describe(with_long_description=False, with_examples=True)}
+
+# Current Date and Time:
+{current_datetime}
 """
+
+        #         system_msg = f"""\
+        # # Instructions
+        # Review the current state of the page and all other information to find the best
+        # possible next action to accomplish your goal. Use Google Flights for questions
+        # related to flight search. Your answer will be interpreted
+        # and executed by a program, make sure to follow the formatting instructions.
+
+        # # Goal:
+        # {goal}
+
+        # # Action Space
+        # {self.action_space.describe(with_long_description=False, with_examples=True)}
+        # """
 
         messages.append({'role': 'system', 'content': system_msg})
 
