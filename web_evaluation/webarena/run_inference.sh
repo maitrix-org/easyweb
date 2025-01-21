@@ -14,63 +14,101 @@ export HOMEPAGE="$BASE_URL:4399"
 # export AGENT_SELECTION="webarena_noplan"
 # export AGENT_SELECTION="webarena_plan"
 
-cd ../..
-
-# # Fullset, BrowsingAgent + Llama3.1
-# poetry run python web_evaluation/webarena/inference_webarena.py \
-#     --agent-cls BrowsingAgent \
-#     --eval-output-dir web_evaluation/webarena/browsingagent-llama \
-#     --llm-config llm \
-#     --model Meta-Llama-3.1-70B-Instruct \
-#     --max-iterations 15 \
-#     --eval-num-workers 4
-
-# bash ~/reset_webarena_host.sh
-# bash ~/run_webarena_host.sh
-# poetry run python web_evaluation/webarena/inference_webarena.py \
-#     --agent-cls BrowsingAgent \
-#     --eval-output-dir web_evaluation/webarena/browsingagent-rand20-1 \
-#     --llm-config llm \
-#     --model gpt-4o \
-#     --eval-n-limit 20 \
-#     --shuffle \
-#     --seed 25 \
-#     --max-iterations 15 \
-#     --eval-num-workers 1
-
-bash ~/reset_webarena_host.sh
-bash ~/run_webarena_host.sh
-export AGENT_SELECTION="webarena_noplan"
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+cd /home/ubuntu/web-agent-application
 poetry run python web_evaluation/webarena/inference_webarena.py \
-    --agent-cls ModularWebAgent \
-    --eval-output-dir web_evaluation/webarena/results/singlepolicy-rand20-1 \
+    --agent-cls BrowsingAgent \
+    --eval-output-dir web_evaluation/webarena/results/browsingagent-full \
     --llm-config llm \
     --model gpt-4o \
-    --eval-n-limit 20 \
-    --shuffle \
-    --seed 25 \
     --max-iterations 15 \
+    --max-retry 2 \
     --eval-num-workers 4
 
-bash ~/reset_webarena_host.sh
-bash ~/run_webarena_host.sh
-export AGENT_SELECTION="webarena_plan"
-poetry run python web_evaluation/webarena/inference_webarena.py \
-    --agent-cls ModularWebAgent \
-    --eval-output-dir web_evaluation/webarena/results/wmp-rand20-1 \
-    --llm-config llm \
-    --model gpt-4o \
-    --eval-n-limit 20 \
-    --shuffle \
-    --seed 25 \
-    --max-iterations 15 \
-    --eval-num-workers 4
-
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+# cd /home/ubuntu/web-agent-application
 # export AGENT_SELECTION="webarena_noplan"
 # poetry run python web_evaluation/webarena/inference_webarena.py \
 #     --agent-cls ModularWebAgent \
-#     --eval-output-dir web_evaluation/webarena/singlepolicy-llama \
+#     --eval-output-dir web_evaluation/webarena/results/singlepolicy-full \
 #     --llm-config llm \
-#     --model Meta-Llama-3.1-70B-Instruct \
+#     --model gpt-4o \
 #     --max-iterations 15 \
+#     --max-retry 2 \
+#     --eval-num-workers 4
+
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+# cd /home/ubuntu/web-agent-application
+# export AGENT_SELECTION="webarena_plan"
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls ModularWebAgent \
+#     --eval-output-dir web_evaluation/webarena/results/wmp-full \
+#     --llm-config llm \
+#     --model gpt-4o \
+#     --max-iterations 15 \
+#     --max-retry 2 \
+#     --eval-num-workers 4
+
+
+
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+# cd /home/ubuntu/web-agent-application
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls BrowsingAgent \
+#     --eval-output-dir web_evaluation/webarena/results/browsingagent-rand300-7 \
+#     --llm-config llm \
+#     --model gpt-4o \
+#     --eval-n-limit 300 \
+#     --shuffle \
+#     --seed 21 \
+#     --max-iterations 15 \
+#     --max-retry 2 \
+#     --eval-num-workers 4
+
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+# cd /home/ubuntu/web-agent-application
+# export AGENT_SELECTION="webarena_noplan"
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls ModularWebAgent \
+#     --eval-output-dir web_evaluation/webarena/results/singlepolicy-rand300-7 \
+#     --llm-config llm \
+#     --model gpt-4o \
+#     --eval-n-limit 300 \
+#     --shuffle \
+#     --seed 21 \
+#     --max-iterations 15 \
+#     --max-retry 2 \
+#     --eval-num-workers 4
+
+# cd ~
+# bash reset_webarena_host.sh
+# bash run_webarena_host.sh
+# sleep 180
+# cd /home/ubuntu/web-agent-application
+# export AGENT_SELECTION="webarena_plan"
+# poetry run python web_evaluation/webarena/inference_webarena.py \
+#     --agent-cls ModularWebAgent \
+#     --eval-output-dir web_evaluation/webarena/results/wmp-rand300-7 \
+#     --llm-config llm \
+#     --model gpt-4o \
+#     --eval-n-limit 300 \
+#     --shuffle \
+#     --seed 21 \
+#     --max-iterations 15 \
+#     --max-retry 2 \
 #     --eval-num-workers 4

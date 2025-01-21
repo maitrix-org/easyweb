@@ -41,7 +41,7 @@ MAX_ITERATIONS = config.max_iterations
 MAX_CHARS = config.llm.max_chars
 MAX_BUDGET_PER_TASK = config.max_budget_per_task
 
-executor = ThreadPoolExecutor(max_workers=10)
+executor = ThreadPoolExecutor(max_workers=20)
 
 
 class AgentController:

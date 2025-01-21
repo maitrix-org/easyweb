@@ -319,19 +319,19 @@ and only include the direct answer to the question given in the user instruction
 """
 
 actor_prompt_template_with_memory_with_update = """\
-{memory}
+{{memory}}
 
 # Observation:
-{observation}
+{{observation}}
 
 # Current State:
-{state}
+{{state}}
 
 # Memory Update:
-{memory_update}
+{{memory_update}}
 
 # Current Intent:
-{intent}
+{{intent}}
 
 # Action:
 Choose an API call that will carry out the intent when executed in the webpage. \
@@ -339,6 +339,7 @@ Use only one action at a time. You must not enclose bid inputs in [brackets] but
 Interact only with elements in the current step observation. Your response \
 will be executed as a Python function call, so ensure it adheres to the format \
 and argument data type specifications defined in the action space.
+{concise_instruction}
 
 Wrap your response in the tag <action> and </action>.\
 """

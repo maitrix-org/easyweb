@@ -121,4 +121,4 @@ with gr.Blocks() as demo:
 if __name__ == '__main__':
     # log_list = list(reversed(sorted(glob('./frontend_logs/*.json'))))
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=True)

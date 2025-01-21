@@ -59,11 +59,11 @@ AGENT_LIBRARY = {
     'webarena': dict_update(default_config, webarena_config),
     'webarena_noplan': dict_update(
         dict_update(default_config, webarena_config),
-        {'use_world_model_planning': False},
+        {'agent_name': 'Autoregressive Agent', 'use_world_model_planning': False},
     ),
     'webarena_plan': dict_update(
         dict_update(default_config, webarena_config),
-        {'use_world_model_planning': True},
+        {'agent_name': 'World Model Agent', 'use_world_model_planning': True},
     ),
 }
 
@@ -124,6 +124,7 @@ class ModularWebAgent(Agent):
             agent_description=agent_config['agent_description'],
             observation_space=self.observation_space,
             action_space=self.action_space,
+            with_datetime=agent_config['identity_with_datetime'],
         )
 
         # Encoder
@@ -276,31 +277,31 @@ class ModularWebAgent(Agent):
         intent = self.planner(state, self.memory, **kwargs)['intent']
         self.logger.info(f'*Intent*: {intent}')
 
-        action = self.actor(obs_txt, state, self.memory, intent, **kwargs)['action']
-        self.logger.info(f'*Action*: {action}')
-
         if self.use_state_memory_encoder:
             step = {
                 'observation': observation,
                 'state': memory_update,
                 'state_original': state,
                 'intent': intent,
-                'action': action,
             }
         else:
             step = {
                 'observation': observation,
                 'state': state,
                 'intent': intent,
-                'action': action,
             }
         self.memory.update(**step)
         step.update(self.memory.current_step)
+        memory_update = self.memory.current_step['memory_update']
         if self.memory_type == 'step_prompted':
-            self.logger.info(
-                f"*Memory update*: {self.memory.current_step['memory_update']}"
-            )
+            self.logger.info(f'*Memory update*: {memory_update}')
         self.memory.step()
+
+        action = self.actor(
+            obs_txt, state, self.memory, intent, memory_update=memory_update, **kwargs
+        )['action']
+        self.logger.info(f'*Action*: {action}')
+        step['action'] = action
 
         if not action.startswith('scroll') and action == self.last_action:
             self.num_repeats += 1
