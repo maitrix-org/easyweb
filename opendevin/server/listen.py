@@ -12,7 +12,6 @@ from fastapi import FastAPI, Request, Response, UploadFile, WebSocket, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
-from fastapi.staticfiles import StaticFiles
 
 import agenthub  # noqa F401 (we import this to get the agents registered)
 from opendevin.controller.agent import Agent
@@ -374,4 +373,4 @@ async def appconfig_defaults():
     return config.defaults_dict
 
 
-app.mount('/', StaticFiles(directory='./frontend/dist', html=True), name='dist')
+# app.mount('/', StaticFiles(directory='./frontend/dist', html=True), name='dist')
