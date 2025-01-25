@@ -27,7 +27,6 @@ parser.add_argument(
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
-
 default_api_key = os.environ.get('OPENAI_API_KEY')
 # LINE_LEN = 100
 # LABEL_LEN = 20
@@ -61,8 +60,6 @@ class BackendManager:
 
 
 backend_manager = BackendManager(backend_ports)
-
-
 # class Node:
 #     def __init__(self, state, in_action, state_info, status, reward, parent):
 #         self.state = state
@@ -1014,8 +1011,11 @@ def clear_page(browser_history, session, feedback):
     browser_history = browser_history[:1]
     current_screenshot, current_url = browser_history[-1]
 
-    session._reset()
-    status = get_status(session.agent_state)
+    if session is not None:
+        session._reset()
+        status = get_status(session.agent_state)
+    else:
+        status = get_status(None)
     # pause_resume = gr.Button("Pause", interactive=False)
     return (
         None,
@@ -1140,6 +1140,8 @@ def display_history(history, messages_history, action_messages):
 # replaced previous function called user() which basically processes the user input into the gr.Chatbot class
 def process_user_message(user_message, history):
     # return '', history + [[user_message, None]]
+    if not user_message.strip():
+        return '', history
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
     return '', history
@@ -1176,10 +1178,16 @@ def toggle_options(visible, ifClick):
     )
 
 
+# if __name__ == '__main__':
+#     # demo.queue(default_concurrency_limit=5)
+#     demo.queue()
+#     demo.launch(share=True)
+
+
 current_dir = os.path.dirname(__file__)
 print(os.path.dirname(__file__))
 
-default_port = 5000
+# default_port = 5000
 # with open(os.path.join(current_dir, 'Makefile')) as f:
 #     while True:
 #         line = f.readline()
@@ -1221,7 +1229,6 @@ current_dir = os.path.dirname(__file__)
 
 with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
     default_api_key = fr.read().strip()
-
 
 # Define the custom HTML for the 5-star rating system
 html_content = """
@@ -1293,7 +1300,6 @@ function(){
 }
 """
 
-
 # make this in python for the clear button
 hide_stars = """
 function(){
@@ -1316,13 +1322,11 @@ css = """
 }
 """
 
-
-def vote(upvote):
-    if upvote:
-        print('Upvoted!')
-    else:
-        print('Downvoted.')
-
+# def vote(upvote):
+#     if upvote:
+#         print('Upvoted!')
+#     else:
+#         print('Downvoted.')
 
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
@@ -1334,8 +1338,8 @@ with gr.Blocks(css=css) as demo:
     # header = gr.Markdown('''## How it works:''')
     tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
                             - 💬 **Ask the Agent** to perform advanced web-related tasks. **For example:**
-                              - "What were box office values of the Star Wars films in the prequel and sequel trilogies?"
-                              - "Can you search for a round-trip flight from Los Angeles to Tokyo in business class?"
+                            - "What were box office values of the Star Wars films in the prequel and sequel trilogies?"
+                            - "Can you search for a round-trip flight from Los Angeles to Tokyo in business class?"
                             - ✍️ **Share your feedback** using the form below once the Agent completes its task!""")
 
     privacy_title = gr.Markdown(
@@ -1598,6 +1602,7 @@ with gr.Blocks(css=css) as demo:
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False
     )
+
 
 if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
