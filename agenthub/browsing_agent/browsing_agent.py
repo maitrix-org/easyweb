@@ -253,7 +253,7 @@ In order to accomplish my goal I need to send the information asked back to the 
         if not action_resp.endswith('```'):
             action_resp = action_resp + ')```'
 
-        time.sleep(random.random() * 5)
+        time.sleep(5 + random.random() * 5)
 
         # logger.info(prompt)
         logger.info(action_resp)

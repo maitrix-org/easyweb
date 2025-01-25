@@ -33,9 +33,13 @@ class ReasonerWebAgent(Agent):
         super().__init__(llm)
         if 'Meta-Llama-3.1-70B-Instruct' in llm.model_name:
             self.config_name = 'opendevin_llama'
+        elif 'gpt-4o-mini' in llm.model_name:
+            self.config_name = 'opendevin_mini_world_model'
         else:
             # self.config_name = 'opendevin'
             self.config_name = 'opendevin_world_model'
+
+        logger.info(f'Using {self.config_name}')
         self.agent = ReasonerAgent(llm, config_name=self.config_name, logger=logger)
         self.reset()
 
