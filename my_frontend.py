@@ -77,7 +77,7 @@ backend_manager = BackendManager(backend_ports)
 #         self.summary = summary
 
 
-class OpenDevinSession:
+class FastWebSession:
     def __init__(
         self,
         agent,
@@ -98,7 +98,7 @@ class OpenDevinSession:
         self._reset()
 
     def initialize(self, as_generator=False):
-        # create an output path that is global to all functions called within the OpenDevinSession class, so that it can be referred back to later
+        # create an output path that is global to all functions called within the FastWebSession class, so that it can be referred back to later
         # this code is copied from _close() function
         now = time.time()
         os.makedirs('frontend_logs', exist_ok=True)
@@ -760,7 +760,7 @@ def get_messages(
 
     # Initialize a new session if it doesn't exist
     if session is None or session.agent_state in ['finished', 'paused']:
-        new_session = OpenDevinSession(
+        new_session = FastWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
             model=model_selection,
@@ -1331,7 +1331,7 @@ css = """
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
     # session = gr.State(
-    #     OpenDevinSession(agent=default_agent, port=default_port, model=default_model)
+    #     FastWebSession(agent=default_agent, port=default_port, model=default_model)
     # )
     session = gr.State(None)
     title = gr.Markdown('# 🚀 OpenQ: An Open-Source LLM-Powered Web Agent')
