@@ -1300,6 +1300,7 @@ function(){
 }
 """
 # random css for other formatting and whatnot
+# background-color: #f4f4f7;
 css = """
 #submit-button{
     width: 200px;
@@ -1308,7 +1309,6 @@ css = """
     padding-left: 20px;
     max-width: 230px;
     padding-bottom: 20px;
-    background-color: #f4f4f7;
 }
 #confirmation-text{
     margin-top: 8px;
@@ -1346,16 +1346,16 @@ with gr.Blocks(css=css) as demo:
                 with gr.Row():
                     agent_selection = gr.Dropdown(
                         [
-                            'DummyWebAgent',
+                            # 'DummyWebAgent',
                             'BrowsingAgent',
-                            'WorldModelAgent',
-                            'NewWorldModelAgent',
-                            'FewShotWorldModelAgent',
-                            'OnepassAgent',
-                            'PolicyAgent',
-                            'WebPlanningAgent',
-                            'AgentModelAgent',
-                            'ModularWebAgent',
+                            # 'WorldModelAgent',
+                            # 'NewWorldModelAgent',
+                            # 'FewShotWorldModelAgent',
+                            # 'OnepassAgent',
+                            # 'PolicyAgent',
+                            # 'WebPlanningAgent',
+                            # 'AgentModelAgent',
+                            # 'ModularWebAgent',
                             'ReasonerWebAgent',
                         ],
                         value=default_agent,
@@ -1568,7 +1568,9 @@ with gr.Blocks(css=css) as demo:
                 stars,
                 options_visible,
                 # upvote,
-                # downvote
+                # downvote,
+                submit,
+                stop,
             ],
             concurrency_limit=args.num_backends,
         )

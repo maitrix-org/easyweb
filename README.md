@@ -17,128 +17,78 @@
 *** https://www.markdownguide.org/basic-syntax/#reference-style-links
 -->
 
-<div align="center">
-  <a href="https://github.com/OpenDevin/OpenDevin/graphs/contributors"><img src="https://img.shields.io/github/contributors/opendevin/opendevin?style=for-the-badge&color=blue" alt="Contributors"></a>
-  <a href="https://github.com/OpenDevin/OpenDevin/network/members"><img src="https://img.shields.io/github/forks/opendevin/opendevin?style=for-the-badge&color=blue" alt="Forks"></a>
-  <a href="https://github.com/OpenDevin/OpenDevin/stargazers"><img src="https://img.shields.io/github/stars/opendevin/opendevin?style=for-the-badge&color=blue" alt="Stargazers"></a>
-  <a href="https://github.com/OpenDevin/OpenDevin/issues"><img src="https://img.shields.io/github/issues/opendevin/opendevin?style=for-the-badge&color=blue" alt="Issues"></a>
-  <a href="https://github.com/OpenDevin/OpenDevin/blob/main/LICENSE"><img src="https://img.shields.io/github/license/opendevin/opendevin?style=for-the-badge&color=blue" alt="MIT License"></a>
-  <br/>
-  <a href="https://join.slack.com/t/opendevin/shared_invite/zt-2i1iqdag6-bVmvamiPA9EZUu7oCO6KhA"><img src="https://img.shields.io/badge/Slack-Join%20Us-red?logo=slack&logoColor=white&style=for-the-badge" alt="Join our Slack community"></a>
-  <a href="https://discord.gg/ESHStjSjD4"><img src="https://img.shields.io/badge/Discord-Join%20Us-purple?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a>
-  <br/>
-  <a href="https://huggingface.co/spaces/OpenDevin/evaluation"><img src="https://img.shields.io/badge/SWE--bench%20Lite-25.0%25-green?style=for-the-badge" alt="SWE-bench "></a>
-  <a href="https://codecov.io/github/opendevin/opendevin?branch=main"><img alt="CodeCov" src="https://img.shields.io/codecov/c/github/opendevin/opendevin?style=for-the-badge"></a>
-</div>
-
 <!-- PROJECT LOGO -->
 <div align="center">
-  <img src="./docs/static/img/logo.png" alt="Logo" width="200" height="200">
-  <h1 align="center">OpenDevin: Code Less, Make More</h1>
-  <a href="https://opendevin.github.io/OpenDevin/"><img src="https://img.shields.io/badge/Documentation-OpenDevin-blue?logo=googledocs&logoColor=white&style=for-the-badge" alt="Check out the documentation"></a>
+  <h1 align="center">FastAgent, Open Source LLM Web Agent</h1>
+  <!-- Change based on updated links or names in the future -->
+  <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
 </div>
-<hr>
+<!-- <hr> -->
+Introducing FastAgent, an open-source LLM text-based all-purpose web agent. Choose an agent, choose a backend LLM, and let the agent browse the web to find the answers.\
+This project was forked from <a href="https://github.com/AI-App/OpenDevin.OpenDevin">OpenDevin</a>, but has been modified since then.
 
-Welcome to OpenDevin, a platform for autonomous software engineers, powered by AI and LLMs.
+<!--Update if repository changes name or location-->
+<!--TODO: change the video link-->
+![Demo Video](https://raw.githubusercontent.com/mingkaid/web-agent-application/demo_videos/video.mov) 
 
-OpenDevin agents collaborate with human developers to write code, fix bugs, and ship features.
+## Getting Started
 
-![App screenshot](./docs/static/img/screenshot.png)
+Firstly, to run anything, you need to first install Docker. You must be using Linux, Mac OS, or WSL on Windows.
 
-## ⚡ Getting Started
-The easiest way to run OpenDevin is inside a Docker container. It works best with the most recent version of Docker, `26.0.0`.
-You must be using Linux, Mac OS, or WSL on Windows.
+Then, **clone** this repo:
 
-To start OpenDevin in a docker container, run the following commands in your terminal:
-
-> [!WARNING]
-> When you run the following command, files in `./workspace` may be modified or deleted.
-
-```bash
-OPENDEVIN_WORKSPACE=$(pwd)/workspace
-docker run -it \
-    --pull=always \
-    -e SANDBOX_USER_ID=$(id -u) \
-    -e PERSIST_SANDBOX="true" \
-    -e SSH_PASSWORD="make something up here" \
-    -e WORKSPACE_MOUNT_PATH=$OPENDEVIN_WORKSPACE \
-    -v $OPENDEVIN_WORKSPACE:/opt/workspace_base \
-    -v /var/run/docker.sock:/var/run/docker.sock \
-    -p 3000:3000 \
-    --add-host host.docker.internal:host-gateway \
-    --name opendevin-app-$(date +%Y%m%d%H%M%S) \
-    ghcr.io/opendevin/opendevin:0.6
+```
+git clone https://github.com/mingkaid/web-agent-application.git
 ```
 
-You'll find OpenDevin running at [http://localhost:3000](http://localhost:3000) with access to `./workspace`. To have OpenDevin operate on your code, place it in `./workspace`.
+Then, use poetry to **install** the necessary dependencies:
 
-OpenDevin will only have access to this workspace folder. The rest of your system will not be affected as it runs in a secured docker sandbox.
+```
+poetry install
+```
 
-## 🚀 Documentation
+Start the **backend**:
 
-To learn more about the project, and for tips on using OpenDevin,
-**check out our [documentation](https://opendevin.github.io/OpenDevin/)**.
+```
+make start-backend
+```
 
-There you'll find resources on how to use different LLM providers (like ollama and Anthropic's Claude),
-troubleshooting resources, and advanced configuration options.
+Start the **frontend**:
 
-## 🤝 How to Contribute
+```
+python frontend.py
+```
 
-OpenDevin is a community-driven project, and we welcome contributions from everyone.
-Whether you're a developer, a researcher, or simply enthusiastic about advancing the field of
-software engineering with AI, there are many ways to get involved:
+Once all of this is launched, navigate to:
 
-- **Code Contributions:** Help us develop new agents, core functionality, the frontend and other interfaces, or sandboxing solutions.
-- **Research and Evaluation:** Contribute to our understanding of LLMs in software engineering, participate in evaluating the models, or suggest improvements.
-- **Feedback and Testing:** Use the OpenDevin toolset, report bugs, suggest features, or provide feedback on usability.
-
-For details, please check [CONTRIBUTING.md](./CONTRIBUTING.md).
-
-## 🤖 Join Our Community
-
-Whether you're a developer, a researcher, or simply enthusiastic about OpenDevin, we'd love to have you in our community.
-Let's make software engineering better together!
-
-- [Slack workspace](https://join.slack.com/t/opendevin/shared_invite/zt-2jsrl32uf-fTeeFjNyNYxqSZt5NPY3fA) - Here we talk about research, architecture, and future development.
-- [Discord server](https://discord.gg/ESHStjSjD4) - This is a community-run server for general discussion, questions, and feedback.
-
-## 📈 Progress
-<p align="center">
-    <a href="https://www.swebench.com/lite.html">
-        <img src="/docs/static/img/results.png" alt="SWE-Bench Lite Score" width="500" height="auto">
-    </a>
-</p>
-
-<p align="center">
-  <a href="https://star-history.com/#OpenDevin/OpenDevin&Date">
-    <img src="https://api.star-history.com/svg?repos=OpenDevin/OpenDevin&type=Date" width="500" alt="Star History Chart">
-  </a>
-</p>
-
-## 📜 License
+```
+localhost:7860
+```
 
 Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
 
-[contributors-shield]: https://img.shields.io/github/contributors/opendevin/opendevin?style=for-the-badge
-[contributors-url]: https://github.com/OpenDevin/OpenDevin/graphs/contributors
-[forks-shield]: https://img.shields.io/github/forks/opendevin/opendevin?style=for-the-badge
-[forks-url]: https://github.com/OpenDevin/OpenDevin/network/members
-[stars-shield]: https://img.shields.io/github/stars/opendevin/opendevin?style=for-the-badge
-[stars-url]: https://github.com/OpenDevin/OpenDevin/stargazers
-[issues-shield]: https://img.shields.io/github/issues/opendevin/opendevin?style=for-the-badge
-[issues-url]: https://github.com/OpenDevin/OpenDevin/issues
-[license-shield]: https://img.shields.io/github/license/opendevin/opendevin?style=for-the-badge
-[license-url]: https://github.com/OpenDevin/OpenDevin/blob/main/LICENSE
+## Join The Community
 
-## 📚 Cite
+We welcome you to join our [Discord](https://discord.gg/NdQD6eJzch) server! Feel free to contribute the following:
 
+**Code Contributions:** Collaborate on building new agents, enhancing core features, improving the frontend and other interfaces, or creating sandboxing solutions.\
+**Research and Evaluation:** Advance our understanding of LLMs in software engineering, assist in model evaluation, or propose enhancements.\
+**Feedback and Testing:** Test FastAgent, identify bugs, recommend features, and share insights on usability.
+
+## Acknowledgments
+We would like to thank <a href="https://github.com/AI-App/OpenDevin.OpenDevin">OpenDevin</a> for the base code for this project. 
+<!--TODO: Anything else to add?-->
+
+## Cite
+
+<!--TODO: Should edit this if github changes-->
 ```
 @misc{opendevin2024,
-  author       = {{OpenDevin Team}},
-  title        = {{OpenDevin: An Open Platform for AI Software Developers as Generalist Agents}},
-  year         = {2024},
+  author       = {{FastAgent Team}},
+  title        = {{FastAgent: an Open-Source LLM Web Agent}},
+  year         = {2025},
   version      = {v1.0},
-  howpublished = {\url{https://github.com/OpenDevin/OpenDevin}},
+  howpublished = {\url{https://github.com/mingkaid/web-agent-application}},
   note         = {Accessed: ENTER THE DATE YOU ACCESSED THE PROJECT}
 }
 ```
