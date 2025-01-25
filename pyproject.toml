@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "opendevin"
+name = "fast-web"
 version = "0.1.0"
 description = "OpenDevin: Code Less, Make More"
 authors = ["OpenDevin"]

@@ -1,4 +1,4 @@
-from opendevin.controller.agent import Agent
+from fast_web.controller.agent import Agent
 
 from .reasoner_web_agent import ReasonerWebAgent
 

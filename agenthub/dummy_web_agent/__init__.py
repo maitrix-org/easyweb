@@ -1,4 +1,4 @@
-from opendevin.controller.agent import Agent
+from fast_web.controller.agent import Agent
 
 from .dummy_web_agent import DummyWebAgent
 

@@ -4,20 +4,20 @@ from typing import Any, Dict, List, Optional
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 
-from opendevin.controller.agent import Agent
-from opendevin.controller.state.state import State
-from opendevin.core.logger import opendevin_logger as logger
-from opendevin.events.action import (
+from fast_web.controller.agent import Agent
+from fast_web.controller.state.state import State
+from fast_web.core.logger import fast_web_logger as logger
+from fast_web.events.action import (
     Action,
     AgentFinishAction,
     BrowseInteractiveAction,
     MessageAction,
 )
-from opendevin.llm.llm import LLM
-from opendevin.runtime.plugins import (
+from fast_web.llm.llm import LLM
+from fast_web.runtime.plugins import (
     PluginRequirement,
 )
-from opendevin.runtime.tools import RuntimeTool
+from fast_web.runtime.tools import RuntimeTool
 
 USE_NAV = (
     os.environ.get('USE_NAV', 'true') == 'true'
