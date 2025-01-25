@@ -1,6 +1,6 @@
 from typing import Optional
 
-from agenthub.codeact_agent.codeact_agent import CodeActAgent
+# from agenthub.codeact_agent.codeact_agent import CodeActAgent
 from opendevin.controller import AgentController
 from opendevin.controller.agent import Agent
 from opendevin.controller.state.state import State
@@ -9,7 +9,6 @@ from opendevin.core.logger import opendevin_logger as logger
 from opendevin.core.schema import ConfigType
 from opendevin.events.stream import EventStream
 from opendevin.llm.llm import LLM
-from opendevin.runtime import DockerSSHBox
 from opendevin.runtime.e2b.runtime import E2BRuntime
 from opendevin.runtime.runtime import Runtime
 from opendevin.runtime.server.runtime import ServerRuntime
@@ -106,11 +105,11 @@ class AgentSession:
 
         max_iterations = args.get(ConfigType.MAX_ITERATIONS, config.max_iterations)
         max_chars = args.get(ConfigType.MAX_CHARS, config.llm.max_chars)
-        if isinstance(agent, CodeActAgent):
-            if not self.runtime or not isinstance(self.runtime.sandbox, DockerSSHBox):
-                logger.warning(
-                    'CodeActAgent requires DockerSSHBox as sandbox! Using other sandbox that are not stateful (LocalBox, DockerExecBox) will not work properly.'
-                )
+        # if isinstance(agent, CodeActAgent):
+        #     if not self.runtime or not isinstance(self.runtime.sandbox, DockerSSHBox):
+        #         logger.warning(
+        #             'CodeActAgent requires DockerSSHBox as sandbox! Using other sandbox that are not stateful (LocalBox, DockerExecBox) will not work properly.'
+        #         )
         self.runtime.init_sandbox_plugins(agent.sandbox_plugins)
         self.runtime.init_runtime_tools(agent.runtime_tools)
 
