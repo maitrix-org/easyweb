@@ -1438,17 +1438,20 @@ with gr.Blocks(css=css) as demo:
     #     FastWebSession(agent=default_agent, port=default_port, model=default_model)
     # )
     session = gr.State(None)
-    title = gr.Markdown('# 🚀 OpenQ: An Open-Source LLM-Powered Web Agent')
+    title = gr.Markdown(
+        '# 🚀 Fast Web: Open Platform for Building and Serving UI Agents'
+    )
     # header = gr.Markdown('''## How it works:''')
     tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
-                            - 💬 **Ask the Agent** to perform advanced web-related tasks. **For example:**
-                            - "What were box office values of the Star Wars films in the prequel and sequel trilogies?"
-                            - "Can you search for a round-trip flight from Los Angeles to Tokyo in business class?"
-                            - ✍️ **Share your feedback** using the form below once the Agent completes its task!""")
+                            - 💬 **Ask the Agent** to perform advanced web-related tasks, **for example:**
+                                - "Can you search for a round-trip flight from Chicago to Dubai in business class?"
+                                - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+                                - "Find an article from Times of San Diego about Trump's inauguration and summarize the main points for me."
+                            - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
+                            - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
+                            - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
+                            - Currently, the agent will only be able to see **up to the latest message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**""")
 
-    privacy_title = gr.Markdown(
-        """❗️**Important: Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.**"""
-    )
     with gr.Row(equal_height=False):
         with gr.Column(scale=2):
             with gr.Group():
