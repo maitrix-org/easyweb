@@ -27,9 +27,9 @@
 <!-- <hr> -->
 Fast Web is an open platform for building and serving AI agents that interact with web browsers.
 
-**Using a web agent has never been easier**: Just open Fast Web's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
+**Using a web agent has never been easier:** Just open Fast Web's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
 
-**Deploy once, use everywhere**: Fast Web comes with a full package for deploying web agents as a service. Built on [OpenHands](https://github.com/All-Hands-AI/OpenHands), Fast Web introduces a parallelized architecture capable of fulfilling multiple user requests simultaneously, and supports toggling your favorite agent and LLM available as APIs.
+**Deploy once, use everywhere:** Fast Web comes with a full package for deploying web agents as a service. Built on [OpenHands](https://github.com/All-Hands-AI/OpenHands), Fast Web introduces a parallelized architecture capable of fulfilling multiple user requests simultaneously, and supports toggling your favorite agent and LLM available as APIs.
 
 <!--Update if repository changes name or location-->
 <!--TODO: change the video link-->
