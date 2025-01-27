@@ -714,30 +714,6 @@ def get_action_history_markdown(action_history):
     return text
 
 
-#     return (
-#         None,
-#         current_screenshot,
-#         current_url,
-#         [],
-#         browser_history,
-#         session,
-#         status,
-#         clear,
-#         go.Figure(),
-#         'No Action Taken Yet',
-#     )
-# chatbot,
-# screenshot,
-# url,
-# action_messages,
-# browser_history,
-# session,
-# status,
-# clear,
-# plot,
-# action_history,
-
-
 def get_messages(
     chat_history,
     action_messages,
@@ -933,27 +909,113 @@ def get_messages(
             )
             # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
             # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
-            if session.agent_state == 'finished':
-                # add the last output message once it is finished
-                # find the last message
-                if len(message_list) >= 3:
-                    if message_list[-3] != '':
-                        chat_history.append(
-                            gr.ChatMessage(role='assistant', content=message_list[-3])
+            if message.get('action', '') in ['message', 'finish']:
+                # chat_history.append(
+                #     gr.ChatMessage(role='assistant', content=message.get('message', '(Empty Message)'))
+                # )
+                chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                assistant_message = message.get('message', '(Empty Message)')
+                assistant_message_chars = []
+                for i, char in enumerate(assistant_message):
+                    assistant_message_chars.append(char)
+                    updated_message = ''.join(assistant_message_chars)
+                    if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
+                        chat_history[-1] = gr.ChatMessage(
+                            role='assistant', content=updated_message
                         )
-                    if message_list[-2] != '':
-                        chat_history.append(
-                            gr.ChatMessage(role='assistant', content=message_list[-2])
+                        time.sleep(0.01)
+
+                        yield (
+                            chat_history,
+                            screenshot,
+                            url,
+                            action_messages,
+                            browser_history,
+                            session,
+                            status,
+                            clear,
+                            feedback,
+                            stars,
+                            options_visible,
+                            # upvote,
+                            # downvote,
+                            submit,
+                            stop,
                         )
-                    if message_list[-2] == '' and message_list[-3] == '':
-                        chat_history.append(
-                            gr.ChatMessage(
-                                role='assistant',
-                                content='Task Complete! How can I assist you next?',
+            elif (
+                session.agent == 'ReasonerWebAgent'
+                and message.get('action', '') == 'browse_interactive'
+                and message.get('args', {}).get('thought', '')
+            ):
+                full_output_dict = json.loads(message['args']['thought'])
+                plan = full_output_dict.get('plan')
+                if plan:
+                    # chat_history.append(
+                    #     gr.ChatMessage(role='assistant', content=plan)
+                    # )
+                    chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                    assistant_message = plan
+                    assistant_message_chars = []
+                    for i, char in enumerate(assistant_message):
+                        assistant_message_chars.append(char)
+                        updated_message = ''.join(assistant_message_chars)
+                        if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
+                            chat_history[-1] = gr.ChatMessage(
+                                role='assistant', content=updated_message
                             )
-                        )
+                            time.sleep(0.01)
+
+                            yield (
+                                chat_history,
+                                screenshot,
+                                url,
+                                action_messages,
+                                browser_history,
+                                session,
+                                status,
+                                clear,
+                                feedback,
+                                stars,
+                                options_visible,
+                                # upvote,
+                                # downvote,
+                                submit,
+                                stop,
+                            )
+            elif (
+                session.agent == 'BrowsingAgent'
+                and message.get('action', '') == 'browse_interactive'
+                and message.get('args', {}).get('thought', '')
+            ):
+                thought = message['args']['thought']
+                chat_history.append(gr.ChatMessage(role='assistant', content=thought))
+            # Stream End
+            # if user_message:
+            #     chat_history.append(gr.ChatMessage(role='user', content=user_message))
+            if session.agent_state == 'finished':  # Stream End
+                # Add the last output message once it is finished
+                # if len(message_list) >= 3:
+                #     if message_list[-3] != '':
+                #         chat_history.append(
+                #             gr.ChatMessage(role='assistant', content=message_list[-3])
+                #         )
+                #     if message_list[-2] != '':
+                #         chat_history.append(
+                #             gr.ChatMessage(role='assistant', content=message_list[-2])
+                #         )
+                #     if message_list[-2] == '' and message_list[-3] == '':
+                #         chat_history.append(
+                #             gr.ChatMessage(
+                #                 role='assistant',
+                #                 content='Task Complete! How can I assist you next?',
+                #             )
+                #         )
+
+                # Stream End: Handle the end-of-session UI updates
                 stars = gr.Textbox(elem_id='dummy_textbox', value=0)
-                session.save_log()  # add if finished if we don't want to save log on stop
+                session.save_log()
+                # stars = gr.Textbox(elem_id='dummy_textbox', value=0)
+                # session.save_log()
             status = get_status(session.agent_state)
             while len(session.action_messages) > len(action_messages):
                 diff = len(session.action_messages) - len(action_messages)
@@ -1079,7 +1141,7 @@ def display_history(history, messages_history, action_messages):
         # try and get the title, if it doesn't work, just use the previous message
         try:
             url = message
-            print('URL', url)
+            # print('URL', url)
             response = requests.get(url)
             soup = BeautifulSoup(response.content, 'html.parser')
             title = soup.title.string
@@ -1101,37 +1163,79 @@ def display_history(history, messages_history, action_messages):
     if 'goto' in action_messages[-1]:
         history_title = 'Browsing ' + message + '...'
 
-    if not isinstance(history[-1], dict):
-        if history[-1].metadata is None or history[-1].role != 'assistant':
-            history.append(
-                gr.ChatMessage(
-                    role='assistant',
-                    content=(links_string),
-                    metadata={'title': history_title},
-                )
-            )
-        else:
-            history[-1] = gr.ChatMessage(
-                role='assistant',
-                content=(links_string),
-                metadata={'title': history_title},
-            )
-    # this else exists just in case it is a dictionary:
+    # The links_string should be appended to the last message that does not come from the assistant
+    # If something like the links_string already exists, replace it with the new one
+    # Otherwise, append it to history
+    last_non_assistant_message_idx = 0
+    for i, chat_message in enumerate(history):
+        if not isinstance(chat_message, dict) and chat_message.role != 'assistant':
+            last_non_assistant_message_idx = i
+        elif isinstance(chat_message, dict) and chat_message['role'] != 'assistant':
+            last_non_assistant_message_idx = i
+
+    # links_string_idx = last_non_assistant_message_idx + 1
+    links_string_idx = last_non_assistant_message_idx + 1
+    # after_last_nonassistant_message_exists and this message is already links_string
+    # if links_string_idx < len(history):
+    #     print(history[links_string_idx])
+    if links_string_idx < len(history) and (
+        (
+            isinstance(history[links_string_idx], dict)
+            and isinstance(history[links_string_idx]['metadata'], dict)
+            and history[links_string_idx]['metadata'].get('title')
+        )
+        or (
+            not isinstance(history[links_string_idx], dict)
+            and isinstance(history[links_string_idx].metadata, dict)
+            and history[links_string_idx].metadata.get('title')
+        )
+    ):
+        history[links_string_idx] = gr.ChatMessage(
+            role='assistant',
+            content=(links_string),
+            metadata={'title': history_title},
+        )
     else:
-        if history[-1]['metadata'] is None or history[-1]['role'] != 'assistant':
-            history.append(
-                gr.ChatMessage(
-                    role='assistant',
-                    content=(links_string),
-                    metadata={'title': history_title},
-                )
-            )
-        else:
-            history[-1] = gr.ChatMessage(
+        history.insert(
+            links_string_idx,
+            gr.ChatMessage(
                 role='assistant',
                 content=(links_string),
                 metadata={'title': history_title},
-            )
+            ),
+        )
+
+    # if not isinstance(history[-1], dict):
+    #     if history[-1].metadata is None or history[-1].role != 'assistant':
+    #         history.append(
+    #             gr.ChatMessage(
+    #                 role='assistant',
+    #                 content=(links_string),
+    #                 metadata={'title': history_title},
+    #             )
+    #         )
+    #     else:
+    #         history[-1] = gr.ChatMessage(
+    #             role='assistant',
+    #             content=(links_string),
+    #             metadata={'title': history_title},
+    #         )
+    # # this else exists just in case it is a dictionary:
+    # else:
+    #     if history[-1]['metadata'] is None or history[-1]['role'] != 'assistant':
+    #         history.append(
+    #             gr.ChatMessage(
+    #                 role='assistant',
+    #                 content=(links_string),
+    #                 metadata={'title': history_title},
+    #             )
+    #         )
+    #     else:
+    #         history[-1] = gr.ChatMessage(
+    #             role='assistant',
+    #             content=(links_string),
+    #             metadata={'title': history_title},
+    #         )
 
     # return history returns the chatbot itself
     return history

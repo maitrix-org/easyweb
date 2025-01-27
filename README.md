@@ -19,6 +19,7 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
+  <img src="./Fast-web Icon.png" alt="FastAgent Logo" width="200">
   <h1 align="center">FastAgent, Open Source LLM Web Agent</h1>
   <!-- Change based on updated links or names in the future -->
   <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
@@ -29,7 +30,7 @@ This project was forked from <a href="https://github.com/AI-App/OpenDevin.OpenDe
 
 <!--Update if repository changes name or location-->
 <!--TODO: change the video link-->
-![Demo Video](https://raw.githubusercontent.com/mingkaid/web-agent-application/demo_videos/video.mov) 
+![Demo Video](https://raw.githubusercontent.com/mingkaid/web-agent-application/demo_videos/video.mov)
 
 ## Getting Started
 
@@ -76,7 +77,7 @@ We welcome you to join our [Discord](https://discord.gg/NdQD6eJzch) server! Feel
 **Feedback and Testing:** Test FastAgent, identify bugs, recommend features, and share insights on usability.
 
 ## Acknowledgments
-We would like to thank <a href="https://github.com/AI-App/OpenDevin.OpenDevin">OpenDevin</a> for the base code for this project. 
+We would like to thank <a href="https://github.com/AI-App/OpenDevin.OpenDevin">OpenDevin</a> for the base code for this project.
 <!--TODO: Anything else to add?-->
 
 ## Cite
