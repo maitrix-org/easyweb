@@ -42,7 +42,7 @@ Fast Web is an open platform for building and serving AI agents that interact wi
 https://github.com/user-attachments/assets/10f9c919-38c7-47f2-8b36-e27bce95dfed
 
 <details>
-<summary>Expand to See More Demos</summary>
+<summary>Expand to see more demos</summary>
 
 **Task:** Find a round-trip ticket from Chicago to Dubai next month, traveling in economy class, with non-stop flights only, departing after 8 AM, and returning within two weeks.
 
@@ -65,8 +65,6 @@ https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
 
 ### 1. Requirements
 
-<details>
-<summary>Expand to See Details</summary>
 
 * Linux, Mac OS, or [WSL on Windows](https://learn.microsoft.com/en-us/windows/wsl/install)
 * [Docker](https://docs.docker.com/engine/install/) (For those on MacOS, make sure to allow the default Docker socket to be used from advanced settings!)
@@ -75,6 +73,9 @@ https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
 * [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) >= 1.8
 
 Make sure you have all these dependencies installed before moving on to `make build`.
+
+<details>
+<summary>Expand for setup without sudo access</summary>
 
 #### Develop without sudo access
 If you want to develop without system admin/sudo access to upgrade/install `Python` and/or `NodeJs`, you can use `conda` or `mamba` to manage the packages for you:
@@ -113,7 +114,7 @@ make run
 ### 5. Individual Server Startup and Scaling Service
 
 <details>
-<summary>Expand to See Details</summary>
+<summary>Expand to see details for scaling service</summary>
 
 - **Start the Backend Server:** If you prefer, you can start the backend server independently to focus on backend-related tasks or configurations.
     ```bash
