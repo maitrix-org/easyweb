@@ -25,6 +25,7 @@
   <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
 </div>
 <!-- <hr> -->
+
 Fast Web is an open platform for building and serving AI agents that interact with web browsers.
 
 **Using a web agent has never been easier**: Just open Fast Web's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
@@ -33,7 +34,29 @@ Fast Web is an open platform for building and serving AI agents that interact wi
 
 <!--Update if repository changes name or location-->
 <!--TODO: change the video link-->
-[Placeholder for Video]
+
+## Demos
+
+**Task:** Plan a travel from Pittsburgh to ICML 2025.
+
+https://github.com/user-attachments/assets/10f9c919-38c7-47f2-8b36-e27bce95dfed
+
+<details>
+<summary>Expand to See More Demos</summary>
+
+**Task:** Find a round-trip ticket from Chicago to Dubai next month, traveling in economy class, with non-stop flights only, departing after 8 AM, and returning within two weeks.
+
+https://github.com/user-attachments/assets/11daf670-86ae-4b6c-ab93-ff7d4504a751
+
+**Task:** I want to buy a black mattress. Can you look at Amazon, eBay, and Mattress Firm and give me one good option from each?
+
+https://github.com/user-attachments/assets/6864940b-0f00-445f-985f-00bcf4480d79
+
+**Task:** I'd like to learn how local news outlets covered Trump's inauguration. Please find one article from each of the following websites: *Times of San Diego*, *The Tennessee Tribune*, and *MinnPost*, and summarize the details to me.
+
+https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
+
+</details>
 
 ## News
 - [2025/01] We released **ReasonerAgent: A Training-Free UI Agent That Exceeds GPT-4o-Based Agents by Up to 124%**. Check out the blog [post](about:blank)
@@ -113,8 +136,10 @@ Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more informati
 
 We welcome you to join our [Discord](https://discord.gg/NdQD6eJzch) server! Feel free to contribute the following:
 
-**Code Contributions:** Collaborate on building new agents, enabling new browser / UI environments, enhancing core features, improving the frontend and other interfaces, or creating sandboxing solutions.\
-**Research and Evaluation:** Advance our understanding of LLMs in automation, assist in model evaluation, or propose enhancements.\
+**Code Contributions:** Collaborate on building new agents, enabling new browser / UI environments, enhancing core features, improving the frontend and other interfaces, or creating sandboxing solutions.
+
+**Research and Evaluation:** Advance our understanding of LLMs in automation, assist in model evaluation, or propose enhancements.
+
 **Feedback and Testing:** Test Fast Web, identify bugs, recommend features, and share insights on usability.
 
 ## Acknowledgments
