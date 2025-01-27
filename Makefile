@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-# Makefile for OpenDevin project
+# Makefile for FastWeb project
 
 # Variables
 DOCKER_IMAGE = ghcr.io/opendevin/sandbox
@@ -208,7 +208,7 @@ start-backend:
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@cd frontend && VITE_BACKEND_HOST=$(BACKEND_HOST) VITE_FRONTEND_PORT=$(FRONTEND_PORT) npm run start
+	@gradio frontend.py
 
 # Run the app
 run:
