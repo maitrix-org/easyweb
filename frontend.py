@@ -299,13 +299,20 @@ class FastWebSession:
 # opens the existing file that was saved, and adds {user_feedback: x} at the top.
 
 
-def save_user_feedback(stars, session):
-    path = session.output_path
-    # print("other output path", path)
-
-    if stars == 'No Action Taken Yet':
-        return
-    if int(stars) >= 1 and int(stars) <= 5:
+    def save_user_feedback(self, vote):
+        path = self.output_path
+        # print("other output path", path)
+        if vote:
+            stars = 1
+        else: 
+            stars = 0
+    def save_user_feedback(self, vote):
+        path = self.output_path
+        # print("other output path", path)
+        if vote:
+            stars = 1
+        else: 
+            stars = 0
         try:
             with open(path, 'r') as file:
                 f = json.load(file)
@@ -725,8 +732,8 @@ def get_messages(
     api_key,
     options_visible,
 ):
-    # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
-    # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
+    # upvote = gr.Button('👍 Good Response', interactive=(session.agent_state == 'finished'))
+    # downvote = gr.Button('👎 Bad Response', interactive=(session.agent_state == 'finished'))
     model_selection = model_display2name[model_selection]
     user_message = None
     if len(chat_history) > 0:
@@ -753,8 +760,10 @@ def get_messages(
         status = get_status(session.agent_state)
 
         screenshot, url = browser_history[-1]
-        feedback = gr.Button('Submit Feedback', visible=False)
-        stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
+        # feedback = gr.Button('Submit Feedback', visible=False)
+        # stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
+        upvote = gr.Button('👍 Good Response', interactive=False)
+        downvote = gr.Button('👎 Bad Response', interactive=False)
         submit = gr.Button(
             'Submit',
             variant='primary',
@@ -779,19 +788,21 @@ def get_messages(
             session,
             status,
             clear,
-            feedback,
-            stars,
+            # feedback,
+            # stars,
             options_visible,
-            # upvote,
-            # downvote,
+            upvote,
+            downvote,
             submit,
             stop,
         )
     else:
         # make sure that the buttons and stars aren't shown yet
         clear = gr.Button('🗑️ Clear', interactive=False)
-        feedback = gr.Button('Submit Feedback')
-        stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
+        # feedback = gr.Button('Submit Feedback')
+        # stars = gr.Textbox(elem_id='dummy_textbox', value=-1)
+        upvote = gr.Button('👍 Good Response', interactive=False)
+        downvote = gr.Button('👎 Bad Response', interactive=False)
         if session.agent_state not in [
             'init',
             'running',
@@ -800,7 +811,7 @@ def get_messages(
         ]:
             if stop_flag:
                 stop_flag = False
-                clear = gr.Button('Clear', interactive=False)
+                clear = gr.Button('🗑️ Clear', interactive=False)
                 screenshot, url = browser_history[-1]
                 session._reset()
                 chat_history = chat_history[-1:]
@@ -822,12 +833,13 @@ def get_messages(
                     [],
                     browser_history,
                     session,
-                    # None,
                     status,
                     clear,
-                    # go.Figure(),
-                    'No Action Taken Yet',
+                    # feedback,
+                    # stars,
                     options_visible,
+                    upvote,
+                    downvote,
                     submit,
                     stop,
                 )
@@ -880,11 +892,11 @@ def get_messages(
                     session,
                     status,
                     clear,
-                    feedback,
-                    stars,
+                    # feedback,
+                    # stars,
                     options_visible,
-                    # upvote,
-                    # downvote,
+                    upvote,
+                    downvote,
                     submit,
                     stop,
                 )
@@ -907,8 +919,8 @@ def get_messages(
             feedback = gr.Button(
                 'Submit Feedback', visible=(session.agent_state == 'finished')
             )
-            # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
-            # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
+            upvote = gr.Button('👍 Good Response', interactive=(session.agent_state == 'finished'))
+            downvote = gr.Button('👎 Bad Response', interactive=(session.agent_state == 'finished'))
             if message.get('action', '') in ['message', 'finish']:
                 # chat_history.append(
                 #     gr.ChatMessage(role='assistant', content=message.get('message', '(Empty Message)'))
@@ -934,11 +946,9 @@ def get_messages(
                             session,
                             status,
                             clear,
-                            feedback,
-                            stars,
                             options_visible,
-                            # upvote,
-                            # downvote,
+                            upvote,
+                            downvote,
                             submit,
                             stop,
                         )
@@ -974,11 +984,9 @@ def get_messages(
                                 session,
                                 status,
                                 clear,
-                                feedback,
-                                stars,
                                 options_visible,
-                                # upvote,
-                                # downvote,
+                                upvote,
+                                downvote,
                                 submit,
                                 stop,
                             )
@@ -1012,7 +1020,7 @@ def get_messages(
                 #         )
 
                 # Stream End: Handle the end-of-session UI updates
-                stars = gr.Textbox(elem_id='dummy_textbox', value=0)
+                # stars = gr.Textbox(elem_id='dummy_textbox', value=0)
                 session.save_log()
                 # stars = gr.Textbox(elem_id='dummy_textbox', value=0)
                 # session.save_log()
@@ -1058,18 +1066,18 @@ def get_messages(
                 session,
                 status,
                 clear,
-                feedback,
-                stars,
+                # feedback,
+                # stars,
                 options_visible,
-                # upvote,
-                # downvote,
+                upvote,
+                downvote,
                 submit,
                 stop,
             )
 
 
-def clear_page(browser_history, session, feedback):
-    feedback = gr.Button('Submit Feedback', visible=False)
+def clear_page(browser_history, session):
+    # feedback = gr.Button('Submit Feedback', visible=False)
     browser_history = browser_history[:1]
     current_screenshot, current_url = browser_history[-1]
 
@@ -1090,7 +1098,7 @@ def clear_page(browser_history, session, feedback):
         # None,  # Reset session to None
         session,
         status,
-        feedback,
+        # feedback,
     )
 
 
@@ -1263,7 +1271,7 @@ def stop_task(session):
     # dont submit if nothing in box
     # session.save_log()
     status = get_status(session.agent_state)
-    clear = gr.Button('Clear', interactive=True)
+    clear = gr.Button('🗑️ Clear', interactive=True)
     return session, status, clear
     # return None, status, clear
 
@@ -1334,105 +1342,128 @@ current_dir = os.path.dirname(__file__)
 with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
     default_api_key = fr.read().strip()
 
-# Define the custom HTML for the 5-star rating system
-html_content = """
-<div style="display: none;" id="feedback" class = "block svelte-5y6bt2 padded">
-    <h2>How did we do?</h2>
-    <div id="stars" style="font-size: 2rem; color: #ffd700;">
-        <span onclick="setRating(1)">★</span>
-        <span onclick="setRating(2)">★</span>
-        <span onclick="setRating(3)">★</span>
-        <span onclick="setRating(4)">★</span>
-        <span onclick="setRating(5)">★</span>
-    </div>
-    <h3 id="confirmation-text"></h3>
-</div>
-"""
+# # Define the custom HTML for the 5-star rating system
+# html_content = """
+# <div style="display: none;" id="feedback" class = "block svelte-5y6bt2 padded">
+#     <h2>How did we do?</h2>
+#     <div id="stars" style="font-size: 2rem; color: #ffd700;">
+#         <span onclick="setRating(1)">★</span>
+#         <span onclick="setRating(2)">★</span>
+#         <span onclick="setRating(3)">★</span>
+#         <span onclick="setRating(4)">★</span>
+#         <span onclick="setRating(5)">★</span>
+#     </div>
+#     <h3 id="confirmation-text"></h3>
+# </div>
+# """
 
-# JavaScript to handle the star rating functionality
-js_code = """
-async () => {
-    let currentRating = -1; // To store the current rating
-    let submitted = false;
+# # JavaScript to handle the star rating functionality
+# js_code = """
+# async () => {
+#     let currentRating = -1; // To store the current rating
+#     let submitted = false;
+#     let shown = true;
 
-    globalThis.setRating = (stars) => {
-        currentRating = stars; // Update the current rating
-        // document.getElementById("rating-text").innerText = `Your rating: ${stars} stars`;
+#     globalThis.setRating = (stars) => {
+#         currentRating = stars; // Update the current rating
+#         // document.getElementById("rating-text").innerText = `Your rating: ${stars} stars`;
 
-        // Highlight stars up to the selected rating
-        let starElements = document.getElementById("stars").children;
-        if (!submitted){
-            for (let i = 0; i < starElements.length; i++) {
-                starElements[i].style.color = i < stars ? "#ffd700" : "gray";
-            }
-        }
-    }
+#         // Highlight stars up to the selected rating
+#         let starElements = document.getElementById("stars").children;
+#         if (!submitted){
+#             for (let i = 0; i < starElements.length; i++) {
+#                 starElements[i].style.color = i < stars ? "#ffd700" : "gray";
+#             }
+#         }
+#     }
 
-    //this is triggered when the submit button is clicked
-    globalThis.submitRating = () => {
-        const confirmationText = document.getElementById("confirmation-text");
-        if (currentRating > 0) {
-            confirmationText.innerText = `Thank you for your feedback.`;
-            document.getElementById("submit-button").style.display = "none";
-            console.log(currentRating);
-        } else {
-            confirmationText.innerText = "Please select a rating before submitting.";
-        }
-        submitted = true;
-        return currentRating;
-    }
+#     //this is triggered when the submit button is clicked
+#     globalThis.submitRating = () => {
+#         const confirmationText = document.getElementById("confirmation-text");
+#         if (currentRating > 0) {
+#             confirmationText.innerText = `Thank you for your feedback.`;
+#             document.getElementById("submit-button").style.display = "none";
+#             console.log(currentRating);
+#         } else {
+#             confirmationText.innerText = "Please select a rating before submitting.";
+#         }
+#         submitted = true;
+#         return currentRating;
+#     }
 
-    //show the stars by setting their display to inline-block
-    globalThis.showStars = () => {
-        document.getElementById("feedback").style.display = "inline-block";
-        document.getElementById("feedback").scrollIntoView({ behavior: "smooth" });
-    }
+#     //show the stars by setting their display to inline-block
+#     globalThis.showStars = () => {
+#         if (shown == true){
+#             document.getElementById("feedback").style.display = "inline-block";
+#             document.getElementById("stars").style.display = "inline-block";
+#             document.getElementById("feedback").scrollIntoView({ behavior: "smooth" });
+#         } else {
+#             shown = true;
+#         }
+#     }
 
-    //hide the stars by setting their display to none
-    globalThis.hideStars = () => {
-        document.getElementById("feedback").style.display = "none";
-    }
+#     //hide the stars by setting their display to none
+#     globalThis.hideStars = () => {
+#         console.log("HELLO");
+#         shown = false;
+#         submitted = false;
+#         console.log("HELLO");
+#         let starElements = document.getElementById("stars").children;
+#         document.getElementById("confirmation-text").innerText = "";
+#         for (let i = 0; i < starElements.length; i++) {
+#             starElements[i].style.color = "black";
+#         }
+#         document.getElementById("stars").style.display = "none";
+#         console.log("HELLO");
+#         document.getElementById("feedback").style.display = "none";
+#         console.log("HELLO");
 
-}
-"""
+#     }
 
-# different so that the function can be called by gradio elements in the python code
-get_rating = """
-function(){
-    let currentRating = submitRating();
-    return currentRating;
-}
-"""
+# }
+# """
 
-# make this in python for the clear button
-hide_stars = """
-function(){
-    hideStars();
-}
-"""
-# random css for other formatting and whatnot
-# background-color: #f4f4f7;
-css = """
-#submit-button{
-    width: 200px;
-}
-#feedback{
-    padding-left: 20px;
-    max-width: 230px;
-    padding-bottom: 20px;
-}
-#confirmation-text{
-    margin-top: 8px;
-}
-"""
+# # different so that the function can be called by gradio elements in the python code
+# get_rating = """
+# function(){
+#     let currentRating = submitRating();
+#     return currentRating;
+# }
+# """
 
-# def vote(upvote):
-#     if upvote:
-#         print('Upvoted!')
-#     else:
-#         print('Downvoted.')
+# # make this in python for the clear button
+# hide_stars = """
+# function(){
+#     hideStars();
+# }
+# """
+# # random css for other formatting and whatnot
+# # background-color: #f4f4f7;
+# css = """
+# #submit-button{
+#     width: 200px;
+# }
+# #feedback{
+#     padding-left: 20px;
+#     max-width: 230px;
+#     padding-bottom: 20px;
+# }
+# #confirmation-text{
+#     margin-top: 8px;
+# }
+# """
 
-with gr.Blocks(css=css) as demo:
+def vote(vote, session):
+    if vote:
+        print('Upvoted!')
+    else:
+        print('Downvoted.')
+    session.save_user_feedback(vote)
+    upvote_button = gr.Button('👍 Good Response', interactive=False)
+    downvote_button = gr.Button('👎 Bad Response', interactive=False)
+    return upvote_button, downvote_button
+
+with gr.Blocks() as demo: #css=css
     action_messages = gr.State([])
     # session = gr.State(
     #     FastWebSession(agent=default_agent, port=default_port, model=default_model)
@@ -1458,7 +1489,7 @@ with gr.Blocks(css=css) as demo:
                 with gr.Row():
                     agent_selection = gr.Dropdown(
                         [
-                            # 'DummyWebAgent',
+                            'DummyWebAgent',
                             'BrowsingAgent',
                             # 'WorldModelAgent',
                             # 'NewWorldModelAgent',
@@ -1486,23 +1517,23 @@ with gr.Blocks(css=css) as demo:
 
             # change to be type=messages, which converts the messages inputted from tuples to gr.ChatMessage class
             chatbot = gr.Chatbot(type='messages', height=320)
-            with gr.Row():
-                rating_html = gr.HTML(html_content)
+            # with gr.Row():
+                # rating_html = gr.HTML(html_content)
                 # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
-                stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
+                # stars = gr.Textbox(elem_id='dummy_textbox', value=-1, visible=False)
                 # when the stars dummy textbox is changed, trigger all of this
-                stars.change(None, None, None, js='() => {showStars()}')
-                stars.change(save_user_feedback, inputs=[stars, session])
+                # stars.change(None, None, None, js='() => {showStars()}')
+                # stars.change(save_user_feedback, inputs=[stars, session])
                 # Load the JavaScript code to initialize the interactive stars
-                demo.load(None, None, None, js=js_code)
+                # demo.load(None, None, None, js=js_code)
             # feedback button, in a different row.
-            feedback = gr.Button(
-                'Submit Feedback',
-                variant='secondary',
-                elem_id='submit-button',
-                visible=False,
-            )
-            feedback.click(None, inputs=None, outputs=stars, js=get_rating)
+            # feedback = gr.Button(
+            #     'Submit Feedback',
+            #     variant='secondary',
+            #     elem_id='submit-button',
+            #     visible=False,
+            # )
+            # feedback.click(None, inputs=None, outputs=stars, js=get_rating)
             with gr.Group():
                 with gr.Row():
                     msg = gr.Textbox(container=False, show_label=False, scale=7)
@@ -1514,6 +1545,8 @@ with gr.Blocks(css=css) as demo:
                         min_width=150,
                     )
                     stop = gr.Button('Stop', visible=False)
+                    # submit.click(None, inputs=None, outputs=stars, js=hide_stars)
+                    # msg.submit(None, inputs=None, outputs=stars, js=hide_stars)
                     submit_triggers = [msg.submit, submit.click]
         with gr.Column(scale=4, visible=False) as visualization_column:
             # with gr.Group():
@@ -1534,7 +1567,9 @@ with gr.Blocks(css=css) as demo:
     with gr.Row():
         toggle_button = gr.Button('🔍 Show Browser')
         # pause_resume = gr.Button('Pause')
-        clear = gr.Button('Clear')
+        upvote = gr.Button('👍 Good Response', interactive=False)
+        downvote = gr.Button('👎 Bad Response', interactive=False)
+        clear = gr.Button('🗑️ Clear')
     # with gr.Row():
     #     rating_html = gr.HTML(html_content)
     #     # dummy textbox that isn't shown in order to store the value which can be referred to by both HTML and gradio
@@ -1552,8 +1587,8 @@ with gr.Blocks(css=css) as demo:
     status = gr.Markdown('Agent Status: 🔴 Inactive')
     browser_history = gr.State([(blank, start_url)])
     options_visible = gr.State(False)
-    # upvote.click(vote, inputs=[gr.State(True)])
-    # downvote.click(vote, inputs=[gr.State(False)])
+    upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
+    downvote.click(vote, inputs=[gr.State(False), session], outputs=[upvote, downvote])
     options_visible.change(
         toggle_options,
         inputs=[options_visible, gr.State(False)],
@@ -1605,11 +1640,11 @@ with gr.Blocks(css=css) as demo:
             session,
             status,
             clear,
-            feedback,
-            stars,
+            # feedback,
+            # stars,
             options_visible,
-            # upvote,
-            # downvote,
+            upvote,
+            downvote,
             submit,
             stop,
         ],
@@ -1676,11 +1711,11 @@ with gr.Blocks(css=css) as demo:
                 session,
                 status,
                 clear,
-                feedback,
-                stars,
+                # feedback,
+                # stars,
                 options_visible,
-                # upvote,
-                # downvote,
+                upvote,
+                downvote,
                 submit,
                 stop,
             ],
@@ -1690,7 +1725,7 @@ with gr.Blocks(css=css) as demo:
     (
         clear.click(
             clear_page,
-            [browser_history, session, feedback],
+            [browser_history, session],
             [
                 chatbot,
                 # pause_resume,
@@ -1701,10 +1736,10 @@ with gr.Blocks(css=css) as demo:
                 browser_history,
                 session,
                 status,
-                feedback,
+                # feedback,
             ],
             queue=False,
-        ).then(fn=None, js=hide_stars)
+        ).then(fn=None) #js=hide_stars
     )
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False
