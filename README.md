@@ -103,7 +103,7 @@ Begin by building the project, which includes setting up the environment and ins
 make build
 ```
 
-### 4. Run the Application
+### 3. Run the Application
 
 Once the setup is complete, launching FastWeb is as simple as running a single command. This command starts both the backend and frontend servers seamlessly.
 
@@ -111,7 +111,7 @@ Once the setup is complete, launching FastWeb is as simple as running a single c
 make run
 ```
 
-### 5. Individual Server Startup and Scaling Service
+### 4. Individual Server Startup and Scaling Service
 
 <details>
 <summary>Expand to see details for scaling service</summary>
