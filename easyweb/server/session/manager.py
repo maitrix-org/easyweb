@@ -11,8 +11,8 @@ from .session import Session
 
 class SessionManager:
     _sessions: dict[str, Session] = {}
-    cleanup_interval: int = 1200
-    session_timeout: int = 3600
+    cleanup_interval: int = 600
+    session_timeout: int = 1800
 
     def __init__(self):
         asyncio.create_task(self._cleanup_sessions())
