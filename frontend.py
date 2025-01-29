@@ -727,7 +727,17 @@ def get_messages(
 ):
     # upvote = gr.Button('👍 Upvote', interactive=(session.agent_state == 'finished'))
     # downvote = gr.Button('👎 Downvote', interactive=(session.agent_state == 'finished'))
+
+    agent_selection = agent_display2class[agent_selection]
     model_selection = model_display2name[model_selection]
+    model_key_filename = model_name2keypath.get(model_selection)
+    if model_key_filename:
+        model_key_filepath = os.path.join(os.getcwd(), model_key_filename)
+        with open(model_key_filepath, 'r') as f:
+            api_key = f.read().strip()
+
+    print(api_key)
+
     user_message = None
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
@@ -740,7 +750,8 @@ def get_messages(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
             model=model_selection,
-            api_key=api_key if model_requires_key[model_selection] else default_api_key,
+            # api_key=api_key if model_requires_key[model_selection] else default_api_key,
+            api_key=api_key,
         )
         session = new_session
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
@@ -835,14 +846,15 @@ def get_messages(
             session.agent = agent_selection
             # session.model = model_port_config[model_selection]["provider"] + '/' + model_selection
             session.model = model_selection
-            if model_requires_key[model_selection]:
-                session.api_key = api_key
-            elif model_port_config[model_selection].get('default_key', None):
-                session.api_key = model_port_config[model_selection].get(
-                    'default_key', None
-                )
-            else:
-                session.api_key = ''
+            session.api_key = api_key
+            # if model_requires_key[model_selection]:
+            #     session.api_key = api_key
+            # elif model_port_config[model_selection].get('default_key', None):
+            #     session.api_key = model_port_config[model_selection].get(
+            #         'default_key', None
+            #     )
+            # else:
+            #     session.api_key = ''
 
             print('API Key:', session.api_key)
             # session.api_key = (
@@ -943,7 +955,7 @@ def get_messages(
                             stop,
                         )
             elif (
-                session.agent == 'ReasonerWebAgent'
+                session.agent.startswith('ReasonerAgent')
                 and message.get('action', '') == 'browse_interactive'
                 and message.get('args', {}).get('thought', '')
             ):
@@ -1097,22 +1109,30 @@ def clear_page(browser_history, session, feedback):
 def check_requires_key(model_selection, api_key):
     model_real_name = model_display2name[model_selection]
     requires_key = model_requires_key[model_real_name]
-    if requires_key:
-        api_key = gr.Textbox(
-            api_key,
-            label='API Key',
-            placeholder='Your API Key',
-            visible=True,
-            max_lines=2,
-        )
-    else:
-        api_key = gr.Textbox(
-            api_key,
-            label='API Key',
-            placeholder='Your API Key',
-            visible=False,
-            max_lines=2,
-        )
+    api_key = gr.Textbox(
+        api_key,
+        label='API Key',
+        placeholder='Your API Key',
+        visible=requires_key,
+        scale=1,
+        max_lines=2,
+    )
+    # if requires_key:
+    #     api_key = gr.Textbox(
+    #         default_api_key,
+    #         label='API Key',
+    #         placeholder='Your API Key',
+    #         visible=True,
+    #         max_lines=2,
+    #     )
+    # else:
+    #     api_key = gr.Textbox(
+    #         default_api_key,
+    #         label='API Key',
+    #         placeholder='Your API Key',
+    #         visible=False,
+    #         max_lines=2,
+    #     )
     return api_key
 
 
@@ -1303,7 +1323,6 @@ print(os.path.dirname(__file__))
 # default_agent = 'WorldModelAgent'
 # default_agent = 'AgentModelAgent'
 # default_agent = 'ModularWebAgent'
-default_agent = 'ReasonerWebAgent'
 
 global model_port_config
 model_port_config = {}
@@ -1330,9 +1349,13 @@ for model, cfg in model_port_config.items():
 
 # default_api_key = os.environ.get('OPENAI_API_KEY')
 current_dir = os.path.dirname(__file__)
+default_api_key = None
+# default_api_key_txt_path = os.path.join(current_dir, 'default_api_key.txt')
+# if os.path.exists(default_api_key_txt_path):
+#     with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
+#         default_api_key = fr.read().strip()
 
-with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
-    default_api_key = fr.read().strip()
+model_name2keypath = {'gpt-4o-mini': 'default_openai_api_key.txt'}
 
 # Define the custom HTML for the 5-star rating system
 html_content = """
@@ -1432,6 +1455,27 @@ css = """
 #     else:
 #         print('Downvoted.')
 
+
+agent_descriptions = [
+    'DummyWebAgent - Debugging only',
+    'BrowsingAgent - 🏃‍♂️ Good for quick tasks, but limited depth.',
+    'ReasonerAgent (Fast) - ⚖️ Mix of speed and intelligence.',
+    'ReasonerAgent (Full) - 🧠 Most advanced reasoning, but slower.',
+]
+
+agent_display_ids = [1, 2, 3]
+agent_display_names = [agent_descriptions[idx] for idx in agent_display_ids]
+
+default_agent_id = 2
+default_agent = agent_descriptions[default_agent_id]
+
+agent_display2class = {
+    agent_descriptions[0]: 'DummyWebAgent',
+    agent_descriptions[1]: 'BrowsingAgent',
+    agent_descriptions[2]: 'ReasonerAgentFast',
+    agent_descriptions[3]: 'ReasonerAgentFull',
+}
+
 with gr.Blocks(css=css) as demo:
     action_messages = gr.State([])
     # session = gr.State(
@@ -1457,22 +1501,11 @@ with gr.Blocks(css=css) as demo:
             with gr.Group():
                 with gr.Row():
                     agent_selection = gr.Dropdown(
-                        [
-                            # 'DummyWebAgent',
-                            'BrowsingAgent',
-                            # 'WorldModelAgent',
-                            # 'NewWorldModelAgent',
-                            # 'FewShotWorldModelAgent',
-                            # 'OnepassAgent',
-                            # 'PolicyAgent',
-                            # 'WebPlanningAgent',
-                            # 'AgentModelAgent',
-                            # 'ModularWebAgent',
-                            'ReasonerWebAgent',
-                        ],
+                        agent_display_names,
                         value=default_agent,
                         interactive=True,
                         label='Agent',
+                        scale=2,
                         # info='Choose your own adventure partner!',
                     )
                     model_selection = gr.Dropdown(
@@ -1480,6 +1513,7 @@ with gr.Blocks(css=css) as demo:
                         value=default_model,
                         interactive=True,
                         label='Backend LLM',
+                        scale=1,
                         # info='Choose the model you would like to use',
                     )
                     api_key = check_requires_key(default_model, default_api_key)
@@ -1714,4 +1748,4 @@ with gr.Blocks(css=css) as demo:
 if __name__ == '__main__':
     # demo.queue(default_concurrency_limit=5)
     demo.queue()
-    demo.launch(share=True)
+    demo.launch(share=False)

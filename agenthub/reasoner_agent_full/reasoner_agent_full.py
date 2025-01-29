@@ -11,7 +11,7 @@ from fast_web.runtime.plugins import (
 from fast_web.runtime.tools import RuntimeTool
 
 
-class ReasonerWebAgent(Agent):
+class ReasonerAgentFull(Agent):
     VERSION = '0.1'
     """
     An agent that uses agent model abstractions to interact with the browser.
@@ -31,12 +31,9 @@ class ReasonerWebAgent(Agent):
         - llm (LLM): The llm to be used by this agent
         """
         super().__init__(llm)
-        if 'Meta-Llama-3.1-70B-Instruct' in llm.model_name:
-            self.config_name = 'fast_web_llama'
-        elif 'gpt-4o-mini' in llm.model_name:
+        if 'gpt-4o-mini' in llm.model_name:
             self.config_name = 'fast_web_mini_world_model'
         else:
-            # self.config_name = 'fast_web'
             self.config_name = 'fast_web_world_model'
 
         logger.info(f'Using {self.config_name}')

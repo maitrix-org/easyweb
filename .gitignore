@@ -1,18 +1,8 @@
-web_evaluation/*/*_logs/
 *.log
-reasoners
-
 *.jsonl
 *.ipynb
 *.json
-
-*default_api_key.txt
-
-agenthub/world_model_agent/world_model_agent-*.py
-agenthub/world_model_agent/prompt-*.py
-# agenthub/new_world_model_agent/reasoners/*
-agenthub/new_world_model_agent/prompt_factory-*.py
-
+*api_key.txt
 *.pem
 
 # Byte-compiled / optimized / DLL files
