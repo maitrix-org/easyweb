@@ -115,8 +115,8 @@ class FastWebSession:
         print(f'{self.agent} Initialized')
 
     def stop(self):
-        if self.agent_state != 'running':
-            raise ValueError('Agent not running, nothing to stop')
+        # if self.agent_state != 'running':
+        #     raise ValueError('Agent not running, nothing to stop')
         print('Stopping')
 
         payload = {'action': 'change_agent_state', 'args': {'agent_state': 'stopped'}}
@@ -338,9 +338,9 @@ def get_messages(
         ]:
             if stop_flag:
                 stop_flag = False
-                clear = gr.Button('🗑️ Clear', interactive=False)
+                finished = session.agent_state in ['finished', 'stopped']
+                clear = gr.Button('🗑️ Clear', interactive=finished)
                 screenshot, url = browser_history[-1]
-                print(chat_history, 'BROOOO')
                 # find 2nd last index of last user message
                 last_user_index = None
                 user_message_count = 0
@@ -351,7 +351,6 @@ def get_messages(
                     if user_message_count == 2:
                         last_user_index = i
                         break
-                print(last_user_index)
                 # keep most recent message
                 chat_history = chat_history[:last_user_index] + chat_history[-1:]
                 session._reset()
@@ -397,7 +396,6 @@ def get_messages(
             action_messages = []
             browser_history = browser_history[:1]
 
-            print(session, 'foisdjfosdf')
             for agent_state in session.initialize(as_generator=True):
                 status = get_status(agent_state)
                 screenshot, url = browser_history[-1]
@@ -407,9 +405,12 @@ def get_messages(
                     variant='primary',
                     scale=1,
                     min_width=150,
-                    visible=session.agent_state != 'running',
+                    visible=False,
                 )
-                stop = gr.Button('Stop', visible=session.agent_state == 'running')
+                stop = gr.Button('Stop', visible=True)
+
+                finished = session.agent_state in ['finished', 'stopped']
+                clear = gr.Button('🗑️ Clear', interactive=finished)
 
                 yield (
                     chat_history,
@@ -434,15 +435,10 @@ def get_messages(
             if website_counter == 1:
                 options_visible = True
 
-            clear = gr.Button(
-                '🗑️ Clear', interactive=(session.agent_state == 'finished')
-            )
-            upvote = gr.Button(
-                '👍 Good Response', interactive=(session.agent_state == 'finished')
-            )
-            downvote = gr.Button(
-                '👎 Bad Response', interactive=(session.agent_state == 'finished')
-            )
+            finished = session.agent_state in ['finished', 'stopped']
+            clear = gr.Button('🗑️ Clear', interactive=finished)
+            upvote = gr.Button('👍 Good Response', interactive=finished)
+            downvote = gr.Button('👎 Bad Response', interactive=finished)
             if message.get('action', '') in ['message', 'finish']:
                 chat_history.append(gr.ChatMessage(role='assistant', content=''))
                 assistant_message = message.get('message', '(Empty Message)')
@@ -677,14 +673,15 @@ def process_user_message(user_message, history):
         return '', history
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
+
     return '', history
 
 
 def stop_task(session):
-    if session.agent_state == 'running':
-        session.stop()
+    # if session.agent_state == 'running':
+    session.stop()
     status = get_status(session.agent_state)
-    clear = gr.Button('🗑️ Clear', interactive=True)
+    # clear = gr.Button('🗑️ Clear', interactive=True)
     return session, status, clear
 
 
@@ -876,7 +873,7 @@ with gr.Blocks() as demo:  # css=css
         stop.click(
             stop_task,
             [session],
-            [session, status, clear],
+            [session, status],
             queue=False,
         )
         # .then(
