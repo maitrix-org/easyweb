@@ -72,6 +72,7 @@ class FastWebSession:
         self._reset()
 
     def initialize(self, as_generator=False):
+        print(f'{self.agent_state} BRUHHHHH1')
         # create an output path that is global to all functions called within the
         # FastWebSession class, so that it can be referred back to later
         now = time.time()
@@ -122,7 +123,7 @@ class FastWebSession:
         self.ws.send(json.dumps(payload))
 
         self.agent_state = 'stopped'
-        self._reset
+        # self._reset
 
     def run(self, task):
         if self.agent_state not in ['init', 'running', 'pausing', 'resuming', 'paused']:
@@ -382,6 +383,8 @@ def get_messages(
             print('API Key:', session.api_key)
             action_messages = []
             browser_history = browser_history[:1]
+
+            print(session, 'foisdjfosdf')
             for agent_state in session.initialize(as_generator=True):
                 status = get_status(agent_state)
                 screenshot, url = browser_history[-1]
@@ -862,36 +865,37 @@ with gr.Blocks() as demo:  # css=css
             [session],
             [session, status, clear],
             queue=False,
-        ).then(
-            get_messages,
-            [
-                chatbot,
-                action_messages,
-                browser_history,
-                session,
-                status,
-                agent_selection,
-                model_selection,
-                api_key,
-                options_visible,
-            ],
-            [
-                chatbot,
-                screenshot,
-                url,
-                action_messages,
-                browser_history,
-                session,
-                status,
-                clear,
-                options_visible,
-                upvote,
-                downvote,
-                submit,
-                stop,
-            ],
-            concurrency_limit=args.num_backends,
         )
+        # .then(
+        #     get_messages,
+        #     [
+        #         chatbot,
+        #         action_messages,
+        #         browser_history,
+        #         session,
+        #         status,
+        #         agent_selection,
+        #         model_selection,
+        #         api_key,
+        #         options_visible,
+        #     ],
+        #     [
+        #         chatbot,
+        #         screenshot,
+        #         url,
+        #         action_messages,
+        #         browser_history,
+        #         session,
+        #         status,
+        #         clear,
+        #         options_visible,
+        #         upvote,
+        #         downvote,
+        #         submit,
+        #         stop,
+        #     ],
+        #     concurrency_limit=args.num_backends,
+        # )
     )
     (
         clear.click(
