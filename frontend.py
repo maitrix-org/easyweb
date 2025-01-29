@@ -72,7 +72,6 @@ class FastWebSession:
         self._reset()
 
     def initialize(self, as_generator=False):
-        print(f'{self.agent_state} BRUHHHHH1')
         # create an output path that is global to all functions called within the
         # FastWebSession class, so that it can be referred back to later
         now = time.time()
