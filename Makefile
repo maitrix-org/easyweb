@@ -26,6 +26,12 @@ build:
 ifeq ($(INSTALL_DOCKER),)
 	@$(MAKE) -s pull-docker-image
 endif
+	@echo "$(GREEN)Cloning llm-reasoners repository...$(RESET)"
+	@if [ ! -d "../llm-reasoners" ]; then \
+		git clone https://github.com/mingkaid/llm-reasoners.git ../llm-reasoners; \
+	else \
+		echo "Repository 'llm-reasoners' already exists. Skipping clone."; \
+	fi
 	@$(MAKE) -s install-python-dependencies
 	@$(MAKE) -s install-precommit-hooks
 	@echo "$(GREEN)Build completed successfully.$(RESET)"
@@ -102,23 +108,42 @@ check-docker:
 		exit 1; \
 	fi
 
+# check-poetry:
+# 	@echo "$(YELLOW)Checking Poetry installation...$(RESET)"
+# 	@if command -v poetry > /dev/null; then \
+# 		POETRY_VERSION=$(shell poetry --version 2>&1 | sed -E 's/Poetry \(version ([0-9]+\.[0-9]+\.[0-9]+)\)/\1/'); \
+# 		IFS='.' read -r -a POETRY_VERSION_ARRAY <<< "$$POETRY_VERSION"; \
+# 		if [ $${POETRY_VERSION_ARRAY[0]} -ge 1 ] && [ $${POETRY_VERSION_ARRAY[1]} -ge 8 ]; then \
+# 			echo "$(BLUE)$(shell poetry --version) is already installed.$(RESET)"; \
+# 		else \
+# 			echo "$(RED)Poetry 1.8 or later is required. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
+# 			echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
+# 			echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+# 			exit 1; \
+# 		fi; \
+# 	else \
+# 		echo "$(RED)Poetry is not installed. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
+# 		echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
+# 		echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+# 		exit 1; \
+# 	fi
 check-poetry:
 	@echo "$(YELLOW)Checking Poetry installation...$(RESET)"
 	@if command -v poetry > /dev/null; then \
 		POETRY_VERSION=$(shell poetry --version 2>&1 | sed -E 's/Poetry \(version ([0-9]+\.[0-9]+\.[0-9]+)\)/\1/'); \
-		IFS='.' read -r -a POETRY_VERSION_ARRAY <<< "$$POETRY_VERSION"; \
-		if [ $${POETRY_VERSION_ARRAY[0]} -ge 1 ] && [ $${POETRY_VERSION_ARRAY[1]} -ge 8 ]; then \
-			echo "$(BLUE)$(shell poetry --version) is already installed.$(RESET)"; \
+		if [ "$$POETRY_VERSION" = "1.8.4" ]; then \
+			echo "$(BLUE)Poetry version $$POETRY_VERSION is already installed.$(RESET)"; \
 		else \
-			echo "$(RED)Poetry 1.8 or later is required. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
-			echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
-			echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+			echo "$(RED)Poetry 1.8.4 is required. Installed version is $$POETRY_VERSION.$(RESET)"; \
+			echo "$(RED)Please install Poetry 1.8.4 by running the following command, then add Poetry to your PATH:$(RESET)"; \
+			echo "$(RED) curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python$(PYTHON_VERSION) -$(RESET)"; \
+			echo "$(RED)More details here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
 			exit 1; \
 		fi; \
 	else \
-		echo "$(RED)Poetry is not installed. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
-		echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
-		echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+		echo "$(RED)Poetry is not installed. Please install Poetry 1.8.4 by running the following command, then add Poetry to your PATH:$(RESET)"; \
+		echo "$(RED) curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python$(PYTHON_VERSION) -$(RESET)"; \
+		echo "$(RED)More details here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
 		exit 1; \
 	fi
 
