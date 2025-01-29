@@ -70,7 +70,7 @@ https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
 * [Docker](https://docs.docker.com/engine/install/) (For those on MacOS, make sure to allow the default Docker socket to be used from advanced settings!)
 * [Python](https://www.python.org/downloads/) = 3.11
 * [NodeJS](https://nodejs.org/en/download/package-manager) >= 18.17.1
-* [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) >= 1.8
+* [Poetry](https://python-poetry.org/docs/#installing-with-the-official-installer) = 1.8.4
 
 Make sure you have all these dependencies installed before moving on to `make build`.
 
@@ -88,7 +88,7 @@ bash Miniforge3-$(uname)-$(uname -m).sh
 # Install Python 3.11, nodejs, and poetry
 mamba install python=3.11
 mamba install conda-forge::nodejs
-mamba install conda-forge::poetry
+mamba install conda-forge::poetry=1.8.4
 ```
 
 </details>
