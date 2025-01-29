@@ -20,6 +20,7 @@ parser.add_argument(
     default=1,
     help='The number of backends to initialize (default: 1)',
 )
+
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
@@ -759,6 +760,23 @@ def vote(vote, session):
     return upvote_button, downvote_button
 
 
+tos_popup_js = r"""
+() => {
+    if (window.alerted_before) return;
+
+    const msg = "Users of this website are required to agree to the following terms:\n\n" +
+           "This service is a research preview offering limited safety measures and may perform unsafe actions. " +
+           "It must not be used for any illegal, harmful, violent, racist, or sexual purposes. " +
+           "Please refrain from uploading any private or sensitive information. " +
+           "By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content), " +
+           "and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.";
+
+
+    alert(msg);
+    window.alerted_before = true;
+}
+"""
+
 agent_descriptions = [
     'DummyWebAgent - Debugging only',
     'BrowsingAgent - 🏃‍♂️ Good for quick tasks, but limited depth.',
@@ -962,6 +980,7 @@ with gr.Blocks() as demo:  # css=css
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False
     )
+    demo.load(None, None, None, js=tos_popup_js)
 
 if __name__ == '__main__':
     demo.queue()

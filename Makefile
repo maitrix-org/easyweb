@@ -28,7 +28,7 @@ ifeq ($(INSTALL_DOCKER),)
 endif
 	@echo "$(GREEN)Cloning llm-reasoners repository...$(RESET)"
 	@if [ ! -d "../llm-reasoners" ]; then \
-		git clone https://github.com/mingkaid/llm-reasoners.git ../llm-reasoners; \
+		git clone https://github.com/maitrix-org/llm-reasoners.git ../llm-reasoners; \
 	else \
 		echo "Repository 'llm-reasoners' already exists. Skipping clone."; \
 	fi
@@ -225,7 +225,7 @@ start-backend:
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@gradio frontend.py
+	@poetry run gradio frontend.py
 
 # Run the app
 run:
