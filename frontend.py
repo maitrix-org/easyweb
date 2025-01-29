@@ -123,7 +123,7 @@ class FastWebSession:
         self.ws.send(json.dumps(payload))
 
         self.agent_state = 'stopped'
-        # self._reset
+        self._reset
 
     def run(self, task):
         if self.agent_state not in ['init', 'running', 'pausing', 'resuming', 'paused']:
@@ -340,8 +340,21 @@ def get_messages(
                 stop_flag = False
                 clear = gr.Button('🗑️ Clear', interactive=False)
                 screenshot, url = browser_history[-1]
+                print(chat_history, 'BROOOO')
+                # find 2nd last index of last user message
+                last_user_index = None
+                user_message_count = 0
+                for i in range(len(chat_history) - 1, -1, -1):
+                    msg = chat_history[i]
+                    if msg['role'] == 'user':
+                        user_message_count += 1
+                    if user_message_count == 2:
+                        last_user_index = i
+                        break
+                print(last_user_index)
+                # keep most recent message
+                chat_history = chat_history[:last_user_index] + chat_history[-1:]
                 session._reset()
-                chat_history = chat_history[-1:]
                 action_messages = []
 
                 submit = gr.Button(
