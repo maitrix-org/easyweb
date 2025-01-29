@@ -1,14 +1,14 @@
 from reasoners import ReasonerAgent
 
-from fast_web.controller.agent import Agent
-from fast_web.controller.state.state import State
-from fast_web.core.logger import fast_web_logger as logger
-from fast_web.events.action import Action
-from fast_web.llm.llm import LLM
-from fast_web.runtime.plugins import (
+from easyweb.controller.agent import Agent
+from easyweb.controller.state.state import State
+from easyweb.core.logger import easyweb_logger as logger
+from easyweb.events.action import Action
+from easyweb.llm.llm import LLM
+from easyweb.runtime.plugins import (
     PluginRequirement,
 )
-from fast_web.runtime.tools import RuntimeTool
+from easyweb.runtime.tools import RuntimeTool
 
 
 class ReasonerAgentFast(Agent):
@@ -32,9 +32,9 @@ class ReasonerAgentFast(Agent):
         """
         super().__init__(llm)
         if 'gpt-4o-mini' in llm.model_name:
-            self.config_name = 'fast_web_mini'
+            self.config_name = 'easyweb_mini'
         else:
-            self.config_name = 'fast_web'
+            self.config_name = 'easyweb'
 
         logger.info(f'Using {self.config_name}')
         self.agent = ReasonerAgent(llm, config_name=self.config_name, logger=logger)

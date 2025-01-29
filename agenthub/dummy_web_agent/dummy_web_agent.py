@@ -4,20 +4,20 @@ from typing import Any, Dict, List, Optional
 
 from browsergym.core.action.highlevel import HighLevelActionSet
 
-from fast_web.controller.agent import Agent
-from fast_web.controller.state.state import State
-from fast_web.core.logger import fast_web_logger as logger
-from fast_web.events.action import (
+from easyweb.controller.agent import Agent
+from easyweb.controller.state.state import State
+from easyweb.core.logger import easyweb_logger as logger
+from easyweb.events.action import (
     Action,
     AgentFinishAction,
     BrowseInteractiveAction,
     MessageAction,
 )
-from fast_web.llm.llm import LLM
-from fast_web.runtime.plugins import (
+from easyweb.llm.llm import LLM
+from easyweb.runtime.plugins import (
     PluginRequirement,
 )
-from fast_web.runtime.tools import RuntimeTool
+from easyweb.runtime.tools import RuntimeTool
 
 USE_NAV = (
     os.environ.get('USE_NAV', 'true') == 'true'

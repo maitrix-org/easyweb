@@ -53,7 +53,7 @@ class BackendManager:
 backend_manager = BackendManager(backend_ports)
 
 
-class FastWebSession:
+class EasyWebSession:
     def __init__(
         self,
         agent,
@@ -73,7 +73,7 @@ class FastWebSession:
 
     def initialize(self, as_generator=False):
         # create an output path that is global to all functions called within the
-        # FastWebSession class, so that it can be referred back to later
+        # EasyWebSession class, so that it can be referred back to later
         now = time.time()
         os.makedirs('frontend_logs', exist_ok=True)
 
@@ -291,7 +291,7 @@ def get_messages(
 
     # Initialize a new session if it doesn't exist
     if session is None or session.agent_state in ['finished', 'paused']:
-        new_session = FastWebSession(
+        new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
             model=model_selection,

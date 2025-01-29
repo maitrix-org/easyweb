@@ -12,7 +12,7 @@ from browsergym.core.action.base import AbstractActionSet
 from browsergym.core.action.highlevel import HighLevelActionSet
 from browsergym.core.action.python import PythonActionSet
 
-from fast_web.runtime.browser.browser_env import BrowserEnv
+from easyweb.runtime.browser.browser_env import BrowserEnv
 
 from .utils import (
     ParseError,

@@ -19,18 +19,18 @@
 
 <!-- PROJECT LOGO -->
 <div align="center">
-  <img src="./fast-web-icon.png" alt="Fast Web Logo" width="200">
-  <h1 align="center">Fast Web: UI Agents at Your Fingertips</h1>
+  <img src="./easy-web-icon.png" alt="Easy Web Logo" width="200">
+  <h1 align="center">EasyWeb: UI Agents at Your Fingertips</h1>
   <!-- Change based on updated links or names in the future -->
   <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
 </div>
 <!-- <hr> -->
 
-Fast Web is an open platform for building and serving AI agents that interact with web browsers.
+EasyWeb is an open platform for building and serving AI agents that interact with web browsers.
 
-**Using a web agent has never been easier:** Just open Fast Web's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
+**Using a web agent has never been easier:** Just open EasyWeb's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
 
-**Deploy once, use everywhere:** Fast Web comes with a full package for deploying web agents as a service. Built on [OpenHands](https://github.com/All-Hands-AI/OpenHands), Fast Web introduces a parallelized architecture capable of fulfilling multiple user requests simultaneously, and supports toggling your favorite agent and LLM available as APIs.
+**Deploy once, use everywhere:** EasyWeb comes with a full package for deploying web agents as a service. Built on [OpenHands](https://github.com/All-Hands-AI/OpenHands), EasyWeb introduces a parallelized architecture capable of fulfilling multiple user requests simultaneously, and supports toggling your favorite agent and LLM available as APIs.
 
 <!--Update if repository changes name or location-->
 <!--TODO: change the video link-->
@@ -42,7 +42,7 @@ Fast Web is an open platform for building and serving AI agents that interact wi
 https://github.com/user-attachments/assets/10f9c919-38c7-47f2-8b36-e27bce95dfed
 
 <details>
-<summary>Expand to see more demos</summary>
+<summary><b>Expand to see more demos</b></summary>
 
 **Task:** Find a round-trip ticket from Chicago to Dubai next month, traveling in economy class, with non-stop flights only, departing after 8 AM, and returning within two weeks.
 
@@ -75,9 +75,8 @@ https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
 Make sure you have all these dependencies installed before moving on to `make build`.
 
 <details>
-<summary>Expand for setup without sudo access</summary>
+<summary><b>Expand for setup without sudo access</b></summary>
 
-#### Develop without sudo access
 If you want to develop without system admin/sudo access to upgrade/install `Python` and/or `NodeJs`, you can use `conda` or `mamba` to manage the packages for you:
 
 ```bash
@@ -105,7 +104,7 @@ make build
 
 ### 3. Run the Application
 
-Once the setup is complete, launching FastWeb is as simple as running a single command. This command starts both the backend and frontend servers seamlessly.
+Once the setup is complete, launching EasyWeb is as simple as running a single command. This command starts both the backend and frontend servers seamlessly.
 
 ```bash
 make run
@@ -114,7 +113,7 @@ make run
 ### 4. Individual Server Startup and Scaling Service
 
 <details>
-<summary>Expand to see details for scaling service</summary>
+<summary><b>Expand to see details for scaling service</b></summary>
 
 - **Start the Backend Server:** If you prefer, you can start the backend server independently to focus on backend-related tasks or configurations.
     ```bash
@@ -131,7 +130,9 @@ make run
 
 </details>
 
-Distributed under the MIT License. See [`LICENSE`](./LICENSE) for more information.
+<br>
+
+Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
 
 ## Join The Community
 
@@ -141,7 +142,7 @@ We welcome you to join our [Discord](https://discord.gg/NdQD6eJzch) server! Feel
 
 **Research and Evaluation:** Advance our understanding of LLMs in automation, assist in model evaluation, or propose enhancements.
 
-**Feedback and Testing:** Test Fast Web, identify bugs, recommend features, and share insights on usability.
+**Feedback and Testing:** Test EasyWeb, identify bugs, recommend features, and share insights on usability.
 
 ## Acknowledgments
 We would like to thank [OpenHands](https://github.com/All-Hands-AI/OpenHands) for the base code for this project.
@@ -151,11 +152,11 @@ We would like to thank [OpenHands](https://github.com/All-Hands-AI/OpenHands) fo
 
 <!--TODO: Should edit this if github changes-->
 ```
-@software{fast_web2025,
+@software{easyweb2025,
   author = {Maitrix Team},
-  title = {Fast Web: Open Platform for Building and Serving Web-Browsing Agents},
+  title = {EasyWeb: Open Platform for Building and Serving Web-Browsing Agents},
   year = {2025},
   publisher = {GitHub},
-  url = {https://github.com/maitrix-org/fast-web}
+  url = {https://github.com/maitrix-org/easyweb}
 }
 ```

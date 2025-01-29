@@ -1,5 +1,5 @@
 SHELL=/bin/bash
-# Makefile for FastWeb project
+# Makefile for EasyWeb project
 
 # Variables
 DOCKER_IMAGE = ghcr.io/opendevin/sandbox
@@ -196,7 +196,7 @@ install-precommit-hooks:
 
 lint-backend:
 	@echo "$(YELLOW)Running linters...$(RESET)"
-	@poetry run pre-commit run --files fast_web/**/* agenthub/**/* evaluation/**/* --show-diff-on-failure --config $(PRECOMMIT_CONFIG_PATH)
+	@poetry run pre-commit run --files easyweb/**/* agenthub/**/* evaluation/**/* --show-diff-on-failure --config $(PRECOMMIT_CONFIG_PATH)
 
 lint-frontend:
 	@echo "$(YELLOW)Running linters for frontend...$(RESET)"
@@ -220,7 +220,7 @@ build-frontend:
 # Start backend
 start-backend:
 	@echo "$(YELLOW)Starting backend...$(RESET)"
-	@poetry run uvicorn fast_web.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
+	@poetry run uvicorn easyweb.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
 
 # Start frontend
 start-frontend:
@@ -236,7 +236,7 @@ run:
 	fi
 	@mkdir -p logs
 	@echo "$(YELLOW)Starting backend server...$(RESET)"
-	@poetry run uvicorn fast_web.server.listen:app --port $(BACKEND_PORT) &
+	@poetry run uvicorn easyweb.server.listen:app --port $(BACKEND_PORT) &
 	@echo "$(YELLOW)Waiting for the backend to start...$(RESET)"
 	@until nc -z localhost $(BACKEND_PORT); do sleep 0.1; done
 	@echo "$(GREEN)Backend started successfully.$(RESET)"
@@ -309,7 +309,7 @@ setup-config-prompts:
 # Clean up all caches
 clean:
 	@echo "$(YELLOW)Cleaning up caches...$(RESET)"
-	@rm -rf fast_web/.cache
+	@rm -rf easyweb/.cache
 	@echo "$(GREEN)Caches cleaned up successfully.$(RESET)"
 
 # Help
