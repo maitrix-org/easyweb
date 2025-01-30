@@ -290,7 +290,11 @@ def get_messages(
             user_message = chat_history[-1]['content']
 
     # Initialize a new session if it doesn't exist
-    if session is None or session.agent_state in ['finished', 'stopped']:
+    if (
+        session is None
+        or session.agent_state is None
+        or session.agent_state in ['finished', 'stopped']
+    ):
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
