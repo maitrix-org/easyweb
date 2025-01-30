@@ -590,6 +590,22 @@ def clear_page(browser_history, session):
     )
 
 
+def check_supported_models(agent_selection, model_selection, api_key):
+    supported_models = agent_supported_models.get(agent_selection, model_list)
+    selected_model = (
+        model_selection if model_selection in supported_models else supported_models[0]
+    )
+    model_selection = gr.Dropdown(
+        supported_models,
+        value=selected_model,
+        interactive=True,
+        label='Backend LLM',
+        scale=1,
+        # info='Choose the model you would like to use',
+    )
+    return model_selection, check_requires_key(selected_model, api_key)
+
+
 def check_requires_key(model_selection, api_key):
     model_real_name = model_display2name[model_selection]
     requires_key = model_requires_key[model_real_name]
@@ -601,22 +617,6 @@ def check_requires_key(model_selection, api_key):
         scale=1,
         max_lines=2,
     )
-    # if requires_key:
-    #     api_key = gr.Textbox(
-    #         default_api_key,
-    #         label='API Key',
-    #         placeholder='Your API Key',
-    #         visible=True,
-    #         max_lines=2,
-    #     )
-    # else:
-    #     api_key = gr.Textbox(
-    #         default_api_key,
-    #         label='API Key',
-    #         placeholder='Your API Key',
-    #         visible=False,
-    #         max_lines=2,
-    #     )
     return api_key
 
 
@@ -702,7 +702,7 @@ def stop_task(session):
     # if session.agent_state == 'running':
     session.stop()
     status = get_status(session.agent_state)
-    # clear = gr.Button('🗑️ Clear', interactive=True)
+    clear = gr.Button('🗑️ Clear', interactive=True)
     return session, status, clear
 
 
@@ -780,10 +780,10 @@ tos_popup_js = r"""
 """
 
 agent_descriptions = [
-    'DummyWebAgent - Debugging only',
-    'BrowsingAgent - 🏃‍♂️ Good for quick tasks, but limited depth.',
-    'ReasonerAgent (Fast) - ⚖️ Mix of speed and intelligence.',
-    'ReasonerAgent (Full) - 🧠 Most advanced reasoning, but slower.',
+    'DummyWebAgent — Debugging only',
+    'BrowsingAgent — 🏃‍♂️ Good for quick tasks, but limited depth.',
+    'ReasonerAgent (Fast) — ⚖️ Mix of speed and intelligence.',
+    'ReasonerAgent (Full) — 🧠 Most advanced reasoning, but slower.',
 ]
 
 agent_display_ids = [1, 2, 3]
@@ -799,6 +799,10 @@ agent_display2class = {
     agent_descriptions[3]: 'ReasonerAgentFull',
 }
 
+agent_supported_models = {
+    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
+}
+
 with gr.Blocks() as demo:  # css=css
     action_messages = gr.State([])
     session = gr.State(None)
@@ -809,8 +813,9 @@ with gr.Blocks() as demo:  # css=css
                             - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
                                 - 🆓 We offer GPT-4o-mini as a free option for testing basic tasks.
                                 - 🚀 For best performance, select GPT-4o and provide your own API key. (We do not store API keys.)
-                                - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, DeepSeek, etc.
-                            - 💬 **Ask the Agent** to perform advanced web-related tasks, **for example:**
+                                - 🐋 DeepSeek models are available for use with your own API key, but we do not recommend them due to recent instabilities.
+                                - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, and more.
+                            - 💬 **Ask the Agent** to perform web-related tasks, **for example:**
                                 - "Use DuckDuckGo to search for the current president of USA."
                                 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
                                 - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
@@ -822,7 +827,7 @@ with gr.Blocks() as demo:  # css=css
                             - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
                             - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
                             - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-                            - Currently, the agent will only be able to see **up to the latest user message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**""")
+                            - 💡 Currently, the agent can only see **up to the latest user message**. We're working on enabling multi-turn interactions — stay tuned!""")
 
     with gr.Row(equal_height=False):
         with gr.Column(scale=2):
@@ -938,7 +943,7 @@ with gr.Blocks() as demo:  # css=css
         stop.click(
             stop_task,
             [session],
-            [session, status],
+            [session, status, clear],
             queue=False,
         )
         # .then(
@@ -987,6 +992,12 @@ with gr.Blocks() as demo:  # css=css
             ],
             queue=False,
         ).then(fn=None)
+    )
+    agent_selection.select(
+        check_supported_models,
+        [agent_selection, model_selection, api_key],
+        [model_selection, api_key],
+        queue=False,
     )
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False

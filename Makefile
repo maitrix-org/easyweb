@@ -227,7 +227,7 @@ start-backend:
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@poetry run python frontend.py
+	@poetry run gradio frontend.py
 
 # Run the app
 run:
