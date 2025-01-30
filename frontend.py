@@ -828,30 +828,30 @@ with gr.Blocks() as demo:  # css=css
                             - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
                             - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
                             - 💡 Currently, the agent can only see **up to the latest user message**. We're working on enabling multi-turn interactions — stay tuned!""")
+    with gr.Group():
+        with gr.Row():
+            agent_selection = gr.Dropdown(
+                agent_display_names,
+                value=default_agent,
+                interactive=True,
+                label='Agent',
+                scale=2,
+                # info='Choose your own adventure partner!',
+            )
+            model_selection = gr.Dropdown(
+                model_list,
+                value=default_model,
+                interactive=True,
+                label='Backend LLM',
+                scale=1,
+                # info='Choose the model you would like to use',
+            )
+            api_key = check_requires_key(default_model, default_api_key)
 
     with gr.Row(equal_height=False):
-        with gr.Column(scale=2):
-            with gr.Group():
-                with gr.Row():
-                    agent_selection = gr.Dropdown(
-                        agent_display_names,
-                        value=default_agent,
-                        interactive=True,
-                        label='Agent',
-                        scale=2,
-                        # info='Choose your own adventure partner!',
-                    )
-                    model_selection = gr.Dropdown(
-                        model_list,
-                        value=default_model,
-                        interactive=True,
-                        label='Backend LLM',
-                        scale=1,
-                        # info='Choose the model you would like to use',
-                    )
-                    api_key = check_requires_key(default_model, default_api_key)
+        with gr.Column(scale=1):
+            chatbot = gr.Chatbot(type='messages')
 
-            chatbot = gr.Chatbot(type='messages', height=320)
             with gr.Group():
                 with gr.Row():
                     msg = gr.Textbox(container=False, show_label=False, scale=7)
@@ -864,7 +864,7 @@ with gr.Blocks() as demo:  # css=css
                     )
                     stop = gr.Button('Stop', visible=False)
                     submit_triggers = [msg.submit, submit.click]
-        with gr.Column(scale=4, visible=False) as visualization_column:
+        with gr.Column(scale=2, visible=False) as visualization_column:
             with gr.Group():
                 start_url = 'about:blank'
                 url = gr.Textbox(start_url, label='URL', interactive=False, max_lines=1)
