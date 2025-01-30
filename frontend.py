@@ -226,8 +226,11 @@ class EasyWebSession:
         else:
             stars = 0
         try:
-            with open(path, 'r') as file:
-                f = json.load(file)
+            if os.path.exists(path):
+                with open(path, 'r') as file:
+                    f = json.load(file)
+            else:
+                f = self.raw_messages
             f.insert(0, {'user feedback: ': stars})
             json.dump(f, open(path, 'w'))
             print('User feedback saved!')
@@ -321,7 +324,9 @@ def get_messages(
             min_width=150,
             visible=session.agent_state != 'running',
         )
-        stop = gr.Button('Stop', visible=session.agent_state == 'running')
+        stop = gr.Button(
+            'Stop', scale=1, min_width=150, visible=session.agent_state == 'running'
+        )
 
         yield (
             chat_history,
@@ -375,7 +380,12 @@ def get_messages(
                     min_width=150,
                     visible=session.agent_state != 'running',
                 )
-                stop = gr.Button('Stop', visible=session.agent_state == 'running')
+                stop = gr.Button(
+                    'Stop',
+                    scale=1,
+                    min_width=150,
+                    visible=session.agent_state == 'running',
+                )
 
                 yield (
                     chat_history,
@@ -420,7 +430,7 @@ def get_messages(
                     min_width=150,
                     visible=False,
                 )
-                stop = gr.Button('Stop', visible=True)
+                stop = gr.Button('Stop', scale=1, min_width=150, visible=True)
 
                 finished = session.agent_state in ['finished', 'stopped']
                 clear = gr.Button('🗑️ Clear', interactive=finished)
@@ -551,7 +561,9 @@ def get_messages(
                 min_width=150,
                 visible=session.agent_state != 'running',
             )
-            stop = gr.Button('Stop', visible=session.agent_state == 'running')
+            stop = gr.Button(
+                'Stop', scale=1, min_width=150, visible=session.agent_state == 'running'
+            )
             yield (
                 chat_history,
                 screenshot,
@@ -862,7 +874,7 @@ with gr.Blocks() as demo:  # css=css
                         scale=1,
                         min_width=150,
                     )
-                    stop = gr.Button('Stop', visible=False)
+                    stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
                     submit_triggers = [msg.submit, submit.click]
         with gr.Column(scale=2, visible=False) as visualization_column:
             with gr.Group():
