@@ -20,6 +20,7 @@ parser.add_argument(
     default=1,
     help='The number of backends to initialize (default: 1)',
 )
+
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
@@ -125,7 +126,7 @@ class EasyWebSession:
         self._reset
 
     def run(self, task):
-        if self.agent_state not in ['init', 'running', 'pausing', 'resuming', 'paused']:
+        if self.agent_state not in ['init', 'running']:
             raise ValueError(
                 'Agent not initialized. Please run the initialize() method first'
             )
@@ -134,14 +135,13 @@ class EasyWebSession:
             payload = {'action': 'message', 'args': {'content': task}}
             self.ws.send(json.dumps(payload))
 
-        while self.agent_state not in ['finished', 'paused', 'stopped']:
+        while self.agent_state not in ['finished', 'stopped']:
             message = self._get_message()
             self._read_message(message)
 
             print(self.agent_state)
             yield message
-        if self.agent_state != 'stopped':
-            backend_manager.release_backend(self.port)
+        backend_manager.release_backend(self.port)
 
     def _get_message(self):
         response = self.ws.recv()
@@ -290,7 +290,7 @@ def get_messages(
             user_message = chat_history[-1]['content']
 
     # Initialize a new session if it doesn't exist
-    if session is None or session.agent_state in ['finished', 'paused']:
+    if session is None or session.agent_state in ['finished', 'stopped']:
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
@@ -302,8 +302,7 @@ def get_messages(
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
-        session.agent_state is None
-        or session.agent_state in ['paused', 'finished', 'stopped']
+        session.agent_state is None or session.agent_state in ['finished', 'stopped']
     ) and user_message is None:
         clear = gr.Button('🗑️ Clear', interactive=True)
         status = get_status(session.agent_state)
@@ -759,6 +758,23 @@ def vote(vote, session):
     return upvote_button, downvote_button
 
 
+tos_popup_js = r"""
+() => {
+    if (window.alerted_before) return;
+
+    const msg = "Users of this website are required to agree to the following terms:\n\n" +
+           "This service is a research preview offering limited safety measures and may perform unsafe actions. " +
+           "It must not be used for any illegal, harmful, violent, racist, or sexual purposes. " +
+           "Please refrain from uploading any private or sensitive information. " +
+           "By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content), " +
+           "and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.";
+
+
+    alert(msg);
+    window.alerted_before = true;
+}
+"""
+
 agent_descriptions = [
     'DummyWebAgent - Debugging only',
     'BrowsingAgent - 🏃‍♂️ Good for quick tasks, but limited depth.',
@@ -971,6 +987,7 @@ with gr.Blocks() as demo:  # css=css
     model_selection.select(
         check_requires_key, [model_selection, api_key], api_key, queue=False
     )
+    demo.load(None, None, None, js=tos_popup_js)
 
 if __name__ == '__main__':
     demo.queue()

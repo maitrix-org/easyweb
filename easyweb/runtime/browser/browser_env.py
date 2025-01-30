@@ -127,7 +127,7 @@ class BrowserEnv:
                             };
                         }""")
 
-                    scroll_position = get_scroll_position(env.page)
+                    scroll_position = get_scroll_position(env.unwrapped.page)
                     logger.info(scroll_position)
                     obs['scroll_position'] = scroll_position
 

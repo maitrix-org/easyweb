@@ -28,7 +28,7 @@ ifeq ($(INSTALL_DOCKER),)
 endif
 	@echo "$(GREEN)Cloning llm-reasoners repository...$(RESET)"
 	@if [ ! -d "../llm-reasoners" ]; then \
-		git clone https://github.com/mingkaid/llm-reasoners.git ../llm-reasoners; \
+		git clone https://github.com/maitrix-org/llm-reasoners.git ../llm-reasoners; \
 	else \
 		echo "Repository 'llm-reasoners' already exists. Skipping clone."; \
 	fi
@@ -161,6 +161,8 @@ install-python-dependencies:
 		poetry run pip install chroma-hnswlib; \
 	fi
 	@poetry install
+	@echo "$(BLUE)Installing extra dependencies with pip...$(RESET)"
+	@poetry run pip install gradio bs4 websocket-client
 	@if [ -f "/etc/manjaro-release" ]; then \
 		echo "$(BLUE)Detected Manjaro Linux. Installing Playwright dependencies...$(RESET)"; \
 		poetry run pip install playwright; \
@@ -225,7 +227,7 @@ start-backend:
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@gradio frontend.py
+	@poetry run python frontend.py
 
 # Run the app
 run:

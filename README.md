@@ -119,14 +119,21 @@ make run
     ```bash
     make start-backend
     ```
-- **Start Multiple Backend Server with Specified Port:** If you prefer, you can also start multiple backend server independently on different terminals with custom ports for running multiple requests (one request per backend). We aim to support a more scalable approach to multiple backends going forward.
-    ```bash
-    BACKEND_PORT={port_of_your_choice} make start-backend
-    ```
 - **Start the Frontend Server:** Similarly, you can start the frontend server on its own to work on frontend-related components or interface enhancements.
     ```bash
-    make start-frontend
+    python frontend.py
     ```
+- **Start Multiple Backend Server with Specified Port:** If you prefer, you can also start multiple backend server independently on different terminals with ports $5000$ and onwards for running multiple requests (one request per backend).
+    ```bash
+    BACKEND_PORT={port_5000_onwards} make start-backend
+    ```
+    Once you started multiple backend port, please start the frontend using:
+    ```bash
+    python frontend.py --num-backends {num_backend_opened}
+    ```
+    Then you can duplicate the frontend link you just opened to start running parallel requests.
+
+    We aim to support a more scalable approach to multiple backends going forward.
 
 </details>
 
