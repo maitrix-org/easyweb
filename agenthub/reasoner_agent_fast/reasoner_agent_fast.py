@@ -33,6 +33,8 @@ class ReasonerAgentFast(Agent):
         super().__init__(llm)
         if 'gpt-4o-mini' in llm.model_name:
             self.config_name = 'easyweb_mini'
+        elif 'deepseek-reasoner' in llm.model_name:
+            self.config_name = 'easyweb_r1'
         else:
             self.config_name = 'easyweb'
 
