@@ -11,7 +11,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = ">=3.11,<3.13"
 datasets = "*"
 pandas = "*"
 litellm = "*"
@@ -23,9 +23,9 @@ fastapi = "*"
 toml = "*"
 uvicorn = "*"
 types-toml = "*"
-numpy = "*"
+numpy = "1.26.0"
 json-repair = "*"
-browsergym = "0.3.4" # integrate browsergym as the browsing interface
+browsergym = "*" # integrate browsergym as the browsing interface
 html2text = "*"
 e2b = "^0.17.1"
 pexpect = "*"
