@@ -799,17 +799,26 @@ with gr.Blocks() as demo:  # css=css
     action_messages = gr.State([])
     session = gr.State(None)
     title = gr.Markdown(
-        '# 🚀 Fast Web: Open Platform for Building and Serving UI Agents'
+        '# 🚀 EasyWeb: Open Platform for Building and Serving UI Agents'
     )
-    tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
+    tutorial1 = gr.Markdown("""\
+                            - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
+                                - 🆓 We offer GPT-4o-mini as a free option for testing basic tasks.
+                                - 🚀 For best performance, select GPT-4o and provide your own API key. (We do not store API keys.)
+                                - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, DeepSeek, etc.
                             - 💬 **Ask the Agent** to perform advanced web-related tasks, **for example:**
-                                - "Can you search for a round-trip flight from Chicago to Dubai in business class?"
+                                - "Use DuckDuckGo to search for the current president of USA."
                                 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
-                                - "Find an article from Times of San Diego about Trump's inauguration and summarize the main points for me."
+                                - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+                            - 🔎 **Browsing Tips**:
+                                - 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
+                                - ⚡ Speed may vary depending on backend API load.
+                                - 🔄 The agent may repeat actions before trying alternative approaches.
+                                - 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
                             - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
                             - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
                             - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-                            - Currently, the agent will only be able to see **up to the latest message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**""")
+                            - Currently, the agent will only be able to see **up to the latest user message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**""")
 
     with gr.Row(equal_height=False):
         with gr.Column(scale=2):
