@@ -1,11 +1,11 @@
 [tool.poetry]
-name = "fast-web"
+name = "easyweb"
 version = "0.1.0"
-description = "OpenDevin: Code Less, Make More"
-authors = ["OpenDevin"]
+description = "EasyWeb: UI Agents at Your Fingertips"
+authors = ["Maitrix Team"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/OpenDevin/OpenDevin"
+repository = "https://github.com/maitrix-org/easyweb"
 packages = [
     { include = "reasoners", from = "../llm-reasoners" },
 ]
