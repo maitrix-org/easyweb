@@ -126,7 +126,7 @@ class EasyWebSession:
         self._reset
 
     def run(self, task):
-        if self.agent_state not in ['init', 'running', 'pausing', 'resuming', 'paused']:
+        if self.agent_state not in ['init', 'running']:
             raise ValueError(
                 'Agent not initialized. Please run the initialize() method first'
             )
@@ -135,14 +135,13 @@ class EasyWebSession:
             payload = {'action': 'message', 'args': {'content': task}}
             self.ws.send(json.dumps(payload))
 
-        while self.agent_state not in ['finished', 'paused', 'stopped']:
+        while self.agent_state not in ['finished', 'stopped']:
             message = self._get_message()
             self._read_message(message)
 
             print(self.agent_state)
             yield message
-        if self.agent_state != 'stopped':
-            backend_manager.release_backend(self.port)
+        backend_manager.release_backend(self.port)
 
     def _get_message(self):
         response = self.ws.recv()
@@ -291,7 +290,7 @@ def get_messages(
             user_message = chat_history[-1]['content']
 
     # Initialize a new session if it doesn't exist
-    if session is None or session.agent_state in ['finished', 'paused']:
+    if session is None or session.agent_state in ['finished', 'stopped']:
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
@@ -303,8 +302,7 @@ def get_messages(
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
-        session.agent_state is None
-        or session.agent_state in ['paused', 'finished', 'stopped']
+        session.agent_state is None or session.agent_state in ['finished', 'stopped']
     ) and user_message is None:
         clear = gr.Button('🗑️ Clear', interactive=True)
         status = get_status(session.agent_state)
