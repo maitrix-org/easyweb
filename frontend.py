@@ -20,7 +20,10 @@ parser.add_argument(
     default=1,
     help='The number of backends to initialize (default: 1)',
 )
-
+parser.add_argument('--ip', type=str, default=None, help='server name for public demo')
+parser.add_argument(
+    '--port', type=int, default=None, help='server port for public demo'
+)
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
@@ -1021,6 +1024,10 @@ with gr.Blocks(
         model_selection.select(
             check_requires_key, [model_selection, api_key], api_key, queue=False
         )
+        tos = gr.Markdown("""\
+        ### Terms of Service
+        ### Acknowledgement
+        """)
     with gr.Tab('📖 Instructions'):
         with gr.Row():
             instructions = gr.Markdown("""\
@@ -1046,6 +1053,15 @@ with gr.Blocks(
 - 🛡️ We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.
 - 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.\
 """)
+    with gr.Tab('ℹ️ About Us'):
+        with gr.Row():
+            introductions = gr.Markdown("""\
+## About Us
+### Open-source contributors
+### Learn more
+### Contact Us
+### Acknowledgment
+""")
         # tutorial1 = gr.Markdown("""\
 
         #                         - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
@@ -1070,4 +1086,7 @@ with gr.Blocks(
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=False, server_name='0.0.0.0', server_port=80)
+    if args.ip and args.port:
+        demo.launch(share=False, server_name=args.ip, server_port=args.port)
+    else:
+        demo.launch(share=False)
