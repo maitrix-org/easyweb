@@ -1,10 +1,11 @@
+from typing import Any
+
 from reasoners import ReasonerAgent
 
 from easyweb.controller.agent import Agent
 from easyweb.controller.state.state import State
 from easyweb.core.logger import easyweb_logger as logger
 from easyweb.events.action import Action
-from easyweb.llm.llm import LLM
 from easyweb.runtime.plugins import (
     PluginRequirement,
 )
@@ -22,19 +23,21 @@ class ReasonerAgentFast(Agent):
 
     def __init__(
         self,
-        llm: LLM,
+        llm: Any,
     ) -> None:
         """
         Initializes a new instance of the AbstractBrowsingAgent class.
 
         Parameters:
-        - llm (LLM): The llm to be used by this agent
+        - llm (Any): The llm to be used by this agent
         """
         super().__init__(llm)
-        if 'gpt-4o-mini' in llm.model_name:
+        if isinstance(llm, dict):
+            model_names = ''.join([m.model_name for m in llm.values()])
+        else:
+            model_names = llm.model_name
+        if 'gpt-4o-mini' in model_names:
             self.config_name = 'easyweb_mini'
-        elif 'deepseek-reasoner' in llm.model_name:
-            self.config_name = 'easyweb_r1'
         else:
             self.config_name = 'easyweb'
 

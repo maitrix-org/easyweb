@@ -4,13 +4,28 @@
         "base_url": "https://api.openai.com/v1/",
         "requires_key": false,
         "default": true,
-        "display_name": "GPT-4o-mini (Free)"
+        "display_name": "OpenAI GPT-4o-mini (Free)"
     },
     "gpt-4o":
     {
         "base_url": "https://api.openai.com/v1/",
         "requires_key": true,
-        "display_name": "GPT-4o"
+        "display_name": "OpenAI GPT-4o"
+    },
+    "o1":
+    {
+        "requires_key": true,
+        "modules": {
+            "default": {
+                "model": "gpt-4o",
+                "base_url": "https://api.openai.com/v1/"
+            },
+            "policy": {
+                "model": "o1",
+                "base_url": "https://api.openai.com/v1/"
+            }
+        },
+        "display_name": "OpenAI o1"
     },
     "deepseek-chat":
     {
@@ -21,9 +36,19 @@
     },
     "deepseek-reasoner":
     {
-        "provider": "deepseek",
-        "base_url": "https://api.deepseek.com",
         "requires_key": true,
+        "modules": {
+            "default": {
+                "model": "deepseek-chat",
+                "provider": "deepseek",
+                "base_url": "https://api.deepseek.com"
+            },
+            "policy": {
+                "model": "deepseek-reasoner",
+                "provider": "deepseek",
+                "base_url": "https://api.deepseek.com"
+            }
+        },
         "display_name": "DeepSeek R1 (⚠️ Unstable)"
     }
 }

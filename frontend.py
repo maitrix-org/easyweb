@@ -817,7 +817,7 @@ agent_display2class = {
 }
 
 agent_supported_models = {
-    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
+    agent_descriptions[3]: ['OpenAI GPT-4o-mini (Free)', 'GPT-4o'],
 }
 
 with gr.Blocks() as demo:  # css=css
@@ -1023,4 +1023,4 @@ with gr.Blocks() as demo:  # css=css
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=True)

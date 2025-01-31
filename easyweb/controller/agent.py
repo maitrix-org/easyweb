@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Type
+from typing import TYPE_CHECKING, Any, Type
 
 if TYPE_CHECKING:
     from easyweb.controller.state.state import State
@@ -8,7 +8,6 @@ from easyweb.core.exceptions import (
     AgentAlreadyRegisteredError,
     AgentNotRegisteredError,
 )
-from easyweb.llm.llm import LLM
 from easyweb.runtime.plugins import PluginRequirement
 from easyweb.runtime.tools import RuntimeTool
 
@@ -28,7 +27,7 @@ class Agent(ABC):
 
     def __init__(
         self,
-        llm: LLM,
+        llm: Any,
     ):
         self.llm = llm
         self._complete = False

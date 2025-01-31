@@ -56,6 +56,15 @@ class BrowsingAgent(Agent):
         Parameters:
         - llm (LLM): The llm to be used by this agent
         """
+        if isinstance(llm, dict):
+            if 'policy' in llm:
+                llm = llm['policy']
+            elif 'default' in llm:
+                llm = llm['default']
+            else:
+                raise RuntimeError(
+                    "BrowsingAgent's model is set to policy or default, when model is specified by modules."
+                )
         super().__init__(llm)
         # define a configurable action space, with chat functionality, web navigation, and webpage grounding using accessibility tree and HTML.
         # see https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/action/highlevel.py for more details

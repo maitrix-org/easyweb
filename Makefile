@@ -3,9 +3,8 @@ SHELL=/bin/bash
 
 # Variables
 DOCKER_IMAGE = ghcr.io/opendevin/sandbox
-BACKEND_PORT ?= 5000
+BACKEND_PORT ?= 3000
 BACKEND_HOST = "127.0.0.1:$(BACKEND_PORT)"
-FRONTEND_PORT = 3001
 DEFAULT_WORKSPACE_DIR = "./workspace"
 DEFAULT_MODEL = "gpt-4o"
 CONFIG_FILE = config.toml
@@ -242,7 +241,8 @@ run:
 	@echo "$(YELLOW)Waiting for the backend to start...$(RESET)"
 	@until nc -z localhost $(BACKEND_PORT); do sleep 0.1; done
 	@echo "$(GREEN)Backend started successfully.$(RESET)"
-	@cd frontend && echo "$(BLUE)Starting frontend with npm...$(RESET)" && npm run start -- --port $(FRONTEND_PORT)
+	@echo "$(YELLOW)Starting frontend...$(RESET)"
+	@poetry run gradio frontend.py
 	@echo "$(GREEN)Application started successfully.$(RESET)"
 
 # Setup config.toml
