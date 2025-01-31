@@ -815,184 +815,127 @@ agent_supported_models = {
     agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
 }
 
-with gr.Blocks() as demo:  # css=css
-    action_messages = gr.State([])
-    session = gr.State(None)
-    title = gr.Markdown(
-        '# 🚀 EasyWeb: Open Platform for Building and Serving UI Agents'
-    )
-    tutorial1 = gr.Markdown("""\
-                            - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
-                                - 🆓 We offer GPT-4o-mini as a free option for testing basic tasks.
-                                - 🚀 For best performance, select GPT-4o and provide your own API key. (We do not store API keys.)
-                                - 🐋 DeepSeek models are available for use with your own API key, but we do not recommend them due to recent instabilities.
-                                - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, and more.
-                            - 💬 **Ask the Agent** to perform web-related tasks, **for example:**
-                                - "Use DuckDuckGo to search for the current president of USA."
-                                - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
-                                - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
-                            - 🔎 **Browsing Tips**:
-                                - 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
-                                - ⚡ Speed may vary depending on backend API load.
-                                - 🔄 The agent may repeat actions before trying alternative approaches.
-                                - 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
-                            - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
-                            - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
-                            - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-                            - 💡 Currently, the agent can only see **up to the latest user message**. We're working on enabling multi-turn interactions — stay tuned!""")
-    with gr.Group():
-        with gr.Row():
-            agent_selection = gr.Dropdown(
-                agent_display_names,
-                value=default_agent,
-                interactive=True,
-                label='Agent',
-                scale=2,
-                # info='Choose your own adventure partner!',
-            )
-            model_selection = gr.Dropdown(
-                model_list,
-                value=default_model,
-                interactive=True,
-                label='Backend LLM',
-                scale=1,
-                # info='Choose the model you would like to use',
-            )
-            api_key = check_requires_key(default_model, default_api_key)
+with gr.Blocks(
+    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg)
+) as demo:  # css=css
+    with gr.Tab('🌐 Demo'):
+        action_messages = gr.State([])
+        session = gr.State(None)
+        title = gr.Markdown("""\
+    # 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
+    [Twitter](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
+    """)
 
-    with gr.Row(equal_height=False):
-        with gr.Column(scale=1):
-            chatbot = gr.Chatbot(type='messages')
+        description = gr.Markdown("""\
+    #### Example Prompts:
+    - "Use DuckDuckGo to search for the current president of USA."
+    - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+    - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
 
-            with gr.Group():
-                with gr.Row():
-                    msg = gr.Textbox(container=False, show_label=False, scale=7)
+    <font size="4"> **Note:** The agent defaults to DuckDuckGo for search engine due to restrictions, and currently only sees up to the latest user message. \
+    Include specific websites or detailed instructions in your prompt for more consistent behavior.</font>
 
-                    submit = gr.Button(
-                        'Submit',
-                        variant='primary',
-                        scale=1,
-                        min_width=150,
+    #### ⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.\
+    """)
+
+        with gr.Group():
+            with gr.Row():
+                agent_selection = gr.Dropdown(
+                    agent_display_names,
+                    value=default_agent,
+                    interactive=True,
+                    label='Agent',
+                    scale=2,
+                    # info='Choose your own adventure partner!',
+                )
+                model_selection = gr.Dropdown(
+                    model_list,
+                    value=default_model,
+                    interactive=True,
+                    label='Backend LLM',
+                    scale=1,
+                    # info='Choose the model you would like to use',
+                )
+                api_key = check_requires_key(default_model, default_api_key)
+
+        with gr.Row(equal_height=False):
+            with gr.Column(scale=1):
+                chatbot = gr.Chatbot(type='messages')
+
+                with gr.Group():
+                    with gr.Row():
+                        msg = gr.Textbox(container=False, show_label=False, scale=7)
+
+                        submit = gr.Button(
+                            'Submit',
+                            variant='primary',
+                            scale=1,
+                            min_width=150,
+                        )
+                        stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
+                        submit_triggers = [msg.submit, submit.click]
+            with gr.Column(scale=2, visible=False) as visualization_column:
+                with gr.Group():
+                    start_url = 'about:blank'
+                    url = gr.Textbox(
+                        start_url, label='URL', interactive=False, max_lines=1
                     )
-                    stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
-                    submit_triggers = [msg.submit, submit.click]
-        with gr.Column(scale=2, visible=False) as visualization_column:
-            with gr.Group():
-                start_url = 'about:blank'
-                url = gr.Textbox(start_url, label='URL', interactive=False, max_lines=1)
-                blank = Image.new('RGB', (1280, 720), (255, 255, 255))
-                screenshot = gr.Image(blank, interactive=False, label='Webpage')
+                    blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+                    screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
-    with gr.Row():
-        toggle_button = gr.Button('🔍 Show Browser')
-        upvote = gr.Button('👍 Good Response', interactive=False)
-        downvote = gr.Button('👎 Bad Response', interactive=False)
-        clear = gr.Button('🗑️ Clear')
+        with gr.Row():
+            toggle_button = gr.Button('🔍 Show Browser')
+            upvote = gr.Button('👍 Good Response', interactive=False)
+            downvote = gr.Button('👎 Bad Response', interactive=False)
+            clear = gr.Button('🗑️ Clear')
 
-    status = gr.Markdown('Agent Status: 🔴 Inactive')
-    browser_history = gr.State([(blank, start_url)])
-    options_visible = gr.State(False)
-    upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
-    downvote.click(vote, inputs=[gr.State(False), session], outputs=[upvote, downvote])
-    options_visible.change(
-        toggle_options,
-        inputs=[options_visible, gr.State(False)],
-        outputs=[
-            visualization_column,
-            options_visible,
-            toggle_button,
-        ],
-        queue=False,
-    )
-    toggle_click = toggle_button.click(
-        toggle_options,
-        inputs=[options_visible, gr.State(True)],
-        outputs=[
-            visualization_column,
-            options_visible,
-            toggle_button,
-        ],
-        queue=False,
-    )
-    chat_msg = gr.events.on(
-        submit_triggers,
-        process_user_message,
-        [msg, chatbot],
-        [msg, chatbot],
-        queue=False,
-    )
-    bot_msg = chat_msg.then(
-        get_messages,
-        [
-            chatbot,
-            action_messages,
-            browser_history,
-            session,
-            status,
-            agent_selection,
-            model_selection,
-            api_key,
-            options_visible,
-        ],
-        [
-            chatbot,
-            screenshot,
-            url,
-            action_messages,
-            browser_history,
-            session,
-            status,
-            clear,
-            options_visible,
-            upvote,
-            downvote,
-            submit,
-            stop,
-        ],
-        concurrency_limit=args.num_backends,
-    )
-    (
-        stop.click(
-            stop_task,
-            [session],
-            [session, status, clear],
+        status = gr.Markdown('Agent Status: 🔴 Inactive')
+        browser_history = gr.State([(blank, start_url)])
+        options_visible = gr.State(False)
+        upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
+        downvote.click(
+            vote, inputs=[gr.State(False), session], outputs=[upvote, downvote]
+        )
+        options_visible.change(
+            toggle_options,
+            inputs=[options_visible, gr.State(False)],
+            outputs=[
+                visualization_column,
+                options_visible,
+                toggle_button,
+            ],
             queue=False,
         )
-        # .then(
-        #     get_messages,
-        #     [
-        #         chatbot,
-        #         action_messages,
-        #         browser_history,
-        #         session,
-        #         status,
-        #         agent_selection,
-        #         model_selection,
-        #         api_key,
-        #         options_visible,
-        #     ],
-        #     [
-        #         chatbot,
-        #         screenshot,
-        #         url,
-        #         action_messages,
-        #         browser_history,
-        #         session,
-        #         status,
-        #         clear,
-        #         options_visible,
-        #         upvote,
-        #         downvote,
-        #         submit,
-        #         stop,
-        #     ],
-        #     concurrency_limit=args.num_backends,
-        # )
-    )
-    (
-        clear.click(
-            clear_page,
-            [browser_history, session],
+        toggle_click = toggle_button.click(
+            toggle_options,
+            inputs=[options_visible, gr.State(True)],
+            outputs=[
+                visualization_column,
+                options_visible,
+                toggle_button,
+            ],
+            queue=False,
+        )
+        chat_msg = gr.events.on(
+            submit_triggers,
+            process_user_message,
+            [msg, chatbot],
+            [msg, chatbot],
+            queue=False,
+        )
+        bot_msg = chat_msg.then(
+            get_messages,
+            [
+                chatbot,
+                action_messages,
+                browser_history,
+                session,
+                status,
+                agent_selection,
+                model_selection,
+                api_key,
+                options_visible,
+            ],
             [
                 chatbot,
                 screenshot,
@@ -1001,19 +944,123 @@ with gr.Blocks() as demo:  # css=css
                 browser_history,
                 session,
                 status,
+                clear,
+                options_visible,
+                upvote,
+                downvote,
+                submit,
+                stop,
             ],
+            concurrency_limit=args.num_backends,
+        )
+        (
+            stop.click(
+                stop_task,
+                [session],
+                [session, status, clear],
+                queue=False,
+            )
+            # .then(
+            #     get_messages,
+            #     [
+            #         chatbot,
+            #         action_messages,
+            #         browser_history,
+            #         session,
+            #         status,
+            #         agent_selection,
+            #         model_selection,
+            #         api_key,
+            #         options_visible,
+            #     ],
+            #     [
+            #         chatbot,
+            #         screenshot,
+            #         url,
+            #         action_messages,
+            #         browser_history,
+            #         session,
+            #         status,
+            #         clear,
+            #         options_visible,
+            #         upvote,
+            #         downvote,
+            #         submit,
+            #         stop,
+            #     ],
+            #     concurrency_limit=args.num_backends,
+            # )
+        )
+        (
+            clear.click(
+                clear_page,
+                [browser_history, session],
+                [
+                    chatbot,
+                    screenshot,
+                    url,
+                    action_messages,
+                    browser_history,
+                    session,
+                    status,
+                ],
+                queue=False,
+            ).then(fn=None)
+        )
+        agent_selection.select(
+            check_supported_models,
+            [agent_selection, model_selection, api_key],
+            [model_selection, api_key],
             queue=False,
-        ).then(fn=None)
-    )
-    agent_selection.select(
-        check_supported_models,
-        [agent_selection, model_selection, api_key],
-        [model_selection, api_key],
-        queue=False,
-    )
-    model_selection.select(
-        check_requires_key, [model_selection, api_key], api_key, queue=False
-    )
+        )
+        model_selection.select(
+            check_requires_key, [model_selection, api_key], api_key, queue=False
+        )
+    with gr.Tab('📖 Instructions'):
+        with gr.Row():
+            instructions = gr.Markdown("""\
+## 📖 How It Works
+#### 1️⃣ **Choose an Agent & LLM**
+- Use GPT-4o-mini for free, or bring your own GPT-4o API key for better performance.
+- 🐋 DeepSeek models are available but **not recommended** due to recent instabilities.
+
+#### 2️⃣ Ask the agent to perform web-related tasks like:
+- "Use DuckDuckGo to search for the current president of USA."
+- "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+- "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+
+#### 3️⃣ Give us a 👍 or 👎 once the agent completes the task!
+
+<font size="4"> **⚠️ Privacy and Data Usage:** Submitted data may be used for research, and user prompts and feedback are logged. Please avoid uploading confidential or personal information. </font>
+
+## 🔎 Browsing Tips:
+- 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
+- ⚡ Speed may vary depending on backend API load.
+- 🔄 The agent may repeat actions before trying alternative approaches.
+- 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
+- 🛡️ We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.
+- 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.\
+""")
+        # tutorial1 = gr.Markdown("""\
+
+        #                         - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
+        #                             - 🆓 We offer GPT-4o-mini as a free option for testing basic tasks.
+        #                             - 🚀 For best performance, select GPT-4o and provide your own API key. (We do not store API keys.)
+        #                             - 🐋 DeepSeek models are available for use with your own API key, but we do not recommend them due to recent instabilities.
+        #                             - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, and more.
+        #                         - 💬 **Ask the Agent** to perform web-related tasks, **for example:**
+        #                             - "Use DuckDuckGo to search for the current president of USA."
+        #                             - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+        #                             - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+        #                         - 🔎 **Browsing Tips**:
+        #                             - 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
+        #                             - ⚡ Speed may vary depending on backend API load.
+        #                             - 🔄 The agent may repeat actions before trying alternative approaches.
+        #                             - 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
+        #                         - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
+        #                         - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
+        #                         - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
+        #                         - 💡 Currently, the agent can only see **up to the latest user message**. We're working on enabling multi-turn interactions — stay tuned!""")
     demo.load(None, None, None, js=tos_popup_js)
 
 if __name__ == '__main__':
