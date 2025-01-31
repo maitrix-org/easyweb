@@ -230,7 +230,11 @@ start-backends:
 	@for i in $$(seq 0 $(shell echo $$(($(NUM_BACKENDS)-1)))); do \
 		PORT=$$(( $(START_PORT) + $$i )) ; \
 		echo "$(BLUE)Starting backend on port $$PORT...$(RESET)"; \
-		poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*" & \
+		if [ $$i -eq $$(($(NUM_BACKENDS)-1)) ]; then \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*"; \
+		else \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*" & \
+		fi \
 	done
 	@echo "$(GREEN)All backend instances started successfully.$(RESET)"
 

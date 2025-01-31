@@ -1023,4 +1023,4 @@ with gr.Blocks() as demo:  # css=css
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=False, server_name='0.0.0.0', server_port=80)
