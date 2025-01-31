@@ -121,7 +121,7 @@ make run
     ```
 - **Start the Frontend Server:** Similarly, you can start the frontend server on its own to work on frontend-related components or interface enhancements.
     ```bash
-    python frontend.py
+    make start-frontend
     ```
 - **Start Multiple Backend Server with Specified Port:** If you prefer, you can also start multiple backend server independently on different terminals with ports $5000$ and onwards for running multiple requests (one request per backend).
     ```bash
@@ -129,7 +129,7 @@ make run
     ```
     Once you started multiple backend port, please start the frontend using:
     ```bash
-    python frontend.py --num-backends {num_backend_opened}
+    poetry run python frontend.py --num-backends {num_backend_opened}
     ```
     Then you can duplicate the frontend link you just opened to start running parallel requests.
 

@@ -162,7 +162,7 @@ install-python-dependencies:
 	fi
 	@poetry install
 	@echo "$(BLUE)Installing extra dependencies with pip...$(RESET)"
-	@poetry run pip install gradio bs4 websocket-client
+	@poetry run pip install gradio==5.1.0 bs4 websocket-client
 	@if [ -f "/etc/manjaro-release" ]; then \
 		echo "$(BLUE)Detected Manjaro Linux. Installing Playwright dependencies...$(RESET)"; \
 		poetry run pip install playwright; \
@@ -223,6 +223,20 @@ build-frontend:
 start-backend:
 	@echo "$(YELLOW)Starting backend...$(RESET)"
 	@poetry run uvicorn easyweb.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
+
+# Start backends
+start-backends:
+	@echo "$(YELLOW)Starting $(NUM_BACKENDS) backend instance(s) starting at port $(START_PORT)...$(RESET)"
+	@for i in $$(seq 0 $(shell echo $$(($(NUM_BACKENDS)-1)))); do \
+		PORT=$$(( $(START_PORT) + $$i )) ; \
+		echo "$(BLUE)Starting backend on port $$PORT...$(RESET)"; \
+		if [ $$i -eq $$(($(NUM_BACKENDS)-1)) ]; then \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*"; \
+		else \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*" & \
+		fi \
+	done
+	@echo "$(GREEN)All backend instances started successfully.$(RESET)"
 
 # Start frontend
 start-frontend:

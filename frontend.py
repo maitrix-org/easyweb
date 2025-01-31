@@ -289,7 +289,7 @@ def get_messages(
     user_message = None
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
-        if chat_history[-1]['role'] == 'user':
+        if chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] != '':
             user_message = chat_history[-1]['content']
 
     # Initialize a new session if it doesn't exist
@@ -306,6 +306,10 @@ def get_messages(
             api_key=api_key,
         )
         session = new_session
+        if user_message is None:
+            backend_manager.release_backend(session.port)
+            session.agent_state = None
+            chat_history = chat_history[:-1]
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
@@ -703,10 +707,11 @@ def display_history(history, messages_history, action_messages):
 
 def process_user_message(user_message, history):
     if not user_message.strip():
+        chat_message = gr.ChatMessage(role='user', content='')
+        history.append(chat_message)
         return '', history
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
-
     return '', history
 
 
@@ -1065,4 +1070,4 @@ with gr.Blocks(
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=False)
+    demo.launch(share=False, server_name='0.0.0.0', server_port=80)
