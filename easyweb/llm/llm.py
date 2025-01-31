@@ -26,6 +26,7 @@ from easyweb.core.metrics import Metrics
 
 __all__ = ['LLM']
 
+litellm.drop_params = True
 message_separator = '\n\n----------\n\n'
 
 

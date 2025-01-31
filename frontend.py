@@ -24,7 +24,7 @@ parser.add_argument(
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
-default_api_key = os.environ.get('OPENAI_API_KEY')
+default_api_key = 'sk-123'
 
 
 class BackendManager:
@@ -1023,4 +1023,4 @@ with gr.Blocks() as demo:  # css=css
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=True)
+    demo.launch(share=False)
