@@ -123,9 +123,10 @@ make run
     ```bash
     make start-frontend
     ```
-- **Start Multiple Backend Server with Specified Port:** If you prefer, you can also start multiple backend server independently on different terminals with ports $5000$ and onwards for running multiple requests (one request per backend).
+- **Start Multiple Backend Servers** If you prefer, you can also start multiple backend servers together with ports $5000$ and onwards for running multiple requests (one request per backend), given that you have sufficient memory on the machine.
     ```bash
     BACKEND_PORT={port_5000_onwards} make start-backend
+    make start-backends NUM_BACKENDS={number_of_your_choice} START_PORT=5000
     ```
     Once you started multiple backend port, please start the frontend using:
     ```bash

@@ -357,8 +357,6 @@ def get_messages(
         if session.agent_state not in [
             'init',
             'running',
-            'pausing',
-            'resuming',
         ]:
             if stop_flag:
                 stop_flag = False
@@ -798,7 +796,16 @@ tos_popup_js = r"""
     window.alerted_before = true;
 }
 """
-
+image_css = """
+.sponsor-image-about img {
+    margin: 0 20px;
+    margin-top: 20px;
+    height: 40px;
+    max-height: 100%;
+    width: auto;
+    float: left;
+}
+"""
 agent_descriptions = [
     'DummyWebAgent — Debugging only',
     'BrowsingAgent — 🏃‍♂️ Good for quick tasks, but limited depth.',
@@ -824,14 +831,14 @@ agent_supported_models = {
 }
 
 with gr.Blocks(
-    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg)
+    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg), css=image_css
 ) as demo:  # css=css
     with gr.Tab('🌐 Demo'):
         action_messages = gr.State([])
         session = gr.State(None)
         title = gr.Markdown("""\
     # 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
-    [Twitter](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
+    [X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
     """)
 
         description = gr.Markdown("""\
@@ -968,36 +975,6 @@ with gr.Blocks(
                 [session, status, clear],
                 queue=False,
             )
-            # .then(
-            #     get_messages,
-            #     [
-            #         chatbot,
-            #         action_messages,
-            #         browser_history,
-            #         session,
-            #         status,
-            #         agent_selection,
-            #         model_selection,
-            #         api_key,
-            #         options_visible,
-            #     ],
-            #     [
-            #         chatbot,
-            #         screenshot,
-            #         url,
-            #         action_messages,
-            #         browser_history,
-            #         session,
-            #         status,
-            #         clear,
-            #         options_visible,
-            #         upvote,
-            #         downvote,
-            #         submit,
-            #         stop,
-            #     ],
-            #     concurrency_limit=args.num_backends,
-            # )
         )
         (
             clear.click(
@@ -1025,8 +1002,17 @@ with gr.Blocks(
             check_requires_key, [model_selection, api_key], api_key, queue=False
         )
         tos = gr.Markdown("""\
-        ### Terms of Service
-        ### Acknowledgement
+        #### Terms of Service
+        Users of this website are required to agree to the following terms:\n\n
+        This service is a research preview offering limited safety measures and may perform unsafe actions.
+        It must not be used for any illegal, harmful, violent, racist, or sexual purposes.
+        Please refrain from uploading any private or sensitive information.
+        By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content),
+        and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.
+        #### Please report any bug or issue to our [Discord](https://discord.gg/NdQD6eJzch)
+        #### Acknowledgment
+        We thank [Gradio](https://github.com/gradio-app/gradio) and [OpenHands](https://github.com/All-Hands-AI/OpenHands) Team for their system support.
+        We also thank [INSERT ORGANIZATIONS] for their generous sponsorship. Contact us to learn more about partnership.
         """)
     with gr.Tab('📖 Instructions'):
         with gr.Row():
@@ -1057,10 +1043,25 @@ with gr.Blocks(
         with gr.Row():
             introductions = gr.Markdown("""\
 ## About Us
+EasyWeb is an open platform for AI web-agents, hosted by [Maitrix Team](https://maitrix.org/).
+We open-source the [EasyWeb](https://github.com/maitrix-org/easyweb) project at Github, and always welcome contributions from the community.
+If you are interested in collaboration, please contact us, we'd love to hear from you!
 ### Open-source contributors
+- Contributors: Mingkai Deng, Jinyu Hou, Jackie Wang, Mason Choey, Brandon Chiou, Ariel Wu
+- Advisors: Zhiting Hu, Hongxia Jin, Li Erran Li, Graham Neubig, Yilin Shen, Eric Xing\n
+📩 **Correspondence to**: [Mingkai Deng](mailto:mingkai.deng@outlook.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
 ### Learn more
+- ReasonerAgent [launch blog]()
 ### Contact Us
+- Follow our [X](https://x.com/MaitrixOrg) and [Discord](https://discord.gg/NdQD6eJzch)
+- File issues on [Github](https://github.com/maitrix-org/easyweb)
 ### Acknowledgment
+We thank [Gradio](https://github.com/gradio-app/gradio) and [OpenHands](https://github.com/All-Hands-AI/OpenHands) Team for their system support.
+We also thank [INSERT ORGANIZATIONS] for their generous sponsorship. Contact us to learn more about partnership.
+
+<div class="sponsor-image-about">
+    <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
+</div>
 """)
         # tutorial1 = gr.Markdown("""\
 
