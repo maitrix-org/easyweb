@@ -20,7 +20,7 @@
 <!-- PROJECT LOGO -->
 <div align="center">
   <img src="./easy-web-icon.png" alt="Easy Web Logo" width="200">
-  <h1 align="center">EasyWeb: UI Agents at Your Fingertips</h1>
+  <h1 align="center">EasyWeb: Web Agents at Your Fingertips</h1>
   <!-- Change based on updated links or names in the future -->
   <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
 </div>
