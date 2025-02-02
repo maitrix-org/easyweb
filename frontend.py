@@ -885,7 +885,7 @@ with gr.Blocks(
 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
 - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
 
-**Note:** The agent defaults to DuckDuckGo for search engine due to restrictions, and currently only sees up to the latest user message. \
+**Note:** The agent currently **does not remember previous messages**, and defaults to **DuckDuckGo** for search engine due to restrictions. \
 Include specific websites or detailed instructions in your prompt for more consistent behavior.
 
 **⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
