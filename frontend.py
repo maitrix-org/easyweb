@@ -837,6 +837,24 @@ image_css = """
     float: left;
 }
 """
+google_analytics_tracking_id = None
+try:
+    with open('google_analytics_api_key.txt', 'r') as f:
+        google_analytics_tracking_id = f.read().strip()
+except FileNotFoundError:
+    pass
+ga_head_snippet = ''
+if google_analytics_tracking_id:
+    ga_head_snippet = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={google_analytics_tracking_id}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{google_analytics_tracking_id}');
+</script>
+"""
+
 agent_descriptions = [
     'DummyWebAgent — Debugging only',
     'BrowsingAgent — 🏃‍♂️ Good for quick tasks, but limited depth.',
@@ -1142,7 +1160,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 """)
-    demo.load(None, None, None, js=tos_popup_js)
+    demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
 
 if __name__ == '__main__':
     demo.queue()
