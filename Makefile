@@ -240,7 +240,7 @@ start-backends:
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@poetry run gradio frontend.py
+	@poetry run python frontend.py
 
 # Run the app
 run:
@@ -256,7 +256,7 @@ run:
 	@until nc -z localhost $(BACKEND_PORT); do sleep 0.1; done
 	@echo "$(GREEN)Backend started successfully.$(RESET)"
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@poetry run gradio frontend.py
+	@poetry run python frontend.py
 	@echo "$(GREEN)Application started successfully.$(RESET)"
 
 # Setup config.toml
