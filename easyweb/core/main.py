@@ -75,12 +75,7 @@ async def main(
             model, api_base = get_model_port_arg(
                 llm_config.model_port_config_file, args.model_name
             )
-            if isinstance(model, dict):
-                llm = {
-                    k: LLM(model=model[k], base_url=api_base[k]) for k in model.keys()
-                }
-            else:
-                llm = LLM(model=model, base_url=api_base)
+            llm = LLM(model=model, base_url=api_base)
         else:
             logger.info(
                 f'Running agent {args.agent_cls} (model: {llm_config.model}, llm_config: {args.llm_config}) with task: "{task}"'

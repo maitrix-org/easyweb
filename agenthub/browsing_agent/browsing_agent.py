@@ -56,15 +56,6 @@ class BrowsingAgent(Agent):
         Parameters:
         - llm (LLM): The llm to be used by this agent
         """
-        if isinstance(llm, dict):
-            if 'policy' in llm:
-                llm = llm['policy']
-            elif 'default' in llm:
-                llm = llm['default']
-            else:
-                raise RuntimeError(
-                    "BrowsingAgent's model is set to policy or default, when model is specified by modules."
-                )
         super().__init__(llm)
         # define a configurable action space, with chat functionality, web navigation, and webpage grounding using accessibility tree and HTML.
         # see https://github.com/ServiceNow/BrowserGym/blob/main/core/src/browsergym/core/action/highlevel.py for more details
@@ -252,11 +243,16 @@ In order to accomplish my goal I need to send the information asked back to the 
 """
             prompt += concise_instruction
         messages.append({'role': 'user', 'content': prompt})
-        response = self.llm.completion(
+        completion_params = dict(
             messages=messages,
-            temperature=0.0,
             stop=[')```', ')\n```'],
         )
+        # This is hard coded because litellm.get_supported_openai_params
+        # is currently not functional correctly for these two models,
+        # especially o3-mini. Might be updated in a later version.
+        if not ('o1' in self.llm.model_name or 'o3-mini' in self.llm.model_name):
+            completion_params['temperature'] = 0.0
+        response = self.llm.completion(**completion_params)
         self.log_cost(response)
         action_resp = response['choices'][0]['message']['content'].strip()
         if not action_resp.endswith('```'):

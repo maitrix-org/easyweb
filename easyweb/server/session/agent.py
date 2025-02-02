@@ -94,13 +94,7 @@ class AgentSession:
                 config.llm.model_port_config_file, model
             )
         logger.info(f'Creating agent {agent_cls} using LLM {model}')
-        if isinstance(model, dict):
-            llm = {
-                k: LLM(model=model[k], api_key=api_key, base_url=api_base[k])
-                for k in model.keys()
-            }
-        else:
-            llm = LLM(model=model, api_key=api_key, base_url=api_base)
+        llm = LLM(model=model, api_key=api_key, base_url=api_base)
         agent = Agent.get_cls(agent_cls)(llm)
 
         max_iterations = args.get(ConfigType.MAX_ITERATIONS, config.max_iterations)

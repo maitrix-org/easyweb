@@ -15,17 +15,14 @@
     "o1":
     {
         "requires_key": true,
-        "modules": {
-            "default": {
-                "model": "gpt-4o",
-                "base_url": "https://api.openai.com/v1/"
-            },
-            "policy": {
-                "model": "o1",
-                "base_url": "https://api.openai.com/v1/"
-            }
-        },
+        "base_url": "https://api.openai.com/v1/",
         "display_name": "OpenAI o1"
+    },
+    "o3-mini":
+    {
+        "requires_key": true,
+        "base_url": "https://api.openai.com/v1/",
+        "display_name": "OpenAI o3-mini"
     },
     "deepseek-chat":
     {
@@ -37,18 +34,8 @@
     "deepseek-reasoner":
     {
         "requires_key": true,
-        "modules": {
-            "default": {
-                "model": "deepseek-chat",
-                "provider": "deepseek",
-                "base_url": "https://api.deepseek.com"
-            },
-            "policy": {
-                "model": "deepseek-reasoner",
-                "provider": "deepseek",
-                "base_url": "https://api.deepseek.com"
-            }
-        },
+        "provider": "deepseek",
+        "base_url": "https://api.deepseek.com",
         "display_name": "DeepSeek R1 (⚠️ Unstable)"
     }
 }
