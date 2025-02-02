@@ -257,7 +257,7 @@ def get_status(agent_state):
     else:
         status = f'Agent Status: 🔴 {agent_state}'
 
-    return status
+    return f'<font size="4"> {status} </font>'
 
 
 def get_action_history_markdown(action_history):
@@ -837,21 +837,30 @@ with gr.Blocks(
         action_messages = gr.State([])
         session = gr.State(None)
         title = gr.Markdown("""\
-    # 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
-    [X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
-    """)
+# 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
+<font size="4">
+
+[X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
+
+</font>
+""")
 
         description = gr.Markdown("""\
-    #### Example Prompts:
-    - "Use DuckDuckGo to search for the current president of USA."
-    - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
-    - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
 
-    <font size="4"> **Note:** The agent defaults to DuckDuckGo for search engine due to restrictions, and currently only sees up to the latest user message. \
-    Include specific websites or detailed instructions in your prompt for more consistent behavior.</font>
+<font size="4">
 
-    #### ⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.\
-    """)
+**Example Prompts:**
+- "Use DuckDuckGo to search for the current president of USA."
+- "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+- "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+
+**Note:** The agent defaults to DuckDuckGo for search engine due to restrictions, and currently only sees up to the latest user message. \
+Include specific websites or detailed instructions in your prompt for more consistent behavior.
+
+**⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
+
+</font>
+""")
 
         with gr.Group():
             with gr.Row():
@@ -903,8 +912,7 @@ with gr.Blocks(
             upvote = gr.Button('👍 Good Response', interactive=False)
             downvote = gr.Button('👎 Bad Response', interactive=False)
             clear = gr.Button('🗑️ Clear')
-
-        status = gr.Markdown('Agent Status: 🔴 Inactive')
+        status = gr.Markdown('<font size="4"> Agent Status: 🔴 Inactive </font>')
         browser_history = gr.State([(blank, start_url)])
         options_visible = gr.State(False)
         upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
@@ -1002,87 +1010,107 @@ with gr.Blocks(
             check_requires_key, [model_selection, api_key], api_key, queue=False
         )
         tos = gr.Markdown("""\
-        #### Terms of Service
-        Users of this website are required to agree to the following terms:\n\n
-        This service is a research preview offering limited safety measures and may perform unsafe actions.
-        It must not be used for any illegal, harmful, violent, racist, or sexual purposes.
-        Please refrain from uploading any private or sensitive information.
-        By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content),
-        and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.
-        #### Please report any bug or issue to our [Discord](https://discord.gg/NdQD6eJzch)
-        #### Acknowledgment
-        We thank [Gradio](https://github.com/gradio-app/gradio) and [OpenHands](https://github.com/All-Hands-AI/OpenHands) Team for their system support.
-        We also thank [INSERT ORGANIZATIONS] for their generous sponsorship. Contact us to learn more about partnership.
-        """)
+<font size="4">
+
+#### Terms of Service
+Users of this website are required to agree to the following terms:\n\n
+This service is a research preview offering limited safety measures and may perform unsafe actions.
+It must not be used for any illegal, harmful, violent, racist, or sexual purposes.
+Please refrain from uploading any private or sensitive information.
+By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content),
+and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.
+
+#### Please report any bug or issue to our [Discord](https://discord.gg/NdQD6eJzch)
+
+#### Acknowledgment
+
+We thank the [OpenHands](https://github.com/All-Hands-AI/OpenHands) team for their technical support.
+We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.com/) for their generous sponsorship. Contact us to learn more about partnership.
+
+</font>
+
+<div class="sponsor-image-about">
+    <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
+</div>
+
+""")
     with gr.Tab('📖 Instructions'):
         with gr.Row():
             instructions = gr.Markdown("""\
 ## 📖 How It Works
-#### 1️⃣ **Choose an Agent & LLM**
+<font size="4">
+
+1️⃣ **Choose an Agent & LLM:**
 - Use GPT-4o-mini for free, or bring your own GPT-4o API key for better performance.
 - 🐋 DeepSeek models are available but **not recommended** due to recent instabilities.
+- We are working on enabling other LLMs soon!
 
-#### 2️⃣ Ask the agent to perform web-related tasks like:
+2️⃣ **Ask the agent to perform web-related tasks like:**
 - "Use DuckDuckGo to search for the current president of USA."
 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
 - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
 
-#### 3️⃣ Give us a 👍 or 👎 once the agent completes the task!
+3️⃣ **Give us a 👍 or 👎 once the agent completes the task!**
 
-<font size="4"> **⚠️ Privacy and Data Usage:** Submitted data may be used for research, and user prompts and feedback are logged. Please avoid uploading confidential or personal information. </font>
-
+**⚠️ Privacy and Data Usage:** Submitted data may be used for research, and user prompts and feedback are logged. Please avoid uploading confidential or personal information.
 ## 🔎 Browsing Tips:
 - 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
 - ⚡ Speed may vary depending on backend API load.
 - 🔄 The agent may repeat actions before trying alternative approaches.
 - 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
 - 🛡️ We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.
-- 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.\
+- 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.
+
+</font>
 """)
     with gr.Tab('ℹ️ About Us'):
         with gr.Row():
             introductions = gr.Markdown("""\
 ## About Us
-EasyWeb is an open platform for AI web-agents, hosted by [Maitrix Team](https://maitrix.org/).
+
+<font size="4">
+
+EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/), and [Maitrix Team](https://maitrix.org/).
 We open-source the [EasyWeb](https://github.com/maitrix-org/easyweb) project at Github, and always welcome contributions from the community.
 If you are interested in collaboration, please contact us, we'd love to hear from you!
-### Open-source contributors
-- Contributors: Mingkai Deng, Jinyu Hou, Jackie Wang, Mason Choey, Brandon Chiou, Ariel Wu
-- Advisors: Zhiting Hu, Hongxia Jin, Li Erran Li, Graham Neubig, Yilin Shen, Eric Xing\n
+
+</font>
+
+### Open-Source Contributors
+
+<font size="4">
+
+- Contributors: [Mingkai Deng](https://mingkaid.github.io/), [Jackie Wang](https://github.com/Key-J), [Mason Choey](https://www.linkedin.com/in/mason-choey-9a6657325/), [Ariel Wu](https://www.linkedin.com/in/ariel-wu-63624716b/), [Brandon Chiou](https://www.linkedin.com/in/brandon-chiou/), [Jinyu Hou](https://www.linkedin.com/in/jinyu-hou-uoft/)
+- Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric Xing](https://www.cs.cmu.edu/~epxing/)
+
 📩 **Correspondence to**: [Mingkai Deng](mailto:mingkai.deng@outlook.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
-### Learn more
-- ReasonerAgent [launch blog]()
+
+</font>
+
 ### Contact Us
+
+<font size="4">
+
 - Follow our [X](https://x.com/MaitrixOrg) and [Discord](https://discord.gg/NdQD6eJzch)
 - File issues on [Github](https://github.com/maitrix-org/easyweb)
+
+</font>
+
 ### Acknowledgment
-We thank [Gradio](https://github.com/gradio-app/gradio) and [OpenHands](https://github.com/All-Hands-AI/OpenHands) Team for their system support.
-We also thank [INSERT ORGANIZATIONS] for their generous sponsorship. Contact us to learn more about partnership.
+
+<font size="4">
+
+We thank the [OpenHands](https://github.com/All-Hands-AI/OpenHands) team for their technical support.
+We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.com/) for their generous sponsorship. Contact us to learn more about partnership.
+
+</font>
 
 <div class="sponsor-image-about">
     <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 """)
-        # tutorial1 = gr.Markdown("""\
-
-        #                         - 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
-        #                             - 🆓 We offer GPT-4o-mini as a free option for testing basic tasks.
-        #                             - 🚀 For best performance, select GPT-4o and provide your own API key. (We do not store API keys.)
-        #                             - 🐋 DeepSeek models are available for use with your own API key, but we do not recommend them due to recent instabilities.
-        #                             - 🔜 More LLMs coming soon! We’re working on enabling Claude, Gemini, and more.
-        #                         - 💬 **Ask the Agent** to perform web-related tasks, **for example:**
-        #                             - "Use DuckDuckGo to search for the current president of USA."
-        #                             - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
-        #                             - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
-        #                         - 🔎 **Browsing Tips**:
-        #                             - 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
-        #                             - ⚡ Speed may vary depending on backend API load.
-        #                             - 🔄 The agent may repeat actions before trying alternative approaches.
-        #                             - 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
-        #                         - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
-        #                         - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
-        #                         - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-        #                         - 💡 Currently, the agent can only see **up to the latest user message**. We're working on enabling multi-turn interactions — stay tuned!""")
     demo.load(None, None, None, js=tos_popup_js)
 
 if __name__ == '__main__':
