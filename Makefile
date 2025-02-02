@@ -26,11 +26,14 @@ ifeq ($(INSTALL_DOCKER),)
 	@$(MAKE) -s pull-docker-image
 endif
 	@echo "$(GREEN)Cloning llm-reasoners repository...$(RESET)"
-	@if [ ! -d "../llm-reasoners" ]; then \
+	@CURRENT_DIR=$(CURDIR); \
+	if [ ! -d "../llm-reasoners" ]; then \
 		git clone https://github.com/maitrix-org/llm-reasoners.git ../llm-reasoners; \
 	else \
-		echo "Repository 'llm-reasoners' already exists. Skipping clone."; \
-	fi
+		echo "Repository 'llm-reasoners' already exists. Updating repository..."; \
+		cd ../llm-reasoners && git pull; \
+	fi; \
+	cd $$CURRENT_DIR
 	@$(MAKE) -s install-python-dependencies
 	@$(MAKE) -s install-precommit-hooks
 	@echo "$(GREEN)Build completed successfully.$(RESET)"
