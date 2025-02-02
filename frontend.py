@@ -501,42 +501,73 @@ def get_messages(
                 and message.get('args', {}).get('thought', '')
             ):
                 full_output_dict = json.loads(message['args']['thought'])
-                plan = full_output_dict.get('plan')
-                if plan:
-                    chat_history.append(gr.ChatMessage(role='assistant', content=''))
-                    assistant_message = plan
-                    assistant_message_chars = []
-                    for i, char in enumerate(assistant_message):
-                        assistant_message_chars.append(char)
-                        updated_message = ''.join(assistant_message_chars)
-                        if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
-                            chat_history[-1] = gr.ChatMessage(
-                                role='assistant', content=updated_message
-                            )
-                            time.sleep(0.01)
+                plan = full_output_dict.get('plan', message['message'])
 
-                            yield (
-                                chat_history,
-                                screenshot,
-                                url,
-                                action_messages,
-                                browser_history,
-                                session,
-                                status,
-                                clear,
-                                options_visible,
-                                upvote,
-                                downvote,
-                                submit,
-                                stop,
-                            )
+                chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                assistant_message = plan
+                assistant_message_chars = []
+                for i, char in enumerate(assistant_message):
+                    assistant_message_chars.append(char)
+                    updated_message = ''.join(assistant_message_chars)
+                    if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
+                        chat_history[-1] = gr.ChatMessage(
+                            role='assistant', content=updated_message
+                        )
+                        time.sleep(0.01)
+
+                        yield (
+                            chat_history,
+                            screenshot,
+                            url,
+                            action_messages,
+                            browser_history,
+                            session,
+                            status,
+                            clear,
+                            options_visible,
+                            upvote,
+                            downvote,
+                            submit,
+                            stop,
+                        )
             elif (
                 session.agent == 'BrowsingAgent'
                 and message.get('action', '') == 'browse_interactive'
-                and message.get('args', {}).get('thought', '')
+                # and message.get('args', {}).get('thought', '')
             ):
-                thought = message['args']['thought']
-                chat_history.append(gr.ChatMessage(role='assistant', content=thought))
+                thought = message.get('args', {}).get('thought', '')
+                if not thought:
+                    thought = message['message']
+                # chat_history.append(gr.ChatMessage(role='assistant', content=thought))
+                print(thought)
+
+                chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                assistant_message = thought
+                assistant_message_chars = []
+                for i, char in enumerate(assistant_message):
+                    assistant_message_chars.append(char)
+                    updated_message = ''.join(assistant_message_chars)
+                    if (i + 1) % 10 == 0 or i == len(assistant_message) - 1:
+                        chat_history[-1] = gr.ChatMessage(
+                            role='assistant', content=updated_message
+                        )
+                        time.sleep(0.01)
+
+                        yield (
+                            chat_history,
+                            screenshot,
+                            url,
+                            action_messages,
+                            browser_history,
+                            session,
+                            status,
+                            clear,
+                            options_visible,
+                            upvote,
+                            downvote,
+                            submit,
+                            stop,
+                        )
 
             if session.agent_state == 'finished':
                 session.save_log()

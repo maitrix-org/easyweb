@@ -12,6 +12,18 @@
         "requires_key": true,
         "display_name": "GPT-4o"
     },
+    "o1":
+    {
+        "requires_key": true,
+        "base_url": "https://api.openai.com/v1/",
+        "display_name": "OpenAI o1"
+    },
+    "o3-mini":
+    {
+        "requires_key": true,
+        "base_url": "https://api.openai.com/v1/",
+        "display_name": "OpenAI o3-mini"
+    },
     "deepseek-chat":
     {
         "provider": "deepseek",

@@ -1,4 +1,3 @@
-import ast
 import os
 import random
 import time
@@ -24,6 +23,8 @@ from easyweb.runtime.plugins import (
 )
 from easyweb.runtime.tools import RuntimeTool
 
+from .response_parser import BrowsingResponseParser
+
 USE_NAV = (
     os.environ.get('USE_NAV', 'true') == 'true'
 )  # only disable NAV actions when running webarena and miniwob benchmarks
@@ -37,6 +38,67 @@ else:
     EVAL_MODE = False
 
 
+def get_error_prefix(last_browser_action: str) -> str:
+    return f'IMPORTANT! Last action is incorrect:\n{last_browser_action}\nThink again with the current observation of the page.\n'
+
+
+def get_system_message(goal: str, action_space: str) -> str:
+    current_datetime = datetime.now().strftime('%a, %b %d, %Y %H:%M:%S')
+
+    return f"""\
+# Instructions
+Review the current state of the page and all other information to find the best
+possible next action to accomplish your goal. Use Google Flights for questions \
+related to flight search. Your answer will be interpreted
+and executed by a program, make sure to follow the formatting instructions.
+
+# Goal:
+{goal}
+
+# Action Space
+{action_space}
+
+# Current Date and Time:
+{current_datetime}
+"""
+
+
+CONCISE_INSTRUCTION = """\
+
+Here is another example with chain of thought of a valid action when providing a concise answer to user:
+"
+In order to accomplish my goal I need to send the information asked back to the user. This page list the information of HP Inkjet Fax Machine, which is the product identified in the objective. Its price is $279.49. I will send a message back to user with the answer.
+```send_msg_to_user("$279.49")```
+"
+"""
+
+
+def get_prompt(
+    error_prefix: str, cur_url: str, cur_axtree_txt: str, prev_action_str: str
+) -> str:
+    prompt = f"""\
+{error_prefix}
+
+# Current Page URL:
+{cur_url}
+
+# Current Accessibility Tree:
+{cur_axtree_txt}
+
+# Previous Actions
+{prev_action_str}
+
+Here is an example with chain of thought of a valid action when clicking on a button:
+"
+In order to accomplish my goal I need to click on the button with bid 12
+```click("12")```
+"
+""".strip()
+    if USE_CONCISE_ANSWER:
+        prompt += CONCISE_INSTRUCTION
+    return prompt
+
+
 class BrowsingAgent(Agent):
     VERSION = '1.0'
     """
@@ -45,13 +107,13 @@ class BrowsingAgent(Agent):
 
     sandbox_plugins: list[PluginRequirement] = []
     runtime_tools: list[RuntimeTool] = [RuntimeTool.BROWSER]
+    response_parser = BrowsingResponseParser()
 
     def __init__(
         self,
         llm: LLM,
     ) -> None:
-        """
-        Initializes a new instance of the BrowsingAgent class.
+        """Initializes a new instance of the BrowsingAgent class.
 
         Parameters:
         - llm (LLM): The llm to be used by this agent
@@ -70,38 +132,10 @@ class BrowsingAgent(Agent):
 
         self.reset()
 
-    def reset(self) -> None:
-        """
-        Resets the Browsing Agent.
-        """
-        super().reset()
+    def reset(self):
+        """Resets the Browsing Agent."""
         self.cost_accumulator = 0
         self.error_accumulator = 0
-
-    def parse_response(self, response: str) -> Action:
-        if '```' not in response:
-            # unexpected response format, message back to user
-            action_str = f'send_msg_to_user("""{response}""")'
-            return BrowseInteractiveAction(
-                browser_actions=action_str,
-                thought=response,
-                browsergym_send_msg_to_user=response,
-            )
-        thought = response.split('```')[0].strip()
-        action_str = response.split('```')[1].strip()
-        # handle send message to user function call in BrowserGym
-        msg_content = ''
-        for sub_action in action_str.split('\n'):
-            if 'send_msg_to_user(' in sub_action:
-                tree = ast.parse(sub_action)
-                args = tree.body[0].value.args  # type: ignore
-                msg_content = args[0].value
-
-        return BrowseInteractiveAction(
-            browser_actions=action_str,
-            thought=thought,
-            browsergym_send_msg_to_user=msg_content,
-        )
 
     def step(self, state: State) -> Action:
         """
@@ -116,11 +150,9 @@ class BrowsingAgent(Agent):
         - MessageAction(content) - Message action to run (e.g. ask for clarification)
         - AgentFinishAction() - end the interaction
         """
-        goal = state.get_current_user_intent()
-        if goal is None:
-            goal = state.inputs['task']
         messages = []
         prev_actions = []
+        cur_url = ''
         cur_axtree_txt = ''
         error_prefix = ''
         last_obs = None
@@ -153,7 +185,7 @@ class BrowsingAgent(Agent):
 
         prev_action_str = '\n'.join(prev_actions)
         # if the final BrowserInteractiveAction exec BrowserGym's send_msg_to_user,
-        # we should also send a message back to the user in OpenDevin and call it a day
+        # we should also send a message back to the user in OpenHands and call it a day
         if (
             isinstance(last_action, BrowseInteractiveAction)
             and last_action.browsergym_send_msg_to_user
@@ -163,7 +195,13 @@ class BrowsingAgent(Agent):
         if isinstance(last_obs, BrowserOutputObservation):
             if last_obs.error:
                 # add error recovery prompt prefix
-                error_prefix = f'IMPORTANT! Last action is incorrect:\n{last_obs.last_browser_action}\nThink again with the current observation of the page.\n'
+                error_prefix = get_error_prefix(last_obs.last_browser_action)
+                self.error_accumulator += 1
+                if self.error_accumulator > 5:
+                    return MessageAction('Too many errors encountered. Task failed.')
+
+            cur_url = last_obs.url
+
             try:
                 cur_axtree_txt = flatten_axtree_to_str(
                     last_obs.axtree_object,
@@ -177,92 +215,30 @@ class BrowsingAgent(Agent):
                 )
                 return MessageAction('Error encountered when browsing.')
 
-        if error_prefix:
-            self.error_accumulator += 1
-            if self.error_accumulator > 5:
-                return MessageAction('Too many errors encountered. Task failed.')
+        goal = state.get_current_user_intent()
+        if goal is None:
+            goal = state.inputs['task']
 
-        current_datetime = datetime.now().strftime('%a, %b %d, %Y %H:%M:%S')
-        system_msg = f"""\
-# Instructions
-Review the current state of the page and all other information to find the best
-possible next action to accomplish your goal. Use Google Flights for questions
-related to flight search. Your answer will be interpreted
-and executed by a program, make sure to follow the formatting instructions.
-
-# Goal:
-{goal}
-
-# Action Space
-{self.action_space.describe(with_long_description=False, with_examples=True)}
-
-# Current Date and Time:
-{current_datetime}
-"""
-
-        #         system_msg = f"""\
-        # # Instructions
-        # Review the current state of the page and all other information to find the best
-        # possible next action to accomplish your goal. Use Google Flights for questions
-        # related to flight search. Your answer will be interpreted
-        # and executed by a program, make sure to follow the formatting instructions.
-
-        # # Goal:
-        # {goal}
-
-        # # Action Space
-        # {self.action_space.describe(with_long_description=False, with_examples=True)}
-        # """
+        system_msg = get_system_message(
+            goal,
+            self.action_space.describe(with_long_description=False, with_examples=True),
+        )
 
         messages.append({'role': 'system', 'content': system_msg})
 
-        prompt = f"""\
-{error_prefix}
-
-# Current Accessibility Tree:
-{cur_axtree_txt}
-
-# Previous Actions
-{prev_action_str}
-
-Here is an example with chain of thought of a valid action when clicking on a button:
-"
-In order to accomplish my goal I need to click on the button with bid 12
-```click("12")```
-"
-""".strip()
-
-        if USE_CONCISE_ANSWER:
-            concise_instruction = """\
-
-Here is another example with chain of thought of a valid action when providing a concise answer to user:
-"
-In order to accomplish my goal I need to send the information asked back to the user. This page list the information of HP Inkjet Fax Machine, which is the product identified in the objective. Its price is $279.49. I will send a message back to user with the answer.
-```send_msg_to_user("$279.49")```
-"
-"""
-            prompt += concise_instruction
+        prompt = get_prompt(error_prefix, cur_url, cur_axtree_txt, prev_action_str)
         messages.append({'role': 'user', 'content': prompt})
-        completion_params = dict(
+
+        response = self.llm.completion(
             messages=messages,
             stop=[')```', ')\n```'],
         )
-        # This is hard coded because litellm.get_supported_openai_params
-        # is currently not functional correctly for these two models,
-        # especially o3-mini. Might be updated in a later version.
-        if not ('o1' in self.llm.model_name or 'o3-mini' in self.llm.model_name):
-            completion_params['temperature'] = 0.0
-        response = self.llm.completion(**completion_params)
+
         self.log_cost(response)
-        action_resp = response['choices'][0]['message']['content'].strip()
-        if not action_resp.endswith('```'):
-            action_resp = action_resp + ')```'
 
         time.sleep(5 + random.random() * 5)
 
-        # logger.info(prompt)
-        logger.info(action_resp)
-        return self.parse_response(action_resp)
+        return self.response_parser.parse(response)
 
     def search_memory(self, query: str) -> list[str]:
         raise NotImplementedError('Implement this abstract method')
