@@ -837,6 +837,24 @@ image_css = """
     float: left;
 }
 """
+google_analytics_tracking_id = None
+try:
+    with open('google_analytics_api_key.txt', 'r') as f:
+        google_analytics_tracking_id = f.read().strip()
+except FileNotFoundError:
+    pass
+ga_head_snippet = ''
+if google_analytics_tracking_id:
+    ga_head_snippet = f"""
+<script async src="https://www.googletagmanager.com/gtag/js?id={google_analytics_tracking_id}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{google_analytics_tracking_id}');
+</script>
+"""
+
 agent_descriptions = [
     'DummyWebAgent — Debugging only',
     'BrowsingAgent — 🏃‍♂️ Good for quick tasks, but limited depth.',
@@ -885,7 +903,7 @@ with gr.Blocks(
 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
 - "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
 
-**Note:** The agent defaults to DuckDuckGo for search engine due to restrictions, and currently only sees up to the latest user message. \
+**Note:** The agent currently **does not remember previous messages**, and defaults to **DuckDuckGo** for search engine due to restrictions. \
 Include specific websites or detailed instructions in your prompt for more consistent behavior.
 
 **⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
@@ -1142,7 +1160,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 """)
-    demo.load(None, None, None, js=tos_popup_js)
+    demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
 
 if __name__ == '__main__':
     demo.queue()
