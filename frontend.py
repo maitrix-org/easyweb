@@ -880,7 +880,9 @@ agent_supported_models = {
 }
 
 with gr.Blocks(
-    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg), css=image_css
+    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg),
+    css=image_css,
+    title='EasyWeb: AI-Powered Web Agents at Your Fingertips',
 ) as demo:  # css=css
     with gr.Tab('🌐 Demo'):
         action_messages = gr.State([])
@@ -906,7 +908,9 @@ with gr.Blocks(
 **Note:** The agent currently **does not remember previous messages**, and defaults to **DuckDuckGo** for search engine due to restrictions. \
 Include specific websites or detailed instructions in your prompt for more consistent behavior.
 
-**⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
+**⚠️ The interface is currently optimized for Chrome.** If you encounter any issues, please try using Chrome.
+
+**❗ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
 
 </font>
 """)
@@ -1092,7 +1096,6 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 
 1️⃣ **Choose an Agent & LLM:**
 - Use GPT-4o-mini for free, or bring your own GPT-4o API key for better performance.
-- 🐋 DeepSeek models are available but **not recommended** due to recent instabilities.
 - We are working on enabling other LLMs soon!
 
 2️⃣ **Ask the agent to perform web-related tasks like:**
@@ -1120,7 +1123,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 
 <font size="4">
 
-EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/), and [Maitrix Team](https://maitrix.org/).
+EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/) and UCSD [Maitrix Team](https://maitrix.org/).
 We open-source the [EasyWeb](https://github.com/maitrix-org/easyweb) project at Github, and always welcome contributions from the community.
 If you are interested in collaboration, please contact us, we'd love to hear from you!
 
@@ -1133,7 +1136,7 @@ If you are interested in collaboration, please contact us, we'd love to hear fro
 - Contributors: [Mingkai Deng](https://mingkaid.github.io/), [Jackie Wang](https://www.linkedin.com/in/yikunjwang/), [Mason Choey](https://www.linkedin.com/in/mason-choey-9a6657325/), [Ariel Wu](https://www.linkedin.com/in/ariel-wu-63624716b/), [Brandon Chiou](https://www.linkedin.com/in/brandon-chiou/), [Jinyu Hou](https://www.linkedin.com/in/jinyu-hou-uoft/)
 - Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric Xing](https://www.cs.cmu.edu/~epxing/)
 
-📩 **Correspondence to**: [Mingkai Deng](mailto:mingkai.deng@outlook.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
+📩 **Correspondence to**: [Mingkai Deng](mailto:mingkaid34@gmail.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
 
 </font>
 
@@ -1165,6 +1168,11 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 if __name__ == '__main__':
     demo.queue()
     if args.ip and args.port:
-        demo.launch(share=False, server_name=args.ip, server_port=args.port)
+        demo.launch(
+            share=False,
+            server_name=args.ip,
+            server_port=args.port,
+            favicon_path='./frontend-icon.png',
+        )
     else:
-        demo.launch(share=False)
+        demo.launch(share=False, favicon_path='./frontend-icon.png')
