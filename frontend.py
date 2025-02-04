@@ -846,13 +846,30 @@ except FileNotFoundError:
 ga_head_snippet = ''
 if google_analytics_tracking_id:
     ga_head_snippet = f"""
-<script async src="https://www.googletagmanager.com/gtag/js?id={google_analytics_tracking_id}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  gtag('config', '{google_analytics_tracking_id}');
-</script>
+    if (typeof window.dataLayer === "undefined") {{
+        window.dataLayer = [];
+    }}
+    function gtag() {{ window.dataLayer.push(arguments); }}
+    gtag('js', new Date());
+    gtag('config', '{google_analytics_tracking_id}');
+    """
+
+combined_js = r"""
+() => {
+    // TOS Popup code
+    if (!window.alerted_before) {
+        const msg = "Users of this website are required to agree to the following terms:\n\n" +
+           "This service is a research preview offering limited safety measures and may perform unsafe actions. " +
+           "It must not be used for any illegal, harmful, violent, racist, or sexual purposes. " +
+           "Please refrain from uploading any private or sensitive information. " +
+           "By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content), " +
+           "and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.";
+        alert(msg);
+        window.alerted_before = true;
+    }
+
+    {ga_head_snippet}
+}
 """
 
 agent_descriptions = [
@@ -876,7 +893,7 @@ agent_display2class = {
 }
 
 agent_supported_models = {
-    agent_descriptions[3]: ['OpenAI GPT-4o-mini (Free)', 'GPT-4o'],
+    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
 }
 
 with gr.Blocks(
@@ -1160,11 +1177,19 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 """)
-    demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
+    # demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
+    demo.load(None, None, None, js=combined_js)
 
 if __name__ == '__main__':
     demo.queue()
     if args.ip and args.port:
-        demo.launch(share=False, server_name=args.ip, server_port=args.port)
+        demo.launch(
+            share=False,
+            server_name=args.ip,
+            server_port=args.port,
+            ssl_certfile='../ssl_certs/fullchain.pem',
+            ssl_keyfile='../ssl_certs/privkey.pem',
+            ssl_verify=False,
+        )
     else:
         demo.launch(share=False)
