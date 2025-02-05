@@ -919,7 +919,7 @@ with gr.Blocks(
 # 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
 <font size="4">
 
-[X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/NdQD6eJzch) | [GitHub](https://github.com/maitrix-org/easyweb)
+[X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/b5NEhRbvJg) | [GitHub](https://github.com/maitrix-org/easyweb)
 
 </font>
 """)
@@ -938,7 +938,7 @@ Include specific websites or detailed instructions in your prompt for more consi
 
 **⚠️ The interface is currently optimized for Chrome.** If you encounter any issues, please try using Chrome.
 
-**❗ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
+**❗ This is currently an early research preview, where agents may make mistakes or have challenges navigating certain websites. For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
 
 </font>
 """)
@@ -1101,7 +1101,7 @@ Please refrain from uploading any private or sensitive information.
 By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content),
 and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.
 
-#### Please report any bug or issue to our [Discord](https://discord.gg/NdQD6eJzch)
+#### Please report any bug or issue to our [Discord](https://discord.gg/b5NEhRbvJg)
 
 #### Acknowledgment
 
@@ -1162,7 +1162,7 @@ If you are interested in collaboration, please contact us, we'd love to hear fro
 <font size="4">
 
 - Contributors: [Mingkai Deng](https://mingkaid.github.io/), [Jackie Wang](https://www.linkedin.com/in/yikunjwang/), [Mason Choey](https://www.linkedin.com/in/mason-choey-9a6657325/), [Ariel Wu](https://www.linkedin.com/in/ariel-wu-63624716b/), [Brandon Chiou](https://www.linkedin.com/in/brandon-chiou/), [Jinyu Hou](https://www.linkedin.com/in/jinyu-hou-uoft/)
-- Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric Xing](https://www.cs.cmu.edu/~epxing/)
+- Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric P. Xing](https://www.cs.cmu.edu/~epxing/)
 
 📩 **Correspondence to**: [Mingkai Deng](mailto:mingkaid34@gmail.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
 
@@ -1172,7 +1172,7 @@ If you are interested in collaboration, please contact us, we'd love to hear fro
 
 <font size="4">
 
-- Follow our [X](https://x.com/MaitrixOrg) and [Discord](https://discord.gg/NdQD6eJzch)
+- Follow our [X](https://x.com/MaitrixOrg) and [Discord](https://discord.gg/b5NEhRbvJg)
 - File issues on [Github](https://github.com/maitrix-org/easyweb)
 
 </font>
@@ -1207,4 +1207,4 @@ if __name__ == '__main__':
             ssl_verify=args.ssl_verify,
         )
     else:
-        demo.launch(share=False, favicon_path='./frontend-icon.png')
+        demo.launch(share=True, favicon_path='./frontend-icon.png')
