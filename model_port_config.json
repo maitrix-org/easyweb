@@ -23,19 +23,5 @@
         "requires_key": true,
         "base_url": "https://api.openai.com/v1/",
         "display_name": "OpenAI o3-mini"
-    },
-    "deepseek-chat":
-    {
-        "provider": "deepseek",
-        "base_url": "https://api.deepseek.com",
-        "requires_key": true,
-        "display_name": "DeepSeek-V3 (⚠️ Unstable)"
-    },
-    "deepseek-reasoner":
-    {
-        "requires_key": true,
-        "provider": "deepseek",
-        "base_url": "https://api.deepseek.com",
-        "display_name": "DeepSeek-R1 (⚠️ Unstable)"
     }
 }

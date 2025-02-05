@@ -24,6 +24,16 @@ parser.add_argument('--ip', type=str, default=None, help='server name for public
 parser.add_argument(
     '--port', type=int, default=None, help='server port for public demo'
 )
+parser.add_argument(
+    '--ssl-certfile', type=str, default=None, help='path to SSL certfile'
+)
+parser.add_argument('--ssl-keyfile', type=str, default=None, help='path to SSL keyfile')
+parser.add_argument(
+    '--ssl-verify',
+    type=bool,
+    default=False,
+    help='whether to run certificate validation',
+)
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
@@ -894,10 +904,13 @@ agent_display2class = {
 
 agent_supported_models = {
     agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
+    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
 }
 
 with gr.Blocks(
-    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg), css=image_css
+    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg),
+    css=image_css,
+    title='EasyWeb: AI-Powered Web Agents at Your Fingertips',
 ) as demo:  # css=css
     with gr.Tab('🌐 Demo'):
         action_messages = gr.State([])
@@ -923,7 +936,9 @@ with gr.Blocks(
 **Note:** The agent currently **does not remember previous messages**, and defaults to **DuckDuckGo** for search engine due to restrictions. \
 Include specific websites or detailed instructions in your prompt for more consistent behavior.
 
-**⚠️ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
+**⚠️ The interface is currently optimized for Chrome.** If you encounter any issues, please try using Chrome.
+
+**❗ For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
 
 </font>
 """)
@@ -1109,7 +1124,6 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 
 1️⃣ **Choose an Agent & LLM:**
 - Use GPT-4o-mini for free, or bring your own GPT-4o API key for better performance.
-- 🐋 DeepSeek models are available but **not recommended** due to recent instabilities.
 - We are working on enabling other LLMs soon!
 
 2️⃣ **Ask the agent to perform web-related tasks like:**
@@ -1137,7 +1151,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 
 <font size="4">
 
-EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/), and [Maitrix Team](https://maitrix.org/).
+EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/) and UCSD [Maitrix Team](https://maitrix.org/).
 We open-source the [EasyWeb](https://github.com/maitrix-org/easyweb) project at Github, and always welcome contributions from the community.
 If you are interested in collaboration, please contact us, we'd love to hear from you!
 
@@ -1150,7 +1164,7 @@ If you are interested in collaboration, please contact us, we'd love to hear fro
 - Contributors: [Mingkai Deng](https://mingkaid.github.io/), [Jackie Wang](https://www.linkedin.com/in/yikunjwang/), [Mason Choey](https://www.linkedin.com/in/mason-choey-9a6657325/), [Ariel Wu](https://www.linkedin.com/in/ariel-wu-63624716b/), [Brandon Chiou](https://www.linkedin.com/in/brandon-chiou/), [Jinyu Hou](https://www.linkedin.com/in/jinyu-hou-uoft/)
 - Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric Xing](https://www.cs.cmu.edu/~epxing/)
 
-📩 **Correspondence to**: [Mingkai Deng](mailto:mingkai.deng@outlook.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
+📩 **Correspondence to**: [Mingkai Deng](mailto:mingkaid34@gmail.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
 
 </font>
 
@@ -1187,9 +1201,10 @@ if __name__ == '__main__':
             share=False,
             server_name=args.ip,
             server_port=args.port,
-            ssl_certfile='../ssl_certs/fullchain.pem',
-            ssl_keyfile='../ssl_certs/privkey.pem',
-            ssl_verify=False,
+            favicon_path='./frontend-icon.png',
+            ssl_certfile=args.ssl_certfile,
+            ssl_keyfile=args.ssl_keyfile,
+            ssl_verify=args.ssl_verify,
         )
     else:
-        demo.launch(share=False)
+        demo.launch(share=False, favicon_path='./frontend-icon.png')
