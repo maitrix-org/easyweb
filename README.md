@@ -22,7 +22,7 @@
   <img src="./easy-web-icon.png" alt="Easy Web Logo" width="200">
   <h1 align="center">EasyWeb: Web Agents at Your Fingertips</h1>
   <!-- Change based on updated links or names in the future -->
-  <!-- <a href="https://discord.gg/NdQD6eJzch"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a> -->
+  <a href="https://discord.gg/b5NEhRbvJg"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a>
 </div>
 <!-- <hr> -->
 
@@ -143,7 +143,7 @@ Distributed under the MIT License. See [LICENSE](./LICENSE) for more information
 
 ## Join The Community
 
-We welcome you to join our [Discord](https://discord.gg/NdQD6eJzch) server! Feel free to contribute the following:
+We welcome you to join our [Discord](https://discord.gg/b5NEhRbvJg) server! Feel free to contribute the following:
 
 **Code Contributions:** Collaborate on building new agents, enabling new browser / UI environments, enhancing core features, improving the frontend and other interfaces, or creating sandboxing solutions.
 
