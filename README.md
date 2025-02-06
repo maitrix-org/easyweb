@@ -28,6 +28,8 @@
 </div>
 <!-- <hr> -->
 
+<br>
+
 EasyWeb is an open platform for building and serving AI agents that interact with web browsers.
 
 **Using a web agent has never been easier:** Just open EasyWeb's interface, enter your command, and watch the agent take care of your browser-related tasks, whether it be travel planning, online shopping, news gathering, or anything you can think of.
