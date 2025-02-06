@@ -65,7 +65,7 @@ https://github.com/user-attachments/assets/ce822017-4603-48d4-b400-07fe32db6803
 </details>
 
 ## News
-- [2025/02] We released **ReasonerAgent: A Fully Open Source, Ready-to-Run Agent That Uses a Web Browser to Answer Your Queries**. Check out the blog [post](https://reasoner-agent.maitrix.org/)
+- [2025/02] We released **ReasonerAgent: A Fully Open Source, Ready-to-Run Agent That Does Research in a Web Browser and Answers Your Queries**. Check out the blog [post](https://reasoner-agent.maitrix.org/)
 
 ## Getting Started
 
