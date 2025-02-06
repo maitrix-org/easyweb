@@ -129,6 +129,7 @@ class BrowsingAgent(Agent):
             strict=False,  # less strict on the parsing of the actions
             multiaction=True,  # enable to agent to take multiple actions at once
         )
+        self.max_steps = 30
 
         self.reset()
 
@@ -136,6 +137,7 @@ class BrowsingAgent(Agent):
         """Resets the Browsing Agent."""
         self.cost_accumulator = 0
         self.error_accumulator = 0
+        self.num_steps = 0
 
     def step(self, state: State) -> Action:
         """
@@ -161,6 +163,8 @@ class BrowsingAgent(Agent):
         if len(state.history) == 1:
             logger.info('Sleeping')
             time.sleep(10 + 5 * random.random())
+        else:
+            time.sleep(5 + random.random() * 5)
 
         if EVAL_MODE and len(state.history) == 1:
             # for webarena and miniwob++ eval, we need to retrieve the initial observation already in browser env
@@ -191,6 +195,14 @@ class BrowsingAgent(Agent):
             and last_action.browsergym_send_msg_to_user
         ):
             return MessageAction(last_action.browsergym_send_msg_to_user)
+
+        self.num_steps += 1
+        if self.num_steps > self.max_steps:
+            return BrowseInteractiveAction(
+                browser_actions="send_msg_to_user('Maximum number of steps reached. Ending the task.')",
+                thought='The maximum number of allowed steps has been reached. I shall end the task now.',
+                browsergym_send_msg_to_user='Maximum number of steps reached. Ending the task.',
+            )
 
         if isinstance(last_obs, BrowserOutputObservation):
             if last_obs.error:
@@ -235,8 +247,6 @@ class BrowsingAgent(Agent):
         )
 
         self.log_cost(response)
-
-        time.sleep(5 + random.random() * 5)
 
         return self.response_parser.parse(response)
 
