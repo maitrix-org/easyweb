@@ -851,20 +851,30 @@ google_analytics_tracking_id = None
 try:
     with open('google_analytics_api_key.txt', 'r') as f:
         google_analytics_tracking_id = f.read().strip()
+    print(f'Google Analytics Tracking ID: {google_analytics_tracking_id}')
 except FileNotFoundError:
-    pass
-ga_head_snippet = ''
-if google_analytics_tracking_id:
-    ga_head_snippet = f"""
-    if (typeof window.dataLayer === "undefined") {{
-        window.dataLayer = [];
-    }}
-    function gtag() {{ window.dataLayer.push(arguments); }}
-    gtag('js', new Date());
-    gtag('config', '{google_analytics_tracking_id}');
-    """
+    print('Google Analytics Tracking ID Not Found!')
 
-combined_js = r"""
+ga_script = None
+if google_analytics_tracking_id:
+    ga_script = (
+        """
+    <script async src="https://www.googletagmanager.com/gtag/js?id="""
+        + google_analytics_tracking_id
+        + """"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', '"""
+        + google_analytics_tracking_id
+        + """');
+    </script>
+    """
+    )
+
+tos_popup_js = r"""
 () => {
     // TOS Popup code
     if (!window.alerted_before) {
@@ -877,8 +887,6 @@ combined_js = r"""
         alert(msg);
         window.alerted_before = true;
     }
-
-    {ga_head_snippet}
 }
 """
 
@@ -909,6 +917,7 @@ agent_supported_models = {
 with gr.Blocks(
     theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg),
     css=image_css,
+    head=ga_script,
     title='EasyWeb: AI-Powered Web Agents at Your Fingertips',
 ) as demo:  # css=css
     with gr.Tab('🌐 Demo'):
@@ -1190,8 +1199,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 """)
-    # demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
-    demo.load(None, None, None, js=combined_js)
+    demo.load(None, None, None, js=tos_popup_js)
 
 if __name__ == '__main__':
     demo.queue()
@@ -1206,4 +1214,4 @@ if __name__ == '__main__':
             ssl_verify=args.ssl_verify,
         )
     else:
-        demo.launch(share=True, favicon_path='./frontend-icon.png')
+        demo.launch(share=False, favicon_path='./frontend-icon.png')
