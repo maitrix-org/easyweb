@@ -43,22 +43,22 @@ EasyWeb is an open platform for building and serving AI agents that interact wit
 
 **Task:** Plan a travel from Pittsburgh to ICML 2025.
 
-https://github.com/user-attachments/assets/10f9c919-38c7-47f2-8b36-e27bce95dfed
+https://github.com/user-attachments/assets/6fd43d9c-2945-4a4c-ae33-5148df91aa66
 
 <details>
 <summary><b>Expand to see more demos</b></summary>
 
 **Task:** Find a round-trip ticket from Chicago to Dubai next month, traveling in economy class, with non-stop flights only, departing after 8 AM, and returning within two weeks.
 
-https://github.com/user-attachments/assets/11daf670-86ae-4b6c-ab93-ff7d4504a751
+https://github.com/user-attachments/assets/0a50df50-52eb-423f-a270-7d25ab783fee
 
 **Task:** I want to buy a black mattress. Can you look at Amazon, eBay, and Mattress Firm and give me one good option from each?
 
-https://github.com/user-attachments/assets/6864940b-0f00-445f-985f-00bcf4480d79
+https://github.com/user-attachments/assets/3fd31131-3262-492b-a86d-a36d209417ee
 
 **Task:** I'd like to learn how local news outlets covered Trump's inauguration. Please find one article from each of the following websites: *Times of San Diego*, *The Tennessee Tribune*, and *MinnPost*, and summarize the details to me.
 
-https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
+https://github.com/user-attachments/assets/ce822017-4603-48d4-b400-07fe32db6803
 
 </details>
 
