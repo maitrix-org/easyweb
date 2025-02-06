@@ -63,7 +63,7 @@ https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
 </details>
 
 ## News
-- [2025/01] We released **ReasonerAgent: A Training-Free UI Agent That Exceeds GPT-4o-Based Agents by Up to 124%**. Check out the blog [post](about:blank)
+- [2025/01] We released **ReasonerAgent: A Fully Open Source, Ready-to-Run Agent That Uses a Web Browser to Answer Your Queries**. Check out the blog [post](https://reasoner-agent.maitrix.org/)
 
 ## Getting Started
 
