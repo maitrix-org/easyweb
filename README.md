@@ -41,6 +41,8 @@ EasyWeb is an open platform for building and serving AI agents that interact wit
 
 ## Demos
 
+**Note:** The demos below were recorded using **ReasonerAgent with World Model Planning (Full)** and **GPT-4o** between January 2 and 21, 2025. Specific websites and more detailed instructions were included in the prompts to help guide the agent's behavior.
+
 **Task:** Plan a travel from Pittsburgh to ICML 2025.
 
 https://github.com/user-attachments/assets/6fd43d9c-2945-4a4c-ae33-5148df91aa66
