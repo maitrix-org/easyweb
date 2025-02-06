@@ -920,7 +920,7 @@ with gr.Blocks(
     head=ga_script,
     title='EasyWeb: AI-Powered Web Agents at Your Fingertips',
 ) as demo:  # css=css
-    with gr.Tab('🌐 Demo'):
+    with gr.Tab('🌐 EasyWeb'):
         action_messages = gr.State([])
         session = gr.State(None)
         title = gr.Markdown("""\
