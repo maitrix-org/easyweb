@@ -38,6 +38,7 @@ args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
 default_api_key = 'sk-123'
+global_sessions = dict()
 
 
 class BackendManager:
@@ -138,7 +139,7 @@ class EasyWebSession:
         self.agent_state = 'stopped'
         self._reset
 
-    def run(self, task):
+    def run(self, task, request: gr.Request):
         if self.agent_state not in ['init', 'running']:
             raise ValueError(
                 'Agent not initialized. Please run the initialize() method first'
@@ -148,13 +149,17 @@ class EasyWebSession:
             payload = {'action': 'message', 'args': {'content': task}}
             self.ws.send(json.dumps(payload))
 
-        while self.agent_state not in ['finished', 'stopped']:
-            message = self._get_message()
-            self._read_message(message)
+        try:
+            while self.agent_state not in ['finished', 'stopped']:
+                message = self._get_message()
+                self._read_message(message)
 
-            print(self.agent_state)
-            yield message
-        backend_manager.release_backend(self.port)
+                print(self.agent_state)
+                yield message
+        finally:
+            if request.session_hash in global_sessions.keys():
+                backend_manager.release_backend(self.port)
+                del global_sessions[request.session_hash]
 
     def _get_message(self):
         response = self.ws.recv()
@@ -288,6 +293,7 @@ def get_messages(
     model_selection,
     api_key,
     options_visible,
+    request: gr.Request,
 ):
     agent_selection = agent_display2class[agent_selection]
     model_selection = model_display2name[model_selection]
@@ -319,8 +325,11 @@ def get_messages(
             api_key=api_key,
         )
         session = new_session
+        if request.session_hash not in global_sessions.keys():
+            global_sessions[request.session_hash] = session
         if user_message is None:
             backend_manager.release_backend(session.port)
+            del global_sessions[request.session_hash]
             session.agent_state = None
             chat_history = chat_history[:-1]
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
@@ -468,7 +477,7 @@ def get_messages(
 
         website_counter = 0
         message_list = []
-        for message in session.run(user_message):
+        for message in session.run(user_message, request):
             message_list.append(message['message'])
             if website_counter == 1:
                 options_visible = True
@@ -778,6 +787,13 @@ def toggle_options(visible, ifClick):
         new_visible,
         gr.update(value=toggle_text),
     )
+
+
+def unload_fn(request: gr.Request):
+    if request.session_hash in global_sessions.keys():
+        global_sessions[request.session_hash].stop()
+        backend_manager.release_backend(global_sessions[request.session_hash].port)
+        del global_sessions[request.session_hash]
 
 
 current_dir = os.path.dirname(__file__)
@@ -1200,6 +1216,7 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 </div>
 """)
     demo.load(None, None, None, js=tos_popup_js)
+    demo.unload(unload_fn)
 
 if __name__ == '__main__':
     demo.queue()
