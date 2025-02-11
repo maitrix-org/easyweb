@@ -1,11 +1,10 @@
 SHELL=/bin/bash
-# Makefile for FastWeb project
+# Makefile for EasyWeb project
 
 # Variables
 DOCKER_IMAGE = ghcr.io/opendevin/sandbox
 BACKEND_PORT ?= 5000
 BACKEND_HOST = "127.0.0.1:$(BACKEND_PORT)"
-FRONTEND_PORT = 3001
 DEFAULT_WORKSPACE_DIR = "./workspace"
 DEFAULT_MODEL = "gpt-4o"
 CONFIG_FILE = config.toml
@@ -26,6 +25,15 @@ build:
 ifeq ($(INSTALL_DOCKER),)
 	@$(MAKE) -s pull-docker-image
 endif
+	@echo "$(GREEN)Cloning llm-reasoners repository...$(RESET)"
+	@CURRENT_DIR=$(CURDIR); \
+	if [ ! -d "../llm-reasoners" ]; then \
+		git clone https://github.com/maitrix-org/llm-reasoners.git ../llm-reasoners; \
+	else \
+		echo "Repository 'llm-reasoners' already exists. Updating repository..."; \
+		cd ../llm-reasoners && git pull; \
+	fi; \
+	cd $$CURRENT_DIR
 	@$(MAKE) -s install-python-dependencies
 	@$(MAKE) -s install-precommit-hooks
 	@echo "$(GREEN)Build completed successfully.$(RESET)"
@@ -106,19 +114,19 @@ check-poetry:
 	@echo "$(YELLOW)Checking Poetry installation...$(RESET)"
 	@if command -v poetry > /dev/null; then \
 		POETRY_VERSION=$(shell poetry --version 2>&1 | sed -E 's/Poetry \(version ([0-9]+\.[0-9]+\.[0-9]+)\)/\1/'); \
-		IFS='.' read -r -a POETRY_VERSION_ARRAY <<< "$$POETRY_VERSION"; \
-		if [ $${POETRY_VERSION_ARRAY[0]} -ge 1 ] && [ $${POETRY_VERSION_ARRAY[1]} -ge 8 ]; then \
-			echo "$(BLUE)$(shell poetry --version) is already installed.$(RESET)"; \
+		if [ "$$POETRY_VERSION" = "1.8.4" ]; then \
+			echo "$(BLUE)Poetry version $$POETRY_VERSION is already installed.$(RESET)"; \
 		else \
-			echo "$(RED)Poetry 1.8 or later is required. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
-			echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
-			echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+			echo "$(RED)Poetry 1.8.4 is required. Installed version is $$POETRY_VERSION.$(RESET)"; \
+			echo "$(RED)Please install Poetry 1.8.4 by running the following command, then add Poetry to your PATH:$(RESET)"; \
+			echo "$(RED) curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python$(PYTHON_VERSION) -$(RESET)"; \
+			echo "$(RED)More details here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
 			exit 1; \
 		fi; \
 	else \
-		echo "$(RED)Poetry is not installed. You can install poetry by running the following command, then adding Poetry to your PATH:"; \
-		echo "$(RED) curl -sSL https://install.python-poetry.org | python$(PYTHON_VERSION) -$(RESET)"; \
-		echo "$(RED)More detail here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
+		echo "$(RED)Poetry is not installed. Please install Poetry 1.8.4 by running the following command, then add Poetry to your PATH:$(RESET)"; \
+		echo "$(RED) curl -sSL https://install.python-poetry.org | POETRY_VERSION=1.8.4 python$(PYTHON_VERSION) -$(RESET)"; \
+		echo "$(RED)More details here: https://python-poetry.org/docs/#installing-with-the-official-installer$(RESET)"; \
 		exit 1; \
 	fi
 
@@ -136,6 +144,8 @@ install-python-dependencies:
 		poetry run pip install chroma-hnswlib; \
 	fi
 	@poetry install
+	@echo "$(BLUE)Installing extra dependencies with pip...$(RESET)"
+	@poetry run pip install gradio==5.1.0 bs4 websocket-client
 	@if [ -f "/etc/manjaro-release" ]; then \
 		echo "$(BLUE)Detected Manjaro Linux. Installing Playwright dependencies...$(RESET)"; \
 		poetry run pip install playwright; \
@@ -171,7 +181,7 @@ install-precommit-hooks:
 
 lint-backend:
 	@echo "$(YELLOW)Running linters...$(RESET)"
-	@poetry run pre-commit run --files fast_web/**/* agenthub/**/* evaluation/**/* --show-diff-on-failure --config $(PRECOMMIT_CONFIG_PATH)
+	@poetry run pre-commit run --files easyweb/**/* agenthub/**/* evaluation/**/* --show-diff-on-failure --config $(PRECOMMIT_CONFIG_PATH)
 
 lint-frontend:
 	@echo "$(YELLOW)Running linters for frontend...$(RESET)"
@@ -195,12 +205,26 @@ build-frontend:
 # Start backend
 start-backend:
 	@echo "$(YELLOW)Starting backend...$(RESET)"
-	@poetry run uvicorn fast_web.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
+	@poetry run uvicorn easyweb.server.listen:app --port $(BACKEND_PORT) --reload --reload-exclude "workspace/*"
+
+# Start backends
+start-backends:
+	@echo "$(YELLOW)Starting $(NUM_BACKENDS) backend instance(s) starting at port $(START_PORT)...$(RESET)"
+	@for i in $$(seq 0 $(shell echo $$(($(NUM_BACKENDS)-1)))); do \
+		PORT=$$(( $(START_PORT) + $$i )) ; \
+		echo "$(BLUE)Starting backend on port $$PORT...$(RESET)"; \
+		if [ $$i -eq $$(($(NUM_BACKENDS)-1)) ]; then \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*"; \
+		else \
+			poetry run uvicorn easyweb.server.listen:app --port $$PORT --reload --reload-exclude "workspace/*" & \
+		fi \
+	done
+	@echo "$(GREEN)All backend instances started successfully.$(RESET)"
 
 # Start frontend
 start-frontend:
 	@echo "$(YELLOW)Starting frontend...$(RESET)"
-	@gradio frontend.py
+	@poetry run gradio frontend.py
 
 # Run the app
 run:
@@ -211,11 +235,12 @@ run:
 	fi
 	@mkdir -p logs
 	@echo "$(YELLOW)Starting backend server...$(RESET)"
-	@poetry run uvicorn fast_web.server.listen:app --port $(BACKEND_PORT) &
+	@poetry run uvicorn easyweb.server.listen:app --port $(BACKEND_PORT) &
 	@echo "$(YELLOW)Waiting for the backend to start...$(RESET)"
 	@until nc -z localhost $(BACKEND_PORT); do sleep 0.1; done
 	@echo "$(GREEN)Backend started successfully.$(RESET)"
-	@cd frontend && echo "$(BLUE)Starting frontend with npm...$(RESET)" && npm run start -- --port $(FRONTEND_PORT)
+	@echo "$(YELLOW)Starting frontend...$(RESET)"
+	@poetry run python frontend.py
 	@echo "$(GREEN)Application started successfully.$(RESET)"
 
 # Setup config.toml
@@ -284,7 +309,7 @@ setup-config-prompts:
 # Clean up all caches
 clean:
 	@echo "$(YELLOW)Cleaning up caches...$(RESET)"
-	@rm -rf fast_web/.cache
+	@rm -rf easyweb/.cache
 	@echo "$(GREEN)Caches cleaned up successfully.$(RESET)"
 
 # Help

@@ -20,10 +20,25 @@ parser.add_argument(
     default=1,
     help='The number of backends to initialize (default: 1)',
 )
+parser.add_argument('--ip', type=str, default=None, help='server name for public demo')
+parser.add_argument(
+    '--port', type=int, default=None, help='server port for public demo'
+)
+parser.add_argument(
+    '--ssl-certfile', type=str, default=None, help='path to SSL certfile'
+)
+parser.add_argument('--ssl-keyfile', type=str, default=None, help='path to SSL keyfile')
+parser.add_argument(
+    '--ssl-verify',
+    type=bool,
+    default=False,
+    help='whether to run certificate validation',
+)
 args = parser.parse_args()
 
 backend_ports = [5000 + i for i in range(args.num_backends)]
-default_api_key = os.environ.get('OPENAI_API_KEY')
+default_api_key = 'sk-123'
+global_sessions = dict()
 
 
 class BackendManager:
@@ -43,17 +58,17 @@ class BackendManager:
             return None
 
     def release_backend(self, port):
-        try:
+        if port in self.available_ports.queue:
+            print(f'{port} already available')
+        else:
             self.available_ports.put(port, block=True)
             print(f'Released backend on port {port}')
-        except Exception as e:
-            print(f'Error releasing backend: {e}')
 
 
 backend_manager = BackendManager(backend_ports)
 
 
-class FastWebSession:
+class EasyWebSession:
     def __init__(
         self,
         agent,
@@ -73,7 +88,7 @@ class FastWebSession:
 
     def initialize(self, as_generator=False):
         # create an output path that is global to all functions called within the
-        # FastWebSession class, so that it can be referred back to later
+        # EasyWebSession class, so that it can be referred back to later
         now = time.time()
         os.makedirs('frontend_logs', exist_ok=True)
 
@@ -124,8 +139,8 @@ class FastWebSession:
         self.agent_state = 'stopped'
         self._reset
 
-    def run(self, task):
-        if self.agent_state not in ['init', 'running', 'pausing', 'resuming', 'paused']:
+    def run(self, task, request: gr.Request):
+        if self.agent_state not in ['init', 'running']:
             raise ValueError(
                 'Agent not initialized. Please run the initialize() method first'
             )
@@ -133,15 +148,17 @@ class FastWebSession:
         if task is not None:
             payload = {'action': 'message', 'args': {'content': task}}
             self.ws.send(json.dumps(payload))
+        try:
+            while self.agent_state not in ['finished', 'stopped']:
+                message = self._get_message()
+                self._read_message(message)
 
-        while self.agent_state not in ['finished', 'paused', 'stopped']:
-            message = self._get_message()
-            self._read_message(message)
-
-            print(self.agent_state)
-            yield message
-        if self.agent_state != 'stopped':
-            backend_manager.release_backend(self.port)
+                print(self.agent_state)
+                yield message
+        finally:
+            if request.session_hash in global_sessions.keys():
+                backend_manager.release_backend(self.port)
+                del global_sessions[request.session_hash]
 
     def _get_message(self):
         response = self.ws.recv()
@@ -226,8 +243,11 @@ class FastWebSession:
         else:
             stars = 0
         try:
-            with open(path, 'r') as file:
-                f = json.load(file)
+            if os.path.exists(path):
+                with open(path, 'r') as file:
+                    f = json.load(file)
+            else:
+                f = self.raw_messages
             f.insert(0, {'user feedback: ': stars})
             json.dump(f, open(path, 'w'))
             print('User feedback saved!')
@@ -251,7 +271,7 @@ def get_status(agent_state):
     else:
         status = f'Agent Status: 🔴 {agent_state}'
 
-    return status
+    return f'<font size="4"> {status} </font>'
 
 
 def get_action_history_markdown(action_history):
@@ -272,32 +292,53 @@ def get_messages(
     model_selection,
     api_key,
     options_visible,
+    request: gr.Request,
 ):
+    agent_selection = agent_display2class[agent_selection]
     model_selection = model_display2name[model_selection]
+    model_key_filename = model_name2keypath.get(model_selection)
+    if model_key_filename:
+        model_key_filepath = os.path.join(os.getcwd(), model_key_filename)
+        with open(model_key_filepath, 'r') as f:
+            api_key = f.read().strip()
+
+    print(api_key)
+
     user_message = None
     thinking_flag = False
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
-        if chat_history[-1]['role'] == 'user':
+        if chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] != '':
             user_message = chat_history[-1]['content']
             loading_message = gr.ChatMessage(role='assistant', content='⏳ Thinking...')
             chat_history.append(loading_message)
             thinking_flag = True  # so i can know if i need to remove the last message
 
     # Initialize a new session if it doesn't exist
-    if session is None or session.agent_state in ['finished', 'paused']:
-        new_session = FastWebSession(
+    if (
+        session is None
+        or session.agent_state is None
+        or session.agent_state in ['finished', 'stopped']
+    ):
+        new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
             model=model_selection,
-            api_key=api_key if model_requires_key[model_selection] else default_api_key,
+            # api_key=api_key if model_requires_key[model_selection] else default_api_key,
+            api_key=api_key,
         )
         session = new_session
+        if request.session_hash not in global_sessions.keys():
+            global_sessions[request.session_hash] = session
+        if user_message is None:
+            backend_manager.release_backend(session.port)
+            del global_sessions[request.session_hash]
+            session.agent_state = None
+            chat_history = chat_history[:-1]
     stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
-        session.agent_state is None
-        or session.agent_state in ['paused', 'finished', 'stopped']
+        session.agent_state is None or session.agent_state in ['finished', 'stopped']
     ) and user_message is None:
         clear = gr.Button('🗑️ Clear', interactive=True)
         status = get_status(session.agent_state)
@@ -312,7 +353,9 @@ def get_messages(
             min_width=150,
             visible=session.agent_state != 'running',
         )
-        stop = gr.Button('Stop', visible=session.agent_state == 'running')
+        stop = gr.Button(
+            'Stop', scale=1, min_width=150, visible=session.agent_state == 'running'
+        )
 
         yield (
             chat_history,
@@ -336,8 +379,6 @@ def get_messages(
         if session.agent_state not in [
             'init',
             'running',
-            'pausing',
-            'resuming',
         ]:
             if stop_flag:
                 stop_flag = False
@@ -367,7 +408,12 @@ def get_messages(
                     min_width=150,
                     visible=session.agent_state != 'running',
                 )
-                stop = gr.Button('Stop', visible=session.agent_state == 'running')
+                stop = gr.Button(
+                    'Stop',
+                    scale=1,
+                    min_width=150,
+                    visible=session.agent_state == 'running',
+                )
 
                 yield (
                     chat_history,
@@ -387,14 +433,15 @@ def get_messages(
 
             session.agent = agent_selection
             session.model = model_selection
-            if model_requires_key[model_selection]:
-                session.api_key = api_key
-            elif model_port_config[model_selection].get('default_key', None):
-                session.api_key = model_port_config[model_selection].get(
-                    'default_key', None
-                )
-            else:
-                session.api_key = ''
+            session.api_key = api_key
+            # if model_requires_key[model_selection]:
+            #     session.api_key = api_key
+            # elif model_port_config[model_selection].get('default_key', None):
+            #     session.api_key = model_port_config[model_selection].get(
+            #         'default_key', None
+            #     )
+            # else:
+            #     session.api_key = ''
 
             print('API Key:', session.api_key)
             action_messages = []
@@ -411,7 +458,7 @@ def get_messages(
                     min_width=150,
                     visible=False,
                 )
-                stop = gr.Button('Stop', visible=True)
+                stop = gr.Button('Stop', scale=1, min_width=150, visible=True)
 
                 finished = session.agent_state in ['finished', 'stopped']
                 clear = gr.Button('🗑️ Clear', interactive=finished)
@@ -434,11 +481,10 @@ def get_messages(
 
         website_counter = 0
         message_list = []
-        for message in session.run(user_message):
+        for message in session.run(user_message, request):
             message_list.append(message['message'])
             if website_counter == 1:
                 options_visible = True
-
             finished = session.agent_state in ['finished', 'stopped']
             clear = gr.Button('🗑️ Clear', interactive=finished)
             upvote = gr.Button('👍 Good Response', interactive=finished)
@@ -477,7 +523,7 @@ def get_messages(
                             stop,
                         )
             elif (
-                session.agent == 'ReasonerWebAgent'
+                session.agent.startswith('ReasonerAgent')
                 and message.get('action', '') == 'browse_interactive'
                 and message.get('args', {}).get('thought', '')
             ):
@@ -485,45 +531,76 @@ def get_messages(
                     chat_history = chat_history[:-1]
                     thinking_flag = False
                 full_output_dict = json.loads(message['args']['thought'])
-                plan = full_output_dict.get('plan')
-                if plan:
-                    chat_history.append(gr.ChatMessage(role='assistant', content=''))
-                    assistant_message = plan
-                    assistant_message_chars = []
-                    for i, char in enumerate(assistant_message):
-                        assistant_message_chars.append(char)
-                        updated_message = ''.join(assistant_message_chars)
-                        if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
-                            chat_history[-1] = gr.ChatMessage(
-                                role='assistant', content=updated_message
-                            )
-                            time.sleep(0.01)
+                plan = full_output_dict.get('plan', message['message'])
 
-                            yield (
-                                chat_history,
-                                screenshot,
-                                url,
-                                action_messages,
-                                browser_history,
-                                session,
-                                status,
-                                clear,
-                                options_visible,
-                                upvote,
-                                downvote,
-                                submit,
-                                stop,
-                            )
+                chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                assistant_message = plan
+                assistant_message_chars = []
+                for i, char in enumerate(assistant_message):
+                    assistant_message_chars.append(char)
+                    updated_message = ''.join(assistant_message_chars)
+                    if (i + 1) % 5 == 0 or i == len(assistant_message) - 1:
+                        chat_history[-1] = gr.ChatMessage(
+                            role='assistant', content=updated_message
+                        )
+                        time.sleep(0.01)
+
+                        yield (
+                            chat_history,
+                            screenshot,
+                            url,
+                            action_messages,
+                            browser_history,
+                            session,
+                            status,
+                            clear,
+                            options_visible,
+                            upvote,
+                            downvote,
+                            submit,
+                            stop,
+                        )
             elif (
                 session.agent == 'BrowsingAgent'
                 and message.get('action', '') == 'browse_interactive'
-                and message.get('args', {}).get('thought', '')
+                # and message.get('args', {}).get('thought', '')
             ):
                 if thinking_flag:
                     chat_history = chat_history[:-1]
                     thinking_flag = False
-                thought = message['args']['thought']
-                chat_history.append(gr.ChatMessage(role='assistant', content=thought))
+                thought = message.get('args', {}).get('thought', '')
+                if not thought:
+                    thought = message['message']
+                # chat_history.append(gr.ChatMessage(role='assistant', content=thought))
+                print(thought)
+
+                chat_history.append(gr.ChatMessage(role='assistant', content=''))
+                assistant_message = thought
+                assistant_message_chars = []
+                for i, char in enumerate(assistant_message):
+                    assistant_message_chars.append(char)
+                    updated_message = ''.join(assistant_message_chars)
+                    if (i + 1) % 10 == 0 or i == len(assistant_message) - 1:
+                        chat_history[-1] = gr.ChatMessage(
+                            role='assistant', content=updated_message
+                        )
+                        time.sleep(0.01)
+
+                        yield (
+                            chat_history,
+                            screenshot,
+                            url,
+                            action_messages,
+                            browser_history,
+                            session,
+                            status,
+                            clear,
+                            options_visible,
+                            upvote,
+                            downvote,
+                            submit,
+                            stop,
+                        )
 
             if session.agent_state == 'finished':
                 session.save_log()
@@ -553,7 +630,9 @@ def get_messages(
                 min_width=150,
                 visible=session.agent_state != 'running',
             )
-            stop = gr.Button('Stop', visible=session.agent_state == 'running')
+            stop = gr.Button(
+                'Stop', scale=1, min_width=150, visible=session.agent_state == 'running'
+            )
             yield (
                 chat_history,
                 screenshot,
@@ -592,25 +671,33 @@ def clear_page(browser_history, session):
     )
 
 
+def check_supported_models(agent_selection, model_selection, api_key):
+    supported_models = agent_supported_models.get(agent_selection, model_list)
+    selected_model = (
+        model_selection if model_selection in supported_models else supported_models[0]
+    )
+    model_selection = gr.Dropdown(
+        supported_models,
+        value=selected_model,
+        interactive=True,
+        label='Backend LLM',
+        scale=1,
+        # info='Choose the model you would like to use',
+    )
+    return model_selection, check_requires_key(selected_model, api_key)
+
+
 def check_requires_key(model_selection, api_key):
     model_real_name = model_display2name[model_selection]
     requires_key = model_requires_key[model_real_name]
-    if requires_key:
-        api_key = gr.Textbox(
-            api_key,
-            label='API Key',
-            placeholder='Your API Key',
-            visible=True,
-            max_lines=2,
-        )
-    else:
-        api_key = gr.Textbox(
-            api_key,
-            label='API Key',
-            placeholder='Your API Key',
-            visible=False,
-            max_lines=2,
-        )
+    api_key = gr.Textbox(
+        api_key,
+        label='API Key',
+        placeholder='Your API Key',
+        visible=requires_key,
+        scale=1,
+        max_lines=2,
+    )
     return api_key
 
 
@@ -685,9 +772,10 @@ def display_history(history, messages_history, action_messages):
 
 def process_user_message(user_message, history):
     if not user_message.strip():
+        chat_message = gr.ChatMessage(role='user', content='')
+        history.append(chat_message)
         return '', history
     chat_message = gr.ChatMessage(role='user', content=user_message)
-
     history.append(chat_message)
 
     return '', history
@@ -697,7 +785,7 @@ def stop_task(session):
     # if session.agent_state == 'running':
     session.stop()
     status = get_status(session.agent_state)
-    # clear = gr.Button('🗑️ Clear', interactive=True)
+    clear = gr.Button('🗑️ Clear', interactive=True)
     return session, status, clear
 
 
@@ -716,10 +804,15 @@ def toggle_options(visible, ifClick):
     )
 
 
+def unload_fn(request: gr.Request):
+    if request.session_hash in global_sessions.keys():
+        global_sessions[request.session_hash].stop()
+        backend_manager.release_backend(global_sessions[request.session_hash].port)
+        del global_sessions[request.session_hash]
+
+
 current_dir = os.path.dirname(__file__)
 print(os.path.dirname(__file__))
-
-default_agent = 'ReasonerWebAgent'
 
 global model_port_config
 model_port_config = {}
@@ -743,9 +836,9 @@ for model, cfg in model_port_config.items():
         break
 
 current_dir = os.path.dirname(__file__)
+default_api_key = None
 
-with open(os.path.join(current_dir, 'default_api_key.txt'), 'r') as fr:
-    default_api_key = fr.read().strip()
+model_name2keypath = {'gpt-4o-mini': 'default_openai_api_key.txt'}
 
 
 def vote(vote, session):
@@ -759,176 +852,229 @@ def vote(vote, session):
     return upvote_button, downvote_button
 
 
-with gr.Blocks() as demo:  # css=css
-    action_messages = gr.State([])
-    session = gr.State(None)
-    title = gr.Markdown(
-        '# 🚀 Fast Web: Open Platform for Building and Serving UI Agents'
-    )
-    tutorial1 = gr.Markdown(
-        """- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
-                            - 💬 **Ask the Agent** to perform advanced web-related tasks, **for example:**
-                                - "Can you search for a round-trip flight from Chicago to Dubai in business class?"
-                                - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
-                                - "Find an article from Times of San Diego about Trump's inauguration and summarize the main points for me."
-                            - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
-                            - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
-                            - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-                            - Currently, the agent will only be able to see **up to the latest message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**"""
-    )
+tos_popup_js = r"""
+() => {
+    if (window.alerted_before) return;
 
-    with gr.Row(equal_height=False):
-        with gr.Column(scale=2):
-            with gr.Group():
-                with gr.Row():
-                    agent_selection = gr.Dropdown(
-                        [
-                            'DummyWebAgent',
-                            'BrowsingAgent',
-                            'ReasonerWebAgent',
-                        ],
-                        value=default_agent,
-                        interactive=True,
-                        label='Agent',
+    const msg = "Users of this website are required to agree to the following terms:\n\n" +
+           "This service is a research preview offering limited safety measures and may perform unsafe actions. " +
+           "It must not be used for any illegal, harmful, violent, racist, or sexual purposes. " +
+           "Please refrain from uploading any private or sensitive information. " +
+           "By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content), " +
+           "and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.";
+
+
+    alert(msg);
+    window.alerted_before = true;
+}
+"""
+image_css = """
+.sponsor-image-about img {
+    margin: 0 20px;
+    margin-top: 20px;
+    height: 40px;
+    max-height: 100%;
+    width: auto;
+    float: left;
+}
+"""
+google_analytics_tracking_id = None
+try:
+    with open('google_analytics_api_key.txt', 'r') as f:
+        google_analytics_tracking_id = f.read().strip()
+except FileNotFoundError:
+    pass
+ga_head_snippet = ''
+if google_analytics_tracking_id:
+    ga_head_snippet = f"""
+    if (typeof window.dataLayer === "undefined") {{
+        window.dataLayer = [];
+    }}
+    function gtag() {{ window.dataLayer.push(arguments); }}
+    gtag('js', new Date());
+    gtag('config', '{google_analytics_tracking_id}');
+    """
+
+combined_js = r"""
+() => {
+    // TOS Popup code
+    if (!window.alerted_before) {
+        const msg = "Users of this website are required to agree to the following terms:\n\n" +
+           "This service is a research preview offering limited safety measures and may perform unsafe actions. " +
+           "It must not be used for any illegal, harmful, violent, racist, or sexual purposes. " +
+           "Please refrain from uploading any private or sensitive information. " +
+           "By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content), " +
+           "and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.";
+        alert(msg);
+        window.alerted_before = true;
+    }
+
+    {ga_head_snippet}
+}
+"""
+
+agent_descriptions = [
+    'DummyWebAgent — Debugging only',
+    'BrowsingAgent — 🏃‍♂️ Good for quick tasks, but limited depth.',
+    'ReasonerAgent (Fast) — ⚖️ Mix of speed and intelligence.',
+    'ReasonerAgent (Full) — 🧠 Most advanced reasoning, but slower.',
+]
+
+agent_display_ids = [1, 2, 3]
+agent_display_names = [agent_descriptions[idx] for idx in agent_display_ids]
+
+default_agent_id = 2
+default_agent = agent_descriptions[default_agent_id]
+
+agent_display2class = {
+    agent_descriptions[0]: 'DummyWebAgent',
+    agent_descriptions[1]: 'BrowsingAgent',
+    agent_descriptions[2]: 'ReasonerAgentFast',
+    agent_descriptions[3]: 'ReasonerAgentFull',
+}
+
+agent_supported_models = {
+    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
+    agent_descriptions[3]: ['GPT-4o-mini (Free)', 'GPT-4o'],
+}
+
+with gr.Blocks(
+    theme=gr.themes.Default(text_size=gr.themes.sizes.text_lg),
+    css=image_css,
+    title='EasyWeb: AI-Powered Web Agents at Your Fingertips',
+) as demo:  # css=css
+    with gr.Tab('🌐 Demo'):
+        action_messages = gr.State([])
+        session = gr.State(None)
+        title = gr.Markdown(
+            """\
+# 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
+<font size="4">
+
+[X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/b5NEhRbvJg) | [GitHub](https://github.com/maitrix-org/easyweb)
+
+</font>
+"""
+        )
+
+        description = gr.Markdown(
+            """\
+
+<font size="4">
+
+**Example Prompts:**
+- "Use DuckDuckGo to search for the current president of USA."
+- "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+- "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+
+**Note:** The agent currently **does not remember previous messages**, and defaults to **DuckDuckGo** for search engine due to restrictions. \
+Include specific websites or detailed instructions in your prompt for more consistent behavior.
+
+**⚠️ The interface is currently optimized for Chrome.** If you encounter any issues, please try using Chrome.
+
+**❗ This is currently an early research preview, where agents may make mistakes or have challenges navigating certain websites. For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
+
+</font>
+"""
+        )
+
+        with gr.Group():
+            with gr.Row():
+                agent_selection = gr.Dropdown(
+                    agent_display_names,
+                    value=default_agent,
+                    interactive=True,
+                    label='Agent',
+                    scale=2,
+                    # info='Choose your own adventure partner!',
+                )
+                model_selection = gr.Dropdown(
+                    model_list,
+                    value=default_model,
+                    interactive=True,
+                    label='Backend LLM',
+                    scale=1,
+                    # info='Choose the model you would like to use',
+                )
+                api_key = check_requires_key(default_model, default_api_key)
+
+        with gr.Row(equal_height=False):
+            with gr.Column(scale=1):
+                chatbot = gr.Chatbot(type='messages')
+
+                with gr.Group():
+                    with gr.Row():
+                        msg = gr.Textbox(container=False, show_label=False, scale=7)
+
+                        submit = gr.Button(
+                            'Submit',
+                            variant='primary',
+                            scale=1,
+                            min_width=150,
+                        )
+                        stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
+                        submit_triggers = [msg.submit, submit.click]
+            with gr.Column(scale=2, visible=False) as visualization_column:
+                with gr.Group():
+                    start_url = 'about:blank'
+                    url = gr.Textbox(
+                        start_url, label='URL', interactive=False, max_lines=1
                     )
-                    model_selection = gr.Dropdown(
-                        model_list,
-                        value=default_model,
-                        interactive=True,
-                        label='Backend LLM',
-                    )
-                    api_key = check_requires_key(default_model, default_api_key)
+                    blank = Image.new('RGB', (1280, 720), (255, 255, 255))
+                    screenshot = gr.Image(blank, interactive=False, label='Webpage')
 
-            chatbot = gr.Chatbot(type='messages', height=320)
-            with gr.Group():
-                with gr.Row():
-                    msg = gr.Textbox(container=False, show_label=False, scale=7)
-
-                    submit = gr.Button(
-                        'Submit',
-                        variant='primary',
-                        scale=1,
-                        min_width=150,
-                    )
-                    stop = gr.Button('Stop', visible=False)
-                    submit_triggers = [msg.submit, submit.click]
-        with gr.Column(scale=4, visible=False) as visualization_column:
-            with gr.Group():
-                start_url = 'about:blank'
-                url = gr.Textbox(start_url, label='URL', interactive=False, max_lines=1)
-                blank = Image.new('RGB', (1280, 720), (255, 255, 255))
-                screenshot = gr.Image(blank, interactive=False, label='Webpage')
-
-    with gr.Row():
-        toggle_button = gr.Button('🔍 Show Browser')
-        upvote = gr.Button('👍 Good Response', interactive=False)
-        downvote = gr.Button('👎 Bad Response', interactive=False)
-        clear = gr.Button('🗑️ Clear')
-
-    status = gr.Markdown('Agent Status: 🔴 Inactive')
-    browser_history = gr.State([(blank, start_url)])
-    options_visible = gr.State(False)
-    upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
-    downvote.click(vote, inputs=[gr.State(False), session], outputs=[upvote, downvote])
-    options_visible.change(
-        toggle_options,
-        inputs=[options_visible, gr.State(False)],
-        outputs=[
-            visualization_column,
-            options_visible,
-            toggle_button,
-        ],
-        queue=False,
-    )
-    toggle_click = toggle_button.click(
-        toggle_options,
-        inputs=[options_visible, gr.State(True)],
-        outputs=[
-            visualization_column,
-            options_visible,
-            toggle_button,
-        ],
-        queue=False,
-    )
-    chat_msg = gr.events.on(
-        submit_triggers,
-        process_user_message,
-        [msg, chatbot],
-        [msg, chatbot],
-        queue=False,
-    )
-    bot_msg = chat_msg.then(
-        get_messages,
-        [
-            chatbot,
-            action_messages,
-            browser_history,
-            session,
-            status,
-            agent_selection,
-            model_selection,
-            api_key,
-            options_visible,
-        ],
-        [
-            chatbot,
-            screenshot,
-            url,
-            action_messages,
-            browser_history,
-            session,
-            status,
-            clear,
-            options_visible,
-            upvote,
-            downvote,
-            submit,
-            stop,
-        ],
-        concurrency_limit=args.num_backends,
-    )
-    (
-        stop.click(
-            stop_task,
-            [session],
-            [session, status],
+        with gr.Row():
+            toggle_button = gr.Button('🔍 Show Browser')
+            upvote = gr.Button('👍 Good Response', interactive=False)
+            downvote = gr.Button('👎 Bad Response', interactive=False)
+            clear = gr.Button('🗑️ Clear')
+        status = gr.Markdown('<font size="4"> Agent Status: 🔴 Inactive </font>')
+        browser_history = gr.State([(blank, start_url)])
+        options_visible = gr.State(False)
+        upvote.click(vote, inputs=[gr.State(True), session], outputs=[upvote, downvote])
+        downvote.click(
+            vote, inputs=[gr.State(False), session], outputs=[upvote, downvote]
+        )
+        options_visible.change(
+            toggle_options,
+            inputs=[options_visible, gr.State(False)],
+            outputs=[
+                visualization_column,
+                options_visible,
+                toggle_button,
+            ],
             queue=False,
         )
-        # .then(
-        #     get_messages,
-        #     [
-        #         chatbot,
-        #         action_messages,
-        #         browser_history,
-        #         session,
-        #         status,
-        #         agent_selection,
-        #         model_selection,
-        #         api_key,
-        #         options_visible,
-        #     ],
-        #     [
-        #         chatbot,
-        #         screenshot,
-        #         url,
-        #         action_messages,
-        #         browser_history,
-        #         session,
-        #         status,
-        #         clear,
-        #         options_visible,
-        #         upvote,
-        #         downvote,
-        #         submit,
-        #         stop,
-        #     ],
-        #     concurrency_limit=args.num_backends,
-        # )
-    )
-    (
-        clear.click(
-            clear_page,
-            [browser_history, session],
+        toggle_click = toggle_button.click(
+            toggle_options,
+            inputs=[options_visible, gr.State(True)],
+            outputs=[
+                visualization_column,
+                options_visible,
+                toggle_button,
+            ],
+            queue=False,
+        )
+        chat_msg = gr.events.on(
+            submit_triggers,
+            process_user_message,
+            [msg, chatbot],
+            [msg, chatbot],
+            queue=False,
+        )
+        bot_msg = chat_msg.then(
+            get_messages,
+            [
+                chatbot,
+                action_messages,
+                browser_history,
+                session,
+                status,
+                agent_selection,
+                model_selection,
+                api_key,
+                options_visible,
+            ],
             [
                 chatbot,
                 screenshot,
@@ -937,14 +1083,170 @@ with gr.Blocks() as demo:  # css=css
                 browser_history,
                 session,
                 status,
+                clear,
+                options_visible,
+                upvote,
+                downvote,
+                submit,
+                stop,
             ],
+            concurrency_limit=args.num_backends,
+        )
+        (
+            stop.click(
+                stop_task,
+                [session],
+                [session, status, clear],
+                queue=False,
+            )
+        )
+        (
+            clear.click(
+                clear_page,
+                [browser_history, session],
+                [
+                    chatbot,
+                    screenshot,
+                    url,
+                    action_messages,
+                    browser_history,
+                    session,
+                    status,
+                ],
+                queue=False,
+            ).then(fn=None)
+        )
+        agent_selection.select(
+            check_supported_models,
+            [agent_selection, model_selection, api_key],
+            [model_selection, api_key],
             queue=False,
-        ).then(fn=None)
-    )
-    model_selection.select(
-        check_requires_key, [model_selection, api_key], api_key, queue=False
-    )
+        )
+        model_selection.select(
+            check_requires_key, [model_selection, api_key], api_key, queue=False
+        )
+        tos = gr.Markdown(
+            """\
+<font size="4">
+
+#### Terms of Service
+Users of this website are required to agree to the following terms:\n\n
+This service is a research preview offering limited safety measures and may perform unsafe actions.
+It must not be used for any illegal, harmful, violent, racist, or sexual purposes.
+Please refrain from uploading any private or sensitive information.
+By using this service, you acknowledge that we collect user requests and webpage data (screenshots and text content),
+and reserve the right to distribute this data under Creative Commons Attribution (CC-BY) or a similar license.
+
+#### Please report any bug or issue to our [Discord](https://discord.gg/b5NEhRbvJg)
+
+#### Acknowledgment
+
+We thank the [OpenHands](https://github.com/All-Hands-AI/OpenHands) team for their technical support.
+We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.com/) for their generous sponsorship. Contact us to learn more about partnership.
+
+</font>
+
+<div class="sponsor-image-about">
+    <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
+</div>
+
+"""
+        )
+    with gr.Tab('📖 Instructions'):
+        with gr.Row():
+            instructions = gr.Markdown(
+                """\
+## 📖 How It Works
+<font size="4">
+
+1️⃣ **Choose an Agent & LLM:**
+- Use GPT-4o-mini for free, or bring your own GPT-4o API key for better performance.
+- We are working on enabling other LLMs soon!
+
+2️⃣ **Ask the agent to perform web-related tasks like:**
+- "Use DuckDuckGo to search for the current president of USA."
+- "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
+- "Go to the website of MinnPost, find an article about Trump's second inauguration, and summarize the main points for me."
+
+3️⃣ **Give us a 👍 or 👎 once the agent completes the task!**
+
+**⚠️ Privacy and Data Usage:** Submitted data may be used for research, and user prompts and feedback are logged. Please avoid uploading confidential or personal information.
+## 🔎 Browsing Tips:
+- 🦆 Due to restrictions, the agents are at their best with DuckDuckGo as the search engine.
+- ⚡ Speed may vary depending on backend API load.
+- 🔄 The agent may repeat actions before trying alternative approaches.
+- 🎯 Clearer prompts help — specific websites or detailed instructions improve performance.
+- 🛡️ We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.
+- 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.
+
+</font>
+"""
+            )
+    with gr.Tab('ℹ️ About Us'):
+        with gr.Row():
+            introductions = gr.Markdown(
+                """\
+## About Us
+
+<font size="4">
+
+EasyWeb is an open platform for building and serving AI web agents, hosted by students at CMU [Sailing Lab](https://sailing-lab.github.io/) and UCSD [Maitrix Team](https://maitrix.org/).
+We open-source the [EasyWeb](https://github.com/maitrix-org/easyweb) project at Github, and always welcome contributions from the community.
+If you are interested in collaboration, please contact us, we'd love to hear from you!
+
+</font>
+
+### Open-Source Contributors
+
+<font size="4">
+
+- Contributors: [Mingkai Deng](https://mingkaid.github.io/), [Jackie Wang](https://www.linkedin.com/in/yikunjwang/), [Mason Choey](https://www.linkedin.com/in/mason-choey-9a6657325/), [Ariel Wu](https://www.linkedin.com/in/ariel-wu-63624716b/), [Brandon Chiou](https://www.linkedin.com/in/brandon-chiou/), [Jinyu Hou](https://www.linkedin.com/in/jinyu-hou-uoft/)
+- Advisors: [Zhiting Hu](https://zhiting.ucsd.edu/), [Hongxia Jin](https://www.linkedin.com/in/hongxiajin/), [Li Erran Li](https://www.cs.columbia.edu/~lierranli/), [Graham Neubig](https://www.phontron.com/), [Yilin Shen](https://www.linkedin.com/in/yilin-shen-65a56622/), [Eric P. Xing](https://www.cs.cmu.edu/~epxing/)
+
+📩 **Correspondence to**: [Mingkai Deng](mailto:mingkaid34@gmail.com) and [Jackie Wang](mailto:yikunjwang@gmail.com)
+
+</font>
+
+### Contact Us
+
+<font size="4">
+
+- Follow our [X](https://x.com/MaitrixOrg) and [Discord](https://discord.gg/b5NEhRbvJg)
+- File issues on [Github](https://github.com/maitrix-org/easyweb)
+
+</font>
+
+### Acknowledgment
+
+<font size="4">
+
+We thank the [OpenHands](https://github.com/All-Hands-AI/OpenHands) team for their technical support.
+We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.com/) for their generous sponsorship. Contact us to learn more about partnership.
+
+</font>
+
+<div class="sponsor-image-about">
+    <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
+</div>
+"""
+            )
+    # demo.load(None, None, None, js=tos_popup_js + ga_head_snippet)
+    demo.load(None, None, None, js=combined_js)
+    demo.unload(unload_fn)
 
 if __name__ == '__main__':
     demo.queue()
-    demo.launch(share=True)
+    if args.ip and args.port:
+        demo.launch(
+            share=False,
+            server_name=args.ip,
+            server_port=args.port,
+            favicon_path='./frontend-icon.png',
+            ssl_certfile=args.ssl_certfile,
+            ssl_keyfile=args.ssl_keyfile,
+            ssl_verify=args.ssl_verify,
+        )
+    else:
+        demo.launch(share=True, favicon_path='./frontend-icon.png')

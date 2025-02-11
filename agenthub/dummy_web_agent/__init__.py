@@ -1,4 +1,4 @@
-from fast_web.controller.agent import Agent
+from easyweb.controller.agent import Agent
 
 from .dummy_web_agent import DummyWebAgent
 
