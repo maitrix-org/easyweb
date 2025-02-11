@@ -275,10 +275,14 @@ def get_messages(
 ):
     model_selection = model_display2name[model_selection]
     user_message = None
+    thinking_flag = False
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
         if chat_history[-1]['role'] == 'user':
             user_message = chat_history[-1]['content']
+            loading_message = gr.ChatMessage(role='assistant', content='⏳ Thinking...')
+            chat_history.append(loading_message)
+            thinking_flag = True  # so i can know if i need to remove the last message
 
     # Initialize a new session if it doesn't exist
     if session is None or session.agent_state in ['finished', 'paused']:
@@ -350,6 +354,7 @@ def get_messages(
                     if user_message_count == 2:
                         last_user_index = i
                         break
+
                 # keep most recent message
                 chat_history = chat_history[:last_user_index] + chat_history[-1:]
                 session._reset()
@@ -438,7 +443,12 @@ def get_messages(
             clear = gr.Button('🗑️ Clear', interactive=finished)
             upvote = gr.Button('👍 Good Response', interactive=finished)
             downvote = gr.Button('👎 Bad Response', interactive=finished)
+
             if message.get('action', '') in ['message', 'finish']:
+                if thinking_flag:
+                    chat_history = chat_history[:-1]
+                    thinking_flag = False
+
                 chat_history.append(gr.ChatMessage(role='assistant', content=''))
                 assistant_message = message.get('message', '(Empty Message)')
                 assistant_message_chars = []
@@ -471,6 +481,9 @@ def get_messages(
                 and message.get('action', '') == 'browse_interactive'
                 and message.get('args', {}).get('thought', '')
             ):
+                if thinking_flag:
+                    chat_history = chat_history[:-1]
+                    thinking_flag = False
                 full_output_dict = json.loads(message['args']['thought'])
                 plan = full_output_dict.get('plan')
                 if plan:
@@ -506,6 +519,9 @@ def get_messages(
                 and message.get('action', '') == 'browse_interactive'
                 and message.get('args', {}).get('thought', '')
             ):
+                if thinking_flag:
+                    chat_history = chat_history[:-1]
+                    thinking_flag = False
                 thought = message['args']['thought']
                 chat_history.append(gr.ChatMessage(role='assistant', content=thought))
 
@@ -671,6 +687,7 @@ def process_user_message(user_message, history):
     if not user_message.strip():
         return '', history
     chat_message = gr.ChatMessage(role='user', content=user_message)
+
     history.append(chat_message)
 
     return '', history
@@ -748,7 +765,8 @@ with gr.Blocks() as demo:  # css=css
     title = gr.Markdown(
         '# 🚀 Fast Web: Open Platform for Building and Serving UI Agents'
     )
-    tutorial1 = gr.Markdown("""- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
+    tutorial1 = gr.Markdown(
+        """- 🔑 **Choose** an **Agent**, an **LLM**, and provide an **API Key** if required.
                             - 💬 **Ask the Agent** to perform advanced web-related tasks, **for example:**
                                 - "Can you search for a round-trip flight from Chicago to Dubai in business class?"
                                 - "I want to buy a black mattress. Find one black mattress option from Amazon and eBay?"
@@ -756,7 +774,8 @@ with gr.Blocks() as demo:  # css=css
                             - ✍️ **Share your feedback** by giving us a 👍 or 👎 once the Agent completes its task!
                             - **⚠️ Data Usage:** Data submitted may be used for research purposes. Please avoid uploading confidential or personal information. User prompts and feedback are logged.\n
                             - **🛡️ Privacy and Integrity:** We honor site protections like CAPTCHAs and anti-bot measures to maintain user and website integrity.\n
-                            - Currently, the agent will only be able to see **up to the latest message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**""")
+                            - Currently, the agent will only be able to see **up to the latest message**. We have plans to support **multi-turn interaction** going forward. **Stay tuned!**"""
+    )
 
     with gr.Row(equal_height=False):
         with gr.Column(scale=2):
