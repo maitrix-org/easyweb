@@ -310,16 +310,25 @@ def get_messages(
         # check to see if user has sent a message previously
         if chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] != '':
             user_message = chat_history[-1]['content']
-            loading_message = gr.ChatMessage(role='assistant', content='⏳ Thinking...')
-            chat_history.append(loading_message)
             thinking_flag = True  # so i can know if i need to remove the last message
 
+    # stop_flag = False
+    browser_starting_flag = False
     # Initialize a new session if it doesn't exist
     if (
         session is None
         or session.agent_state is None
         or session.agent_state in ['finished', 'stopped']
     ):
+        loading_message = gr.ChatMessage(
+            role='assistant', content='⏳ Browser Starting...'
+        ).__dict__
+        chat_history.append(loading_message)
+        browser_starting_flag = True
+
+        if session is not None and session.agent_state is not None:
+            stop_flag = session.agent_state == 'stopped'
+
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
@@ -335,7 +344,12 @@ def get_messages(
             del global_sessions[request.session_hash]
             session.agent_state = None
             chat_history = chat_history[:-1]
-    stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
+
+    if thinking_flag and not browser_starting_flag:
+        loading_message = gr.ChatMessage(
+            role='assistant', content='⏳ Thinking...'
+        ).__dict__
+        chat_history.append(loading_message)
 
     if (
         session.agent_state is None or session.agent_state in ['finished', 'stopped']
@@ -380,56 +394,59 @@ def get_messages(
             'init',
             'running',
         ]:
-            if stop_flag:
-                stop_flag = False
-                finished = session.agent_state in ['finished', 'stopped']
-                clear = gr.Button('🗑️ Clear', interactive=finished)
-                screenshot, url = browser_history[-1]
-                # find 2nd last index of last user message
-                last_user_index = None
-                user_message_count = 0
-                for i in range(len(chat_history) - 1, -1, -1):
-                    msg = chat_history[i]
-                    if msg['role'] == 'user':
-                        user_message_count += 1
-                    if user_message_count == 2:
-                        last_user_index = i
-                        break
+            # if stop_flag:
+            #     print(chat_history, 'chat history bruh')
+            #     stop_flag = False
+            #     finished = session.agent_state in ['finished', 'stopped']
+            #     clear = gr.Button('🗑️ Clear', interactive=finished)
+            #     screenshot, url = browser_history[-1]
+            #     # find 2nd last index of last user message
+            #     last_user_index = None
+            #     user_message_count = 0
+            #     print(chat_history, "bruh")
+            #     for i in range(len(chat_history) - 1, -1, -1):
+            #         msg = chat_history[i]
+            #         if msg['role'] == 'user':
+            #             user_message_count += 1
+            #         if user_message_count == 2:
+            #             last_user_index = i
+            #             break
 
-                # keep most recent message
-                chat_history = chat_history[:last_user_index] + chat_history[-1:]
-                session._reset()
-                action_messages = []
+            #     # keep most recent message
+            #     chat_history = chat_history[:last_user_index] + chat_history[-1:]
+            #     print(chat_history, "oi oi oi ")
+            #     session._reset()
+            #     action_messages = []
 
-                submit = gr.Button(
-                    'Submit',
-                    variant='primary',
-                    scale=1,
-                    min_width=150,
-                    visible=session.agent_state != 'running',
-                )
-                stop = gr.Button(
-                    'Stop',
-                    scale=1,
-                    min_width=150,
-                    visible=session.agent_state == 'running',
-                )
+            #     submit = gr.Button(
+            #         'Submit',
+            #         variant='primary',
+            #         scale=1,
+            #         min_width=150,
+            #         visible=session.agent_state != 'running',
+            #     )
+            #     stop = gr.Button(
+            #         'Stop',
+            #         scale=1,
+            #         min_width=150,
+            #         visible=session.agent_state == 'running',
+            #     )
 
-                yield (
-                    chat_history,
-                    screenshot,
-                    url,
-                    [],
-                    browser_history,
-                    session,
-                    status,
-                    clear,
-                    options_visible,
-                    upvote,
-                    downvote,
-                    submit,
-                    stop,
-                )
+            #     yield (
+            #         chat_history,
+            #         screenshot,
+            #         url,
+            #         [],
+            #         browser_history,
+            #         session,
+            #         status,
+            #         clear,
+            #         options_visible,
+            #         upvote,
+            #         downvote,
+            #         submit,
+            #         stop,
+            #     )
 
             session.agent = agent_selection
             session.model = model_selection
@@ -481,6 +498,15 @@ def get_messages(
 
         website_counter = 0
         message_list = []
+        if thinking_flag:
+            if browser_starting_flag:
+                chat_history = chat_history[:-1]
+                browser_starting_flag = False
+            loading_message = gr.ChatMessage(
+                role='assistant', content='⏳ Thinking...'
+            ).__dict__
+            chat_history.append(loading_message)
+
         for message in session.run(user_message, request):
             message_list.append(message['message'])
             if website_counter == 1:
@@ -770,11 +796,12 @@ def display_history(history, messages_history, action_messages):
     return history
 
 
-def process_user_message(user_message, history):
+def process_user_message(user_message, history, session):
     if not user_message.strip():
         chat_message = gr.ChatMessage(role='user', content='')
         history.append(chat_message)
         return '', history
+
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
 
@@ -1058,7 +1085,7 @@ Include specific websites or detailed instructions in your prompt for more consi
         chat_msg = gr.events.on(
             submit_triggers,
             process_user_message,
-            [msg, chatbot],
+            [msg, chatbot, session],
             [msg, chatbot],
             queue=False,
         )
