@@ -305,12 +305,10 @@ def get_messages(
     print(api_key)
 
     user_message = None
-    thinking_flag = False
     if len(chat_history) > 0:
         # check to see if user has sent a message previously
         if chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] != '':
             user_message = chat_history[-1]['content']
-            thinking_flag = True  # so i can know if i need to remove the last message
 
     # stop_flag = False
     browser_starting_flag = False
@@ -326,8 +324,8 @@ def get_messages(
         chat_history.append(loading_message)
         browser_starting_flag = True
 
-        if session is not None and session.agent_state is not None:
-            stop_flag = session.agent_state == 'stopped'
+        # if session is not None and session.agent_state is not None:
+        #     stop_flag = session.agent_state == 'stopped'
 
         new_session = EasyWebSession(
             agent=agent_selection,
@@ -344,12 +342,6 @@ def get_messages(
             del global_sessions[request.session_hash]
             session.agent_state = None
             chat_history = chat_history[:-1]
-
-    if thinking_flag and not browser_starting_flag:
-        loading_message = gr.ChatMessage(
-            role='assistant', content='⏳ Thinking...'
-        ).__dict__
-        chat_history.append(loading_message)
 
     if (
         session.agent_state is None or session.agent_state in ['finished', 'stopped']
@@ -394,71 +386,9 @@ def get_messages(
             'init',
             'running',
         ]:
-            # if stop_flag:
-            #     print(chat_history, 'chat history bruh')
-            #     stop_flag = False
-            #     finished = session.agent_state in ['finished', 'stopped']
-            #     clear = gr.Button('🗑️ Clear', interactive=finished)
-            #     screenshot, url = browser_history[-1]
-            #     # find 2nd last index of last user message
-            #     last_user_index = None
-            #     user_message_count = 0
-            #     print(chat_history, "bruh")
-            #     for i in range(len(chat_history) - 1, -1, -1):
-            #         msg = chat_history[i]
-            #         if msg['role'] == 'user':
-            #             user_message_count += 1
-            #         if user_message_count == 2:
-            #             last_user_index = i
-            #             break
-
-            #     # keep most recent message
-            #     chat_history = chat_history[:last_user_index] + chat_history[-1:]
-            #     print(chat_history, "oi oi oi ")
-            #     session._reset()
-            #     action_messages = []
-
-            #     submit = gr.Button(
-            #         'Submit',
-            #         variant='primary',
-            #         scale=1,
-            #         min_width=150,
-            #         visible=session.agent_state != 'running',
-            #     )
-            #     stop = gr.Button(
-            #         'Stop',
-            #         scale=1,
-            #         min_width=150,
-            #         visible=session.agent_state == 'running',
-            #     )
-
-            #     yield (
-            #         chat_history,
-            #         screenshot,
-            #         url,
-            #         [],
-            #         browser_history,
-            #         session,
-            #         status,
-            #         clear,
-            #         options_visible,
-            #         upvote,
-            #         downvote,
-            #         submit,
-            #         stop,
-            #     )
-
             session.agent = agent_selection
             session.model = model_selection
             session.api_key = api_key
-            # if model_requires_key[model_selection]:
-            #     session.api_key = api_key
-            # elif model_port_config[model_selection].get('default_key', None):
-            #     session.api_key = model_port_config[model_selection].get(
-            #         'default_key', None
-            #     )
-            # else:
-            #     session.api_key = ''
 
             print('API Key:', session.api_key)
             action_messages = []
@@ -498,16 +428,21 @@ def get_messages(
 
         website_counter = 0
         message_list = []
-        if thinking_flag:
+
+        for message in session.run(user_message, request):
             if browser_starting_flag:
                 chat_history = chat_history[:-1]
                 browser_starting_flag = False
-            loading_message = gr.ChatMessage(
-                role='assistant', content='⏳ Thinking...'
-            ).__dict__
-            chat_history.append(loading_message)
 
-        for message in session.run(user_message, request):
+            if 'observation' in message:
+                if not message.get('extras', {}).get('agent_state') == 'stopped':
+                    loading_message = gr.ChatMessage(
+                        role='assistant', content='⏳ Thinking...'
+                    ).__dict__
+                    chat_history.append(loading_message)
+            elif 'action' in message:
+                chat_history = chat_history[:-1]
+
             message_list.append(message['message'])
             if website_counter == 1:
                 options_visible = True
@@ -517,10 +452,6 @@ def get_messages(
             downvote = gr.Button('👎 Bad Response', interactive=finished)
 
             if message.get('action', '') in ['message', 'finish']:
-                if thinking_flag:
-                    chat_history = chat_history[:-1]
-                    thinking_flag = False
-
                 chat_history.append(gr.ChatMessage(role='assistant', content=''))
                 assistant_message = message.get('message', '(Empty Message)')
                 assistant_message_chars = []
@@ -553,9 +484,10 @@ def get_messages(
                 and message.get('action', '') == 'browse_interactive'
                 and message.get('args', {}).get('thought', '')
             ):
-                if thinking_flag:
-                    chat_history = chat_history[:-1]
-                    thinking_flag = False
+                # if browser_starting_flag:
+                #     chat_history = chat_history[:-1]
+                #     browser_starting_flag = False
+
                 full_output_dict = json.loads(message['args']['thought'])
                 plan = full_output_dict.get('plan', message['message'])
 
@@ -591,9 +523,10 @@ def get_messages(
                 and message.get('action', '') == 'browse_interactive'
                 # and message.get('args', {}).get('thought', '')
             ):
-                if thinking_flag:
-                    chat_history = chat_history[:-1]
-                    thinking_flag = False
+                # if browser_starting_flag:
+                #     chat_history = chat_history[:-1]
+                #     browser_starting_flag = False
+
                 thought = message.get('args', {}).get('thought', '')
                 if not thought:
                     thought = message['message']
