@@ -22,9 +22,13 @@
   <img src="./easy-web-icon.png" alt="Easy Web Logo" width="200">
   <h1 align="center">EasyWeb: Web Agents at Your Fingertips</h1>
   <!-- Change based on updated links or names in the future -->
+  <a href="https://easyweb.maitrix.org"><img src="https://img.shields.io/badge/Demo-Up-green?logo=gradio&logoColor=white&style=for-the-badge" alt="Try out our public demo"></a>
   <a href="https://discord.gg/b5NEhRbvJg"><img src="https://img.shields.io/badge/Discord-Join-blue?logo=discord&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a>
+  <a href="https://x.com/MaitrixOrg"><img src="https://img.shields.io/badge/Maitrix.org-Follow-black?logo=x&logoColor=white&style=for-the-badge" alt="Join our Discord community"></a>
 </div>
 <!-- <hr> -->
+
+<br>
 
 EasyWeb is an open platform for building and serving AI agents that interact with web browsers.
 
@@ -37,29 +41,31 @@ EasyWeb is an open platform for building and serving AI agents that interact wit
 
 ## Demos
 
+**Note:** The demos below were recorded using **ReasonerAgent with World Model Planning (Full)** and **GPT-4o** between January 2 and 21, 2025. Specific websites and more detailed instructions were included in the prompts to help guide the agent's behavior.
+
 **Task:** Plan a travel from Pittsburgh to ICML 2025.
 
-https://github.com/user-attachments/assets/10f9c919-38c7-47f2-8b36-e27bce95dfed
+https://github.com/user-attachments/assets/6fd43d9c-2945-4a4c-ae33-5148df91aa66
 
 <details>
 <summary><b>Expand to see more demos</b></summary>
 
 **Task:** Find a round-trip ticket from Chicago to Dubai next month, traveling in economy class, with non-stop flights only, departing after 8 AM, and returning within two weeks.
 
-https://github.com/user-attachments/assets/11daf670-86ae-4b6c-ab93-ff7d4504a751
+https://github.com/user-attachments/assets/0a50df50-52eb-423f-a270-7d25ab783fee
 
 **Task:** I want to buy a black mattress. Can you look at Amazon, eBay, and Mattress Firm and give me one good option from each?
 
-https://github.com/user-attachments/assets/6864940b-0f00-445f-985f-00bcf4480d79
+https://github.com/user-attachments/assets/3fd31131-3262-492b-a86d-a36d209417ee
 
 **Task:** I'd like to learn how local news outlets covered Trump's inauguration. Please find one article from each of the following websites: *Times of San Diego*, *The Tennessee Tribune*, and *MinnPost*, and summarize the details to me.
 
-https://github.com/user-attachments/assets/9d2f9dfa-9e39-43e6-8750-d494eaf00795
+https://github.com/user-attachments/assets/ce822017-4603-48d4-b400-07fe32db6803
 
 </details>
 
 ## News
-- [2025/01] We released **ReasonerAgent: A Training-Free UI Agent That Exceeds GPT-4o-Based Agents by Up to 124%**. Check out the blog [post](about:blank)
+- [2025/02] We released **ReasonerAgent: A Fully Open Source, Ready-to-Run Agent That Does Research in a Web Browser and Answers Your Queries**. Check out the blog [post](https://reasoner-agent.maitrix.org/)
 
 ## Getting Started
 
