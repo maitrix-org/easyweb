@@ -430,10 +430,6 @@ def get_messages(
         website_counter = 0
         message_list = []
         for message in session.run(user_message, request):
-            if 'action' in message and browser_starting_flag:
-                chat_history = chat_history[:-1]
-                browser_starting_flag = False
-
             if not browser_starting_flag:
                 if 'observation' in message:
                     if not message.get('extras', {}).get('agent_state') == 'stopped':
@@ -443,6 +439,10 @@ def get_messages(
                         chat_history.append(loading_message)
                 elif 'action' in message:
                     chat_history = chat_history[:-1]
+
+            if 'action' in message and browser_starting_flag:
+                chat_history = chat_history[:-1]
+                browser_starting_flag = False
 
             message_list.append(message['message'])
             if website_counter == 1:
