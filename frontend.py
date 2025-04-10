@@ -744,15 +744,13 @@ def display_history(history, messages_history, action_messages):
     return history
 
 
-def process_user_message(user_message, history, session):
+def process_user_message(user_message, history):
     if not user_message.strip():
         chat_message = gr.ChatMessage(role='user', content='')
         history.append(chat_message)
         return '', history
-
     chat_message = gr.ChatMessage(role='user', content=user_message)
     history.append(chat_message)
-
     return '', history
 
 
@@ -1068,7 +1066,7 @@ Include specific websites or detailed instructions in your prompt for more consi
         chat_msg = gr.events.on(
             submit_triggers,
             process_user_message,
-            [msg, chatbot, session],
+            [msg, chatbot],
             [msg, chatbot],
             queue=False,
         )
