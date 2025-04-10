@@ -58,11 +58,11 @@ class BackendManager:
             return None
 
     def release_backend(self, port):
-        if port in self.available_ports.queue:
-            print(f'{port} already available')
-        else:
+        try:
             self.available_ports.put(port, block=True)
             print(f'Released backend on port {port}')
+        except Exception as e:
+            print(f'Error releasing backend: {e}')
 
 
 backend_manager = BackendManager(backend_ports)
