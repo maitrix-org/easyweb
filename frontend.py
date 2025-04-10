@@ -325,9 +325,6 @@ def get_messages(
         chat_history.append(loading_message)
         browser_starting_flag = True
 
-        # if session is not None and session.agent_state is not None:
-        #     stop_flag = session.agent_state == 'stopped'
-
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
