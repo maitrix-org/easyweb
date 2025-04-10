@@ -612,6 +612,21 @@ def clear_page(browser_history, session):
     else:
         status = get_status(None)
 
+    text_input = gr.Textbox(
+        container=False, show_label=False, scale=7, interactive=True
+    )
+
+    submit = gr.Button(
+        'Submit',
+        variant='primary',
+        scale=1,
+        min_width=150,
+        interactive=True,
+        visible=True,
+    )
+
+    stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
+
     return (
         None,
         current_screenshot,
@@ -620,6 +635,13 @@ def clear_page(browser_history, session):
         browser_history,
         session,
         status,
+        clear,
+        options_visible,
+        upvote,
+        downvote,
+        text_input,
+        submit,
+        stop,
     )
 
 
@@ -739,7 +761,22 @@ def stop_task(session):
     session.stop()
     status = get_status(session.agent_state)
     clear = gr.Button('🗑️ Clear', interactive=True)
-    return session, status, clear
+
+    text_input = gr.Textbox(
+        container=False, show_label=False, scale=7, interactive=True
+    )
+
+    submit = gr.Button(
+        'Submit',
+        variant='primary',
+        scale=1,
+        min_width=150,
+        interactive=True,
+        visible=True,
+    )
+
+    stop = gr.Button('Stop', scale=1, min_width=150, visible=False)
+    return session, status, clear, text_input, submit, stop
 
 
 # toggle hiding and showing the browser. IfClick is basically because I call
@@ -762,6 +799,18 @@ def unload_fn(request: gr.Request):
         global_sessions[request.session_hash].stop()
         backend_manager.release_backend(global_sessions[request.session_hash].port)
         del global_sessions[request.session_hash]
+
+
+def disable_input_and_submit():
+    disabled_input = gr.Textbox(
+        container=False, show_label=False, scale=7, interactive=False
+    )
+
+    disabled_submit = gr.Button(
+        'Submit', variant='primary', scale=1, min_width=150, interactive=False
+    )
+
+    return disabled_input, disabled_submit
 
 
 current_dir = os.path.dirname(__file__)
@@ -1023,7 +1072,15 @@ Include specific websites or detailed instructions in your prompt for more consi
             [msg, chatbot],
             queue=False,
         )
-        bot_msg = chat_msg.then(
+
+        disable_inputs = chat_msg.then(
+            disable_input_and_submit,
+            inputs=[],
+            outputs=[msg, submit],
+            queue=False,
+        )
+
+        bot_msg = disable_inputs.then(
             get_messages,
             [
                 chatbot,
@@ -1057,7 +1114,7 @@ Include specific websites or detailed instructions in your prompt for more consi
             stop.click(
                 stop_task,
                 [session],
-                [session, status, clear],
+                [session, status, clear, msg, submit, stop],
                 queue=False,
             )
         )
@@ -1073,8 +1130,16 @@ Include specific websites or detailed instructions in your prompt for more consi
                     browser_history,
                     session,
                     status,
+                    clear,
+                    options_visible,
+                    upvote,
+                    downvote,
+                    msg,
+                    submit,
+                    stop,
                 ],
                 queue=False,
+                cancels=[bot_msg],
             ).then(fn=None)
         )
         agent_selection.select(
