@@ -311,12 +311,20 @@ def get_messages(
         if chat_history[-1]['role'] == 'user' and chat_history[-1]['content'] != '':
             user_message = chat_history[-1]['content']
 
+    # stop_flag = False
+    browser_starting_flag = False
     # Initialize a new session if it doesn't exist
     if (
         session is None
         or session.agent_state is None
         or session.agent_state in ['finished', 'stopped']
     ):
+        loading_message = gr.ChatMessage(
+            role='assistant', content='⏳ Browser Starting...'
+        ).__dict__
+        chat_history.append(loading_message)
+        browser_starting_flag = True
+
         new_session = EasyWebSession(
             agent=agent_selection,
             port=backend_manager.acquire_backend(),
@@ -332,7 +340,6 @@ def get_messages(
             del global_sessions[request.session_hash]
             session.agent_state = None
             chat_history = chat_history[:-1]
-    stop_flag = session.agent_state is not None and session.agent_state == 'stopped'
 
     if (
         session.agent_state is None or session.agent_state in ['finished', 'stopped']
@@ -377,67 +384,9 @@ def get_messages(
             'init',
             'running',
         ]:
-            if stop_flag:
-                stop_flag = False
-                finished = session.agent_state in ['finished', 'stopped']
-                clear = gr.Button('🗑️ Clear', interactive=finished)
-                screenshot, url = browser_history[-1]
-                # find 2nd last index of last user message
-                last_user_index = None
-                user_message_count = 0
-                for i in range(len(chat_history) - 1, -1, -1):
-                    msg = chat_history[i]
-                    if msg['role'] == 'user':
-                        user_message_count += 1
-                    if user_message_count == 2:
-                        last_user_index = i
-                        break
-                # keep most recent message
-                chat_history = chat_history[:last_user_index] + chat_history[-1:]
-                session._reset()
-                action_messages = []
-
-                submit = gr.Button(
-                    'Submit',
-                    variant='primary',
-                    scale=1,
-                    min_width=150,
-                    visible=session.agent_state != 'running',
-                )
-                stop = gr.Button(
-                    'Stop',
-                    scale=1,
-                    min_width=150,
-                    visible=session.agent_state == 'running',
-                )
-
-                yield (
-                    chat_history,
-                    screenshot,
-                    url,
-                    [],
-                    browser_history,
-                    session,
-                    status,
-                    clear,
-                    options_visible,
-                    upvote,
-                    downvote,
-                    submit,
-                    stop,
-                )
-
             session.agent = agent_selection
             session.model = model_selection
             session.api_key = api_key
-            # if model_requires_key[model_selection]:
-            #     session.api_key = api_key
-            # elif model_port_config[model_selection].get('default_key', None):
-            #     session.api_key = model_port_config[model_selection].get(
-            #         'default_key', None
-            #     )
-            # else:
-            #     session.api_key = ''
 
             print('API Key:', session.api_key)
             action_messages = []
@@ -478,14 +427,28 @@ def get_messages(
         website_counter = 0
         message_list = []
         for message in session.run(user_message, request):
+            if not browser_starting_flag:
+                if 'observation' in message:
+                    if not message.get('extras', {}).get('agent_state') == 'stopped':
+                        loading_message = gr.ChatMessage(
+                            role='assistant', content='⏳ Thinking...'
+                        ).__dict__
+                        chat_history.append(loading_message)
+                elif 'action' in message:
+                    chat_history = chat_history[:-1]
+
+            if 'action' in message and browser_starting_flag:
+                chat_history = chat_history[:-1]
+                browser_starting_flag = False
+
             message_list.append(message['message'])
             if website_counter == 1:
                 options_visible = True
-
             finished = session.agent_state in ['finished', 'stopped']
             clear = gr.Button('🗑️ Clear', interactive=finished)
             upvote = gr.Button('👍 Good Response', interactive=finished)
             downvote = gr.Button('👎 Bad Response', interactive=finished)
+
             if message.get('action', '') in ['message', 'finish']:
                 chat_history.append(gr.ChatMessage(role='assistant', content=''))
                 assistant_message = message.get('message', '(Empty Message)')
@@ -988,16 +951,19 @@ with gr.Blocks(
     with gr.Tab('🌐 EasyWeb'):
         action_messages = gr.State([])
         session = gr.State(None)
-        title = gr.Markdown("""\
+        title = gr.Markdown(
+            """\
 # 🌐 EasyWeb: AI-Powered Web Agents at Your Fingertips
 <font size="4">
 
 [X](https://x.com/MaitrixOrg) | [Discord](https://discord.gg/b5NEhRbvJg) | [GitHub](https://github.com/maitrix-org/easyweb)
 
 </font>
-""")
+"""
+        )
 
-        description = gr.Markdown("""\
+        description = gr.Markdown(
+            """\
 
 <font size="4">
 
@@ -1014,7 +980,8 @@ Include specific websites or detailed instructions in your prompt for more consi
 **❗ This is currently an early research preview, where agents may make mistakes or have challenges navigating certain websites. For research purposes, we log user prompts and feedback and may release to the public in the future. Please do not upload any confidential or personal information.**
 
 </font>
-""")
+"""
+        )
 
         with gr.Group():
             with gr.Row():
@@ -1179,7 +1146,8 @@ Include specific websites or detailed instructions in your prompt for more consi
         model_selection.select(
             check_requires_key, [model_selection, api_key], api_key, queue=False
         )
-        tos = gr.Markdown("""\
+        tos = gr.Markdown(
+            """\
 <font size="4">
 
 #### Terms of Service
@@ -1204,10 +1172,12 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
 
-""")
+"""
+        )
     with gr.Tab('📖 Instructions'):
         with gr.Row():
-            instructions = gr.Markdown("""\
+            instructions = gr.Markdown(
+                """\
 ## 📖 How It Works
 <font size="4">
 
@@ -1232,10 +1202,12 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
 - 💡 The agent currently only sees **up to the latest user message**. Stay tuned as we work on enabling multi-turn interactions.
 
 </font>
-""")
+"""
+            )
     with gr.Tab('ℹ️ About Us'):
         with gr.Row():
-            introductions = gr.Markdown("""\
+            introductions = gr.Markdown(
+                """\
 ## About Us
 
 <font size="4">
@@ -1279,7 +1251,8 @@ We also thank [MBZUAI](https://mbzuai.ac.ae/) and [Samsung](https://www.samsung.
     <img src="https://storage.googleapis.com/public-arena-asset/mbzuai.jpeg" alt="MBZUAI" style="width: 150px; height: auto;">
     <img src="https://upload.wikimedia.org/wikipedia/commons/f/f1/Samsung_logo_blue.png" alt="Samsung" style="width: 150px; height: auto;">
 </div>
-""")
+"""
+            )
     demo.load(None, None, None, js=tos_popup_js)
     demo.unload(unload_fn)
 
